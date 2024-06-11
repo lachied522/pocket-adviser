@@ -44,7 +44,7 @@ export default function SearchBar() {
                 </Button>
             </div>
 
-            {(query.length && results.length > 0) && (
+            {query.length > 0 && results.length > 0 && (
             <SearchResults data={results} />
             )}
         </div>

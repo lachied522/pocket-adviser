@@ -1,12 +1,11 @@
+import { cn } from "@/lib/utils";
 
-interface ContainerProps {
-    children: React.ReactNode
-}
+interface ContainerProps extends React.HTMLProps<HTMLDivElement>{};
 
-export default function Container({ children }: ContainerProps) {
+export default function Container({ children, className, ...props }: ContainerProps) {
 
     return (
-        <div className='container'>
+        <div className={cn('container', className)}>
             {children}
         </div>
     )
