@@ -23,13 +23,13 @@ export default function PortfolioTable() {
             // check that symbol is not already in populated holdings
             // if (populatedHoldings.find((obj) => obj.symbol === holding.symbol)) return;
 
-            const data = await getStockData(holding.symbol);
+            const data = await getStockData(holding.stockId);
             const populatedHolding = { ...holding, ...data };
             setPopulatedHoldings((curr) => {
-                const _holding = curr.find((obj) => obj.symbol === holding.symbol);
+                const _holding = curr.find((obj) => obj.id === holding.stockId);
                 if (_holding) {
                     // update existing holding instead of appending new one
-                    return curr.map((obj) => obj.symbol === holding.symbol? populatedHolding: obj);
+                    return curr.map((obj) => obj.id === holding.stockId? populatedHolding: obj);
                 }
                 return [...curr, populatedHolding];
             });

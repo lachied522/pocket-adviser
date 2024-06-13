@@ -5,7 +5,6 @@ const USDollar = new Intl.NumberFormat("en-US", {
     currency: "USD",
 });
 
-
 export function formatDollar(value: number) {
     return USDollar.format(value);
 }

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/utils";
 
 interface ContainerProps extends React.HTMLProps<HTMLDivElement>{};
 

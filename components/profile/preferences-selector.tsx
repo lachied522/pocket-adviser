@@ -2,7 +2,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/utils";
 
 const SECTORS = [
   {

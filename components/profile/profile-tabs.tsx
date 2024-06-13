@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/utils";
 import { Button } from "@/components/ui/button";
 import { H3 } from "@/components/typography";
 

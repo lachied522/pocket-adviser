@@ -26,34 +26,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { type GlobalState, useGlobalContext } from "@/app/context/GlobalContext";
-
+import type { Stock } from "@prisma/client";
+import { useRef } from "react";
 
 const formSchema = z.object({
-    symbol: z.string().min(1, {
-        message: "Required"
-    }),
+    stockId: z.number(),
     units: z.coerce.number().min(1, {
       message: "Units required",
     }),
-  })
+});
 
 interface AddStockDialogProps {
     children: React.ReactNode
-    symbol: string
+    data: Stock
 }
 
-export default function AddHoldingDialog({ children, symbol }: AddStockDialogProps) {
+export default function AddHoldingDialog({ children, data }: AddStockDialogProps) {
     const { insertHoldingAndUpdateState } = useGlobalContext() as GlobalState;
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            symbol: symbol.toUpperCase(),
+            stockId: data.id,
             units: 1,
         },
     });
+    const closeRef = useRef<HTMLButtonElement>(null);
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        insertHoldingAndUpdateState({ ...values });
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        await insertHoldingAndUpdateState({ ...values });
+        // close dialog
+        if (closeRef.current) closeRef.current.click();
     }
 
     return (
@@ -64,29 +66,23 @@ export default function AddHoldingDialog({ children, symbol }: AddStockDialogPro
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Add {symbol} To Your Portfolio
+                        Add {data.symbol.toUpperCase()} To Your Portfolio
                     </DialogTitle>
                 </DialogHeader>
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-3.5'>
-                        <FormField
-                            control={form.control}
-                            name="symbol"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Symbol</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="AAPL"
-                                            disabled
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <FormItem>
+                            <FormLabel>Symbol</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="AAPL"
+                                    disabled
+                                    value={data.symbol.toUpperCase()}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
 
                         <FormField
                             control={form.control}
@@ -110,10 +106,13 @@ export default function AddHoldingDialog({ children, symbol }: AddStockDialogPro
                             )}
                         />
 
-
                         <div className='flex flex-row justify-between'>
                             <DialogClose asChild>
-                                <Button type='button' variant='secondary'>
+                                <Button
+                                    ref={closeRef}
+                                    type='button'
+                                    variant='secondary'
+                                >
                                     Cancel
                                 </Button>
                             </DialogClose>

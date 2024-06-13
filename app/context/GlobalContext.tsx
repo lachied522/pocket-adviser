@@ -5,13 +5,14 @@ import {
   useCallback,
   useContext,
   useReducer,
-  useEffect
+  useEffect,
+  useMemo
 } from "react";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
-import { getStock } from "../actions/stocks";
-import { deleteHolding, getHoldings, insertHolding, updateHolding } from "../actions/crud/holdings";
+import { getStockByIdAction } from "../actions/stocks";
+import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "../actions/holdings";
 
 import type { Holding, Stock } from "@prisma/client";
 
@@ -19,9 +20,10 @@ export type GlobalState = {
   state: {
     portfolio: Holding[],
   }
-  stockDataMap: { [symbol: string]: Stock }
+  portfolioValue: number,
+  // stockDataMap: { [symbol: string]: Stock }
   dispatch: React.Dispatch<Action>
-  getStockData: (symbol: string) => Promise<Stock>
+  getStockData: (stockId: number) => Promise<Stock>
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'>) => Promise<void>
   updateHoldingAndUpdateState: (holding: Holding) => Promise<void>
   deleteHoldingAndUpdateState: (holding: Holding) => Promise<void>
@@ -43,7 +45,7 @@ export const GlobalProvider = ({
   initialState,
 }: GlobalProviderProps) => {
   const [state, dispatch] = useReducer(GlobalReducer, { portfolio: initialState });
-  const [stockDataMap, setStockDataMap] = useState<{ [symbol: string]: Stock }>({});
+  const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>({});
 
   // useEffect(() => {
   //   let isMounted = false;
@@ -61,18 +63,29 @@ export const GlobalProvider = ({
   //   })();
   // }, []);
 
+  const portfolioValue = useMemo(() => {
+    return state.portfolio.reduce(
+      (acc, obj) => {
+          if (obj.stockId in stockDataMap) {
+            return acc + stockDataMap[obj.stockId].previousClose * obj.units;
+          }
+          return 0;
+      },
+      0
+    )
+  }, [state.portfolio, stockDataMap]);
+
   const getStockData = useCallback(
-    async (symbol: string) => {
-      if (symbol in stockDataMap) return stockDataMap[symbol];
+    async (stockId: number) => {
+      if (stockId in stockDataMap) return stockDataMap[stockId];
 
       try {
         // fetch stock quote
-        const data = await getStock(symbol);
+        const data = await getStockByIdAction(stockId);
         if (!data) return;
         // update state
-        setStockDataMap((curr) => ({ ...curr, [symbol]: data }));
+        setStockDataMap((curr) => ({ ...curr, [stockId]: data }));
         // return data
-        console.log('new data fetched')
         return data;
       } catch (e) {
         console.error(e); // TO DO
@@ -80,11 +93,11 @@ export const GlobalProvider = ({
 
     },
     [stockDataMap, setStockDataMap]
-  )
+  );
 
   const insertHoldingAndUpdateState = useCallback(
     async (holding: Omit<Holding, 'id'>) => {
-      const res = await insertHolding(holding);
+      const res = await insertHoldingAction(holding);
       // update state
       dispatch({
         type: 'INSERT_HOLDING',
@@ -96,7 +109,7 @@ export const GlobalProvider = ({
 
   const updateHoldingAndUpdateState = useCallback(
     async (holding: Holding) => {
-      const res = await updateHolding(holding);
+      const res = await updateHoldingAction(holding);
       console.log(holding.id, res.id);
       // update state
       dispatch({
@@ -110,7 +123,7 @@ export const GlobalProvider = ({
 
   const deleteHoldingAndUpdateState = useCallback(
     async (holding: Holding) => {
-      const res = await deleteHolding(holding);
+      const res = await deleteHoldingAction(holding);
       // update state
       dispatch({
         type: 'DELETE_HOLDING',
@@ -124,6 +137,7 @@ export const GlobalProvider = ({
     <GlobalContext.Provider
       value={{
         state,
+        portfolioValue,
         getStockData,
         insertHoldingAndUpdateState,
         updateHoldingAndUpdateState,

@@ -11,6 +11,12 @@ export async function upsertStock(data: Omit<Stock, 'id'>) {
     });
 }
 
+export async function getStockById(id: number) {
+  return await prisma.stock.findFirst({
+      where: { id }
+  });
+}
+
 export async function getStockBySymbol(symbol: string) {
     return await prisma.stock.findFirst({
         where: { symbol }

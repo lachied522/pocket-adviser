@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
-import { searchStocks } from "@/app/actions/stocks";
+import { searchStocksAction } from "@/app/actions/stocks";
 
 import SearchResults from "./search-results";
 
@@ -17,7 +17,7 @@ export default function SearchBar() {
 
     const onsearch = async () => {
         try {
-            const data = await searchStocks(query);
+            const data = await searchStocksAction(query);
             setResults(data);
         } catch (e) {
             console.error(e);

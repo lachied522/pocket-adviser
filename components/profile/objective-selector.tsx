@@ -2,7 +2,7 @@ import { TrendingUp, HandCoins, Vault, Home, Baby, CandlestickChart } from "luci
 
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/utils";
 
 const OBJECTIVE_ARRAY = [
     {

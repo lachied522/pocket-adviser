@@ -22,7 +22,7 @@ export default function SearchResults({ data }: SearchResultsProps) {
     return (
         <div className='z-10 max-h-[180px] max-w-[240px] flex flex-col gap-2 bg-white rounded-xl shadow-sm overflow-auto absolute'>
             {data.map((result) => (
-            <AddHoldingDialog key={`search-result-${result.symbol}`} symbol={result.symbol}>
+            <AddHoldingDialog key={`search-result-${result.symbol}`} data={result}>
                 <Button
                     variant='ghost'
                     onClick={() => setIsOpen(false)}

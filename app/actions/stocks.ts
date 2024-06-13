@@ -1,11 +1,11 @@
 "use server";
-import { getStockBySymbol, searchStocksBySymbolAndName } from "@/utils/crud/stocks";
+import { getStockById, searchStocksBySymbolAndName } from "@/utils/crud/stocks";
 
-export async function getStock(symbol: string) {
-    return await getStockBySymbol(symbol.toLowerCase());
+export async function getStockByIdAction(id: number) {
+    return await getStockById(id);
 }
 
-export async function searchStocks(query: string) {
+export async function searchStocksAction(query: string) {
     const data = await searchStocksBySymbolAndName(query);
     console.log(data);
     return data;

@@ -1,10 +1,12 @@
+import { H3 } from "@/components/typography";
+import { Card, CardContent } from "@/components/ui/card";
+
 import Container from "@/components/container";
 import Header from "@/components/header";
 import PortfolioTable from "@/components/portfolio/table";
 import ProfileTabs from "@/components/profile/profile-tabs";
 import SearchBar from "@/components/search/seach-bar";
-import { H3 } from "@/components/typography";
-import { Card, CardContent } from "@/components/ui/card";
+import ChatArea from "@/components/ai-companion/chatarea";
 
 export default function Page() {
   return (
@@ -14,6 +16,12 @@ export default function Page() {
         <Card>
           <CardContent className='p-6'>
             <ProfileTabs />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className='p-6'>
+            <ChatArea />
           </CardContent>
         </Card>
 
