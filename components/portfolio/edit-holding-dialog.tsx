@@ -28,7 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { type GlobalState, useGlobalContext } from "@/app/context/GlobalContext";
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import type { PopulatedHolding } from "@/types/helpers";
 

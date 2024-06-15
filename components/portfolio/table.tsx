@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DataTable } from "../ui/data-table";
 
-import { type GlobalState, useGlobalContext } from "@/app/context/GlobalContext";
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import { columns } from "./columns";
 
@@ -12,7 +12,7 @@ import type { PopulatedHolding } from "@/types/helpers";
 
 
 export default function PortfolioTable() {
-    const { state: { portfolio }, getStockData } = useGlobalContext() as GlobalState;
+    const { state, getStockData } = useGlobalContext() as GlobalState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -40,8 +40,8 @@ export default function PortfolioTable() {
 
     useEffect(() => {
         // fetch stock data for each holding and update populated holdings
-        if (!isLoading) populateHoldings(portfolio);
-    }, [portfolio, populateHoldings]);
+        if (!isLoading) populateHoldings(state?.holdings || []);
+    }, [state, populateHoldings]);
 
     return (
         <div>

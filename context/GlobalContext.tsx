@@ -8,23 +8,26 @@ import {
   useEffect,
   useMemo
 } from "react";
+import { useSession } from "next-auth/react";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
-import { getStockByIdAction } from "../actions/stocks";
+import { getUserDataAction } from "../actions/user";
+import { getStockByIdAction } from "../actions/stocks";``
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "../actions/holdings";
 
+import { useGuest } from "@/hooks/useGuest";
+
 import type { Holding, Stock } from "@prisma/client";
+import type { UserData } from "@/types/helpers";
 
 export type GlobalState = {
-  state: {
-    portfolio: Holding[],
-  }
-  portfolioValue: number,
+  state: UserData
+  portfolioValue: number
   // stockDataMap: { [symbol: string]: Stock }
   dispatch: React.Dispatch<Action>
   getStockData: (stockId: number) => Promise<Stock>
-  insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'>) => Promise<void>
+  insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
   updateHoldingAndUpdateState: (holding: Holding) => Promise<void>
   deleteHoldingAndUpdateState: (holding: Holding) => Promise<void>
 }
@@ -36,35 +39,40 @@ export const useGlobalContext = () => {
 };
 
 interface GlobalProviderProps {
-  children: React.ReactNode,
-  initialState: Holding[]
+  children: React.ReactNode
 }
 
 export const GlobalProvider = ({
   children,
-  initialState,
 }: GlobalProviderProps) => {
-  const [state, dispatch] = useReducer(GlobalReducer, { portfolio: initialState });
+  const { data: session, status } = useSession();
+  const [state, dispatch] = useReducer(GlobalReducer, null);
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>({});
+  const { createGuestUser } = useGuest();
 
-  // useEffect(() => {
-  //   let isMounted = false;
-  //   // fetch initial data
-  //   (async function () {
-  //     if (isMounted) return; // prevent useEffect from running twice
-  //     const data = await getHoldings();
-  //     // update state
-  //     dispatch({
-  //       type: 'SET_DATA',
-  //       payload: { portfolio: data }
-  //     });
-
-  //     isMounted = true;
-  //   })();
-  // }, []);
+  useEffect(() => {
+    // fetch initial data
+    (async function () {
+      if (state) return;
+      if (!session) {
+        createGuestUser();
+        return;
+      };
+      // get session
+      const data = await getUserDataAction(session.user.id);
+      console.log('data fetched', data);
+      if (!data) return;
+      // update state
+      dispatch({
+        type: 'SET_DATA',
+        payload: data,
+      });
+    })();
+  }, [session]);
 
   const portfolioValue = useMemo(() => {
-    return state.portfolio.reduce(
+    if (!state) return 0;
+    return state.holdings.reduce(
       (acc, obj) => {
           if (obj.stockId in stockDataMap) {
             return acc + stockDataMap[obj.stockId].previousClose * obj.units;
@@ -73,7 +81,7 @@ export const GlobalProvider = ({
       },
       0
     )
-  }, [state.portfolio, stockDataMap]);
+  }, [state, stockDataMap]);
 
   const getStockData = useCallback(
     async (stockId: number) => {
@@ -96,15 +104,24 @@ export const GlobalProvider = ({
   );
 
   const insertHoldingAndUpdateState = useCallback(
-    async (holding: Omit<Holding, 'id'>) => {
-      const res = await insertHoldingAction(holding);
+    async (holding: Omit<Holding, 'id'|'userId'>) => {
+      if (!state) {
+        console.log('state undefined')
+        return;
+      }
+
+      const res = await insertHoldingAction({
+        ...holding,
+        userId: state.id,
+      });
+      console.log('res', res);
       // update state
       dispatch({
         type: 'INSERT_HOLDING',
         payload: res,
       })
     },
-    [dispatch]
+    [state, dispatch]
   );
 
   const updateHoldingAndUpdateState = useCallback(

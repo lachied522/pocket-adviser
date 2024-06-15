@@ -1,33 +1,38 @@
-import recursiveAICall from "./recursive-ai-call";
 
-import type { Message } from "@/types/ai";
+import recursiveAICall from './recursive-ai-call';
 
 type RequestBody = {
-    messages: Message[]
+    messages: any
+    tools: any
 }
 
 export async function POST(req: Request) {
-    const body = await req.json() as RequestBody;
-
     try {
+        const { messages, tools } = await req.json() as RequestBody;
+
+        if (tools) {
+            console.log(tools);
+            return;
+        }
+
         const response = recursiveAICall({
             model: 'gpt-3.5-turbo',
-            messages: body.messages,
+            messages: messages,
         });
     
         const stream = new ReadableStream({
             async start(controller) {
                 const encoder = new TextEncoder();
-    
+
                 for await (const content of response) {
                     const queue = encoder.encode(content);
                     controller.enqueue(queue);
                 }
-       
+
                 controller.close();
             }
         });
-    
+
         return new Response(stream, {
             headers: {
                 "Content-Type": "text/plain; charset=utf-8"

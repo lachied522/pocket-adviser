@@ -2,7 +2,7 @@
 
 import { getHoldingsWithStocks } from "@/utils/crud/holding";
 
-export const getPortfolioToolSchema = {
+export const getPortfolioSchema = {
     type: "function" as const,
     function: {
         name: "getPortfolio",
@@ -16,7 +16,8 @@ export const getPortfolioToolSchema = {
 }
 
 // it is necessary to define return type as any since the recursiveAICall doesn't know which function it is calling
-export async function getPortfolio(userID?: string, ...args: any[]): Promise<any> {
+export async function getPortfolio(...args: any[]): Promise<any> {
+    console.log('fetching portfolio');
     try {
         const data = await getHoldingsWithStocks();
         // format data before returning

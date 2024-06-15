@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
-import { searchStocksAction } from "@/app/actions/stocks";
+import { searchStocksAction } from "@/actions/stocks";
 
 import SearchResults from "./search-results";
 

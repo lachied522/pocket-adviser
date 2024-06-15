@@ -7,7 +7,7 @@ import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/components/utils";
 import { Button } from "@/components/ui/button";
-import { H3 } from "@/components/typography";
+import { H3 } from "@/components/ui/typography";
 
 import AboutTab from "./about-tab";
 import PreferencesTab from "./preferences-tab";
@@ -42,24 +42,7 @@ export default function ProfileTabs() {
                         duration: 0.32,
                     }}
                 >
-                    <div className='flex flex-row gap-3.5 mb-6'>
-                        <Button
-                            variant={currentTab==='about'? 'default': 'secondary'}
-                            onClick={() => setCurrentTab('about')}
-                        >
-                            About Me
-                        </Button>
-
-                        <Button
-                            variant={currentTab==='preferences'? 'default': 'secondary'}
-                            onClick={() => setCurrentTab('preferences')}
-                        >
-                            Preferences
-                        </Button>
-                    </div>
-
-                    {currentTab ==='about' && <AboutTab />}
-                    {currentTab ==='preferences' && <PreferencesTab />}
+                    <PreferencesTab />
                 </motion.div>
                 )}
             </AnimatePresence>

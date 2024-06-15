@@ -30,7 +30,7 @@ import { Input } from "@/components/ui/input";
 
 import { formatDollar } from "@/utils/formatting";
 
-import { type GlobalState, useGlobalContext } from "@/app/context/GlobalContext";
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 const formSchema = z.object({
     action: z.enum(["deposit", "withdraw", "review"]),

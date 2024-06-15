@@ -1,7 +1,7 @@
-import { H3 } from "@/components/typography";
+import { H3 } from "@/components/ui/typography";
 import { Card, CardContent } from "@/components/ui/card";
+import Container from "@/components/ui/container";
 
-import Container from "@/components/container";
 import Header from "@/components/header";
 import PortfolioTable from "@/components/portfolio/table";
 import ProfileTabs from "@/components/profile/profile-tabs";

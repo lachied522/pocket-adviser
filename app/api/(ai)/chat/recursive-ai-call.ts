@@ -1,7 +1,8 @@
 import OpenAI from "openai";
 
-import { getPortfolio, getPortfolioToolSchema } from "./tools/get-portfolio";
-import { Message } from "@/types/ai";
+import { getPortfolio, getPortfolioSchema } from "./tools/get-portfolio";
+import { getRecommendations, getRecommendationsSchema } from "./tools/get-recommendations";
+import { shouldBuyOrSellStock, shouldBuyOrSellStockSchema } from "./tools/should-buy-or-sell-stock";
 
 // initiliase openai client
 const openai = new OpenAI({
@@ -9,11 +10,15 @@ const openai = new OpenAI({
 });
 
 const AVAILABLE_TOOLS = {
-    getPortfolio
+    getPortfolio,
+    getRecommendations,
+    shouldBuyOrSellStock,
 }
 
 const TOOL_SCHEMAS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
-    getPortfolioToolSchema
+    getPortfolioSchema,
+    getRecommendationsSchema,
+    shouldBuyOrSellStockSchema,
 ]
 
 async function callTool(
@@ -28,6 +33,7 @@ async function callTool(
         const functionToCall = AVAILABLE_TOOLS[functionName as keyof typeof AVAILABLE_TOOLS];
         const functionArgsArr = Object.values(functionArgs);
         
+        /* @ts-ignore:  */
         const result = await functionToCall.apply(null, functionArgsArr);
         console.log(result);
         return JSON.stringify(result);
@@ -40,7 +46,9 @@ async function callTool(
 interface RecursiveAICallProps {
     messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[]
     model?: string
-    userName?: string
+    userName?: string,
+    iteration?: number
+    maxIters?: number
 }
 
 type RecursiveF = AsyncGenerator<string, void | RecursiveF>;
@@ -48,9 +56,15 @@ type RecursiveF = AsyncGenerator<string, void | RecursiveF>;
 export default async function* recursiveAICall({
     model,
     messages,
+    iteration = 0,
+    maxIters = 2,
 }: RecursiveAICallProps): RecursiveF {
-
     try {
+        if (iteration > maxIters) {
+            // catch any iterations greater than depth of maxIters
+            throw new Error('Max iterations.');
+        }
+
         const response = await openai.chat.completions.create({
             model: model || 'gpt-3.5-turbo',
             messages: messages,
@@ -71,10 +85,9 @@ export default async function* recursiveAICall({
             if (delta.content) {
                 yield delta.content;
             }
-            
+
             // https://community.openai.com/t/has-anyone-managed-to-get-a-tool-call-working-when-stream-true/498867/10
             if (delta.tool_calls) {
-                // console.log(chunk.choices[0].delta.tool_calls)
                 const tool_call = delta.tool_calls[0];
                 const index = tool_call.index;
                 if (index === tool_calls.length) {
@@ -84,7 +97,8 @@ export default async function* recursiveAICall({
                 if (tool_call.id) tool_calls[index].id = tool_call.id;
                 if (tool_call.type) tool_calls[index].type = tool_call.type; // always type
                 if (tool_call.function) {
-                    tool_calls[index].function = { ...tool_calls[index].function, ...tool_call.function };
+                    if (tool_call.function.name) tool_calls[index].function.name = tool_call.function.name;
+                    if (tool_call.function.arguments) tool_calls[index].function.arguments += tool_call.function.arguments;
                 }
             }
         }
@@ -114,14 +128,17 @@ export default async function* recursiveAICall({
             const response = recursiveAICall({
                 model,
                 messages,
+                iteration: iteration + 1,
+                maxIters,
             });
             
             for await (const content of response) {
                 yield content;
             }
+        } else {
+            yield `!finish:end`;
         }
-    } catch (e) {
-        console.log(e);
-        if (e instanceof Error) yield `!error:${e.name}`;
+    } catch (e: any) {
+        yield `!finish:{e}`;
     }
 }

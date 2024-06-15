@@ -4,8 +4,10 @@ import { getPrismaClient } from './client';
 
 const prisma = getPrismaClient();
  
-export async function getHoldings(): Promise<Holding[]> {
-  return await prisma.holding.findMany();
+export async function getHoldingsByUserId(userId: string) {
+  return await prisma.holding.findMany({
+    where: { userId }
+  });
 }
 
 export async function getHoldingsWithStocks() {

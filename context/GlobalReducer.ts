@@ -1,40 +1,43 @@
-import type { GlobalState } from "./GlobalContext";
+import type { UserData } from "@/types/helpers";
 
 export type Action = {
     type: 'SET_DATA'
-    payload: GlobalState['state']
+    payload: UserData
 } | {
-    type: 'SET_PORTFOLIO'
-    payload: GlobalState['state']['portfolio']
+    type: 'SET_HOLDINGS'
+    payload: UserData['holdings']
 } | {
     type: 'INSERT_HOLDING'
-    payload: GlobalState['state']['portfolio'][number]
+    payload: UserData['holdings'][number]
 } | {
     type: 'UPDATE_HOLDING'
-    payload: GlobalState['state']['portfolio'][number]
+    payload: UserData['holdings'][number]
 } | {
     type: 'DELETE_HOLDING'
-    payload: GlobalState['state']['portfolio'][number]
+    payload: UserData['holdings'][number]
 }
 
-export function GlobalReducer(state: GlobalState['state'], action: Action) {
-    switch(action.type) {
-        case 'SET_DATA': {
+export function GlobalReducer(state: UserData | null, action: Action) {
+    if (!state) {
+        if (action.type === 'SET_DATA') {
             return action.payload;
         }
+        return null;
+    };
 
-        case 'SET_PORTFOLIO': {
+    switch (action.type) {
+        case 'SET_HOLDINGS': {
             return {
                 ...state,
-                portfolio: action.payload,
+                holdings: action.payload,
             }
         }
 
         case 'INSERT_HOLDING': {
             return {
                 ...state,
-                portfolio: [
-                    ...state.portfolio,
+                holdings: [
+                    ...state.holdings,
                     action.payload
                 ],
             }
@@ -43,7 +46,7 @@ export function GlobalReducer(state: GlobalState['state'], action: Action) {
         case 'UPDATE_HOLDING': {
             return {
                 ...state,
-                portfolio: state.portfolio.map((holding) => {
+                holdings: state.holdings.map((holding) => {
                     if (holding.id === action.payload.id) {
                         return action.payload;
                     }
@@ -55,7 +58,7 @@ export function GlobalReducer(state: GlobalState['state'], action: Action) {
         case 'DELETE_HOLDING': {
             return {
                 ...state,
-                portfolio: state.portfolio.filter((holding) => holding.id !== action.payload.id),
+                holdings: state.holdings.filter((holding) => holding.id !== action.payload.id),
             }
         }
 
