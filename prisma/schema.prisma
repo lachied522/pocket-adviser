@@ -84,6 +84,8 @@ model Stock {
   symbol         String    @unique
   name           String
   exchange       String
+  country        String
+  isEtf          Boolean
   image          String?
   previousClose  Float?
   priceTarget    Float

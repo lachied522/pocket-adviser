@@ -42,6 +42,9 @@ export async function getAggregatedStockData(
         symbol,
         name: quote.name,
         exchange: quote.exchange,
+        country: profile.country,
+        isEtf: profile.isEtf,
+        image: profile.image,
         previousClose: quote.previousClose,
         marketCap: quote.marketCap,
         sector: profile.sector,
@@ -50,7 +53,6 @@ export async function getAggregatedStockData(
         priceTarget: quote.previousClose * (1.07 + (Math.random() - 0.5) * 0.20),
         pe: 20, // TO DO
         epsGrowth: 0.20, // TO DO
-        // dividendAmount: quote.
     }
 }
 
