@@ -36,11 +36,14 @@ export default function LoginForm({ onNavigateSignup }: LoginFormProps) {
     const closeRef = useRef<HTMLButtonElement>(null);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {},
+        defaultValues: {
+            email: '',
+            password: '',
+        },
     });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const response = signIn("email", {
+        const response = await signIn("credentials", {
             ...values,
             redirect: false,
         });

@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,11 +17,13 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+
 import ObjectiveSelector from "./objective-selector";
 import PreferencesSelector from "./preferences-selector";
 
 const formSchema = z.object({
-    objective: z.enum(['retirement', 'income', 'preservation', 'first-home', 'children', 'trading']),
+    objective: z.enum(['RETIREMENT', 'INCOME', 'PRESERVATION', 'FIRSTHOME', 'CHILDREN', 'TRADING']),
     passive: z.number().nullable(),
     international: z.number().nullable(),
     preferences: z.record(
@@ -28,22 +32,25 @@ const formSchema = z.object({
     ),
 });
 
-interface PreferencesTabProps {
-}
-
-export default function PreferencesTab({}: PreferencesTabProps) {
+export default function PreferencesTab() {
+    const { state, updateProfileAndUpdateState } = useGlobalContext() as GlobalState;
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            objective: 'retirement',
-            passive: 70,
-            international: 30,
-            preferences: {}
+            objective: state?.profile?.objective || 'RETIREMENT',
+            passive: state?.profile?.passive || 70,
+            international: state?.profile?.international || 30,
+            preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> || {},
         },
     });
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        setIsLoading(true);
+        await updateProfileAndUpdateState({
+            ...values,
+        });
+        setIsLoading(false);
     }
 
     return (
@@ -134,7 +141,10 @@ export default function PreferencesTab({}: PreferencesTabProps) {
                 />
 
                 <div className='flex flex-row justify-end'>
-                    <Button type='submit' onClick={() => console.log(form.formState.errors)}>
+                    <Button
+                        type='submit'
+                        disabled={isLoading}
+                    >
                         Apply
                     </Button>
                 </div>

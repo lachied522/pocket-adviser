@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Profile" ALTER COLUMN "objective" DROP NOT NULL,
+ALTER COLUMN "passive" DROP NOT NULL,
+ALTER COLUMN "international" DROP NOT NULL,
+ALTER COLUMN "preferences" DROP NOT NULL;

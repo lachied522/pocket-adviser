@@ -1,42 +1,68 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
+
 import { createUserAction } from "@/actions/user";
-import { useState, useEffect } from "react";
 
-const COOKIE_NAME_FOR_GUEST_USER_ID = "userId";
+import { COOKIE_NAME_FOR_GUEST_USER_ID } from "@/constants/cookies";
 
-const getCookie = (name: string) => {
-    let cookieArray = document.cookie.split(';');
-    let cookie = cookieArray.find(c => c.trim().startsWith(`${name}=`));
-    return cookie ? cookie.split('=')[1] : null;
-};
+function getCookie(name: string) {
+    if (!document) return null;
 
-const setCookie = (name: string, value: string) => {
+    const cookieValue = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split('=')[1];
+
+    if (cookieValue) return cookieValue;
+    return null;
+}
+
+function setCookie(name: string, value: string) {
     document.cookie = `${name}=${value}; path=/`;
 }
 
+const getGuestFromCookies = () => {
+    return getCookie(COOKIE_NAME_FOR_GUEST_USER_ID);
+}
+
 export const useGuest = () => {
-    const [userId, setUserId] = useState<string | null>(null);
+    const [guestId, setGuestId] = useState<string | null>(null);
+    const createRef = useRef<ReturnType<typeof createUserAction> | null>(null)
 
-    const createGuestUser = async () => {
-        if (userId) return userId;
-        const user = await createUserAction({});
+    const setGuestCookie = (value: string) => {
+        setCookie(COOKIE_NAME_FOR_GUEST_USER_ID, value);
+        setGuestId(value);
+    }
 
-        console.log({ user });
-        setUserId(user.id);
-        setCookie(COOKIE_NAME_FOR_GUEST_USER_ID, user.id);
+    const createGuestUserIfNecessary = async () => {
+        // check if userId already exists in cookies to avoid unnecessary user creation
+        const _userId = getGuestFromCookies();
+        if (_userId) {
+            console.log('guest retrieved from cookies');
+            return _userId;
+        };
+
+        if (createRef.current) return (await createRef.current).id; // prevent multiple requests
+
+        createRef.current = createUserAction({ guest: true });
+        console.log('guest created');
+
+        const user = await createRef.current;
+        // set cookie
+        setGuestCookie(user.id);
+        // remove createRef
+        createRef.current = null;
         return user.id;
     }
 
     useEffect(() => {
         // check if userId exists in cookies
-        const _userId = getCookie('userId');
-        if (_userId) {
-            setUserId(_userId);
-        }
+        setGuestId(getGuestFromCookies());
     }, []);
 
     return {
-        userId,
-        createGuestUser,
+        guestId,
+        getGuestFromCookies,
+        createGuestUserIfNecessary,
     }
 }

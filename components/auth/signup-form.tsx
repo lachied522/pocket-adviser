@@ -1,5 +1,6 @@
 "use client";
 import { useRef } from "react";
+import { signIn } from "next-auth/react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -52,10 +53,14 @@ export default function SignupForm({ onNavigateLogin }: SignupFormProps) {
         })
         .then((res) => res.json());
 
-        console.log(response);
-        // call onSubmit
+        // sign in with credentials
+        await signIn("credentials", {
+            ...values,
+            redirect: false,
+        });
+        
         // close dialog and reset form
-        // if (closeRef.current) closeRef.current.click();
+        if (closeRef.current) closeRef.current.click();
     }
 
     const onClose = () => {

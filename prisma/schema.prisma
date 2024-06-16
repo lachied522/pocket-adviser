@@ -71,12 +71,12 @@ model VerificationRequest {
 }
 
 model Profile {
-  userId        String    @id
-  objective     Objective @default(RETIREMENT)
-  passive       Float
-  international Float
-  preferences   Json
-  User          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String     @id
+  objective     Objective? @default(RETIREMENT)
+  passive       Float?
+  international Float?
+  preferences   Json?
+  User          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Stock {

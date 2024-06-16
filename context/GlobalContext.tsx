@@ -18,11 +18,12 @@ import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from ".
 
 import { useGuest } from "@/hooks/useGuest";
 
-import type { Holding, Stock } from "@prisma/client";
+import type { Holding, Profile, Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
+import { updateProfileAction } from "@/actions/profile";
 
 export type GlobalState = {
-  state: UserData
+  state: UserData | null
   portfolioValue: number
   // stockDataMap: { [symbol: string]: Stock }
   dispatch: React.Dispatch<Action>
@@ -30,6 +31,7 @@ export type GlobalState = {
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
   updateHoldingAndUpdateState: (holding: Holding) => Promise<void>
   deleteHoldingAndUpdateState: (holding: Holding) => Promise<void>
+  updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
 }
 
 const GlobalContext = createContext<any>(null);
@@ -40,27 +42,33 @@ export const useGlobalContext = () => {
 
 interface GlobalProviderProps {
   children: React.ReactNode
+  initialState: UserData | null
 }
 
 export const GlobalProvider = ({
   children,
+  initialState,
 }: GlobalProviderProps) => {
   const { data: session, status } = useSession();
-  const [state, dispatch] = useReducer(GlobalReducer, null);
+  const [state, dispatch] = useReducer(GlobalReducer, initialState);
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>({});
-  const { createGuestUser } = useGuest();
+  const { getGuestFromCookies, createGuestUserIfNecessary } = useGuest();
 
   useEffect(() => {
     // fetch initial data
     (async function () {
-      if (state) return;
-      if (!session) {
-        createGuestUser();
-        return;
+      let data: UserData|null = null;
+      if (session) {
+        data = await getUserDataAction(session.user.id);
+      } else {
+        const _guestId = getGuestFromCookies();
+        console.log('guest', _guestId)
+        if (_guestId) {
+          // do not create a new guest if guestId does not exist - only create when necessary
+          data = await getUserDataAction(_guestId);
+        }
       };
-      // get session
-      const data = await getUserDataAction(session.user.id);
-      console.log('data fetched', data);
+      
       if (!data) return;
       // update state
       dispatch({
@@ -105,16 +113,16 @@ export const GlobalProvider = ({
 
   const insertHoldingAndUpdateState = useCallback(
     async (holding: Omit<Holding, 'id'|'userId'>) => {
-      if (!state) {
-        console.log('state undefined')
-        return;
+      let userId = state?.id;
+      if (!userId) {
+        userId = await createGuestUserIfNecessary();
       }
-
       const res = await insertHoldingAction({
         ...holding,
-        userId: state.id,
+        userId,
       });
-      console.log('res', res);
+
+      console.log({res});
       // update state
       dispatch({
         type: 'INSERT_HOLDING',
@@ -150,6 +158,28 @@ export const GlobalProvider = ({
     [dispatch]
   );
 
+  const updateProfileAndUpdateState = useCallback(
+    async (profile: Omit<Profile, 'userId'>) => {
+      let userId = state?.id;
+      if (!userId) {
+        userId = await createGuestUserIfNecessary();
+      }
+
+      const res = await updateProfileAction({
+        ...profile,
+        userId: userId,
+      })
+      dispatch({
+        type: 'UPDATE_PROFILE',
+        payload: res
+      });
+
+      console.log('state updated', profile);
+
+    },
+    [state]
+  );
+
   return (
     <GlobalContext.Provider
       value={{
@@ -159,6 +189,7 @@ export const GlobalProvider = ({
         insertHoldingAndUpdateState,
         updateHoldingAndUpdateState,
         deleteHoldingAndUpdateState,
+        updateProfileAndUpdateState,
         dispatch
       }}
     >

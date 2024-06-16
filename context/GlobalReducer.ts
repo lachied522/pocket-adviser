@@ -15,6 +15,9 @@ export type Action = {
 } | {
     type: 'DELETE_HOLDING'
     payload: UserData['holdings'][number]
+} | {
+    type: 'UPDATE_PROFILE'
+    payload: UserData['profile']
 }
 
 export function GlobalReducer(state: UserData | null, action: Action) {
@@ -59,6 +62,17 @@ export function GlobalReducer(state: UserData | null, action: Action) {
             return {
                 ...state,
                 holdings: state.holdings.filter((holding) => holding.id !== action.payload.id),
+            }
+        }
+
+        case 'UPDATE_PROFILE': {
+            if (!action.payload) return state;
+            return {
+                ...state,
+                profile: {
+                    ...(state.profile? state.profile: {}),
+                    ...action.payload,
+                }
             }
         }
 
