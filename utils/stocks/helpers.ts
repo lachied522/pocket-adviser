@@ -40,7 +40,8 @@ export async function getAggregatedStockData(
 
     return {
         symbol,
-        name: quote.name,
+        name: profile.companyName,
+        description: profile.description,
         exchange: quote.exchange,
         country: profile.country,
         isEtf: profile.isEtf,

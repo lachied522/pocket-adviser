@@ -83,6 +83,7 @@ model Stock {
   id             Int       @id @default(autoincrement())
   symbol         String    @unique
   name           String
+  description    String?
   exchange       String
   country        String
   isEtf          Boolean

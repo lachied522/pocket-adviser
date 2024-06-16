@@ -25,6 +25,8 @@ export type StockQuote = {
 // see https://site.financialmodelingprep.com/developer/docs#company-profile-company-information
 export type CompanyProfile = {
     symbol: string
+    companyName: string
+    description: string // company description
     price: number
     beta: number
     mktCap: bigint

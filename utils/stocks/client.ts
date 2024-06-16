@@ -36,7 +36,6 @@ export default class StockDataClient {
     async getQuote(symbol: string): Promise<StockQuote | null> {
         const data = await this.makeAuthenticatedAPIRequest(`quote/${symbol}`);
         if (!(data && data.length)) return null;
-        console.log('quote fetched');
         return data[0];
     }
 
