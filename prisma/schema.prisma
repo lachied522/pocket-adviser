@@ -83,7 +83,9 @@ model Stock {
   id             Int       @id @default(autoincrement())
   symbol         String    @unique
   name           String
-  previousClose  Float
+  exchange       String
+  image          String?
+  previousClose  Float?
   priceTarget    Float
   beta           Float?
   dividendAmount Float?

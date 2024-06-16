@@ -19,14 +19,18 @@ export type StockQuote = {
     previousClose: number
     eps: number
     pe: number
+    exchange: string
 }
 
+// see https://site.financialmodelingprep.com/developer/docs#company-profile-company-information
 export type CompanyProfile = {
     symbol: string
     price: number
     beta: number
     mktCap: bigint
     lastDiv: number
+    dcf?: number // dcf value??
+    dcfDiff?: number // difference between dcf and current price??
     volAvg: number // average volume??
     industry: string
     sector: string

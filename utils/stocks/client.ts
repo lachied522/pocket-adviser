@@ -5,7 +5,7 @@ export default class StockDataClient {
     API_BASE_URL = `https://financialmodelingprep.com/api`;
 
     constructor () {
-
+        // pass
     }
 
     async makeAuthenticatedAPIRequest(
@@ -36,6 +36,7 @@ export default class StockDataClient {
     async getQuote(symbol: string): Promise<StockQuote | null> {
         const data = await this.makeAuthenticatedAPIRequest(`quote/${symbol}`);
         if (!(data && data.length)) return null;
+        console.log('quote fetched');
         return data[0];
     }
 
@@ -51,5 +52,11 @@ export default class StockDataClient {
         const data = await this.makeAuthenticatedAPIRequest('price-target', params, 4);
         if (!(data && data.length)) return null;
         return data[0];
+    }
+
+    async getAllStocksByExchange(exchange: 'ASX'|'NASDAQ' = 'NASDAQ'): Promise<StockQuote[]> {
+        // see https://site.financialmodelingprep.com/developer/docs#exchange-symbols-stock-list
+        const data = await this.makeAuthenticatedAPIRequest(`symbol/${exchange}`);
+        return data;
     }
 }

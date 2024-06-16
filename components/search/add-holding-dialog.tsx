@@ -1,4 +1,5 @@
 "use client";
+import { useRef, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,7 +28,6 @@ import { Input } from "@/components/ui/input";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import type { Stock } from "@prisma/client";
-import { useRef } from "react";
 
 const formSchema = z.object({
     stockId: z.number(),
@@ -39,10 +39,12 @@ const formSchema = z.object({
 interface AddStockDialogProps {
     children: React.ReactNode
     data: Stock
+    onComplete: () => void
 }
 
-export default function AddHoldingDialog({ children, data }: AddStockDialogProps) {
+export default function AddHoldingDialog({ children, data, onComplete }: AddStockDialogProps) {
     const { insertHoldingAndUpdateState } = useGlobalContext() as GlobalState;
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -53,9 +55,19 @@ export default function AddHoldingDialog({ children, data }: AddStockDialogProps
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        await insertHoldingAndUpdateState({ ...values });
-        // close dialog
-        if (closeRef.current) closeRef.current.click();
+        setIsLoading(true);
+
+        try {
+            await insertHoldingAndUpdateState({ ...values });
+
+            onComplete();
+            // close dialog and reset loading state
+            if (closeRef.current) closeRef.current.click();
+            setIsLoading(false);
+        } catch (e) {
+            // TO DO
+            console.error(e);
+        }
     }
 
     return (
@@ -79,6 +91,18 @@ export default function AddHoldingDialog({ children, data }: AddStockDialogProps
                                     placeholder="AAPL"
                                     disabled
                                     value={data.symbol.toUpperCase()}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+
+                        <FormItem>
+                            <FormLabel>Exchange</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder="NASDAQ"
+                                    disabled
+                                    value={data.exchange.toUpperCase()}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -117,7 +141,10 @@ export default function AddHoldingDialog({ children, data }: AddStockDialogProps
                                 </Button>
                             </DialogClose>
 
-                            <Button type='submit'>
+                            <Button
+                                type='submit'
+                                disabled={isLoading}
+                            >
                                 Add
                             </Button>
                         </div>

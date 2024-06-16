@@ -43,10 +43,10 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <>{formatDollar(Number(row.getValue('units')) * Number(row.getValue('previousClose')))}</>
     )
   },
-  {
-    accessorKey: "cost",
-    header: "Cost",
-  },
+  // {
+  //   accessorKey: "cost",
+  //   header: "Cost",
+  // },
   {
     accessorKey: 'id',
     header: 'Edit',

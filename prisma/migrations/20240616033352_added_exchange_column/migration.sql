@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Stock" ADD COLUMN     "exchange" TEXT NOT NULL DEFAULT 'NASDAQ',
+ALTER COLUMN "previousClose" DROP NOT NULL;
