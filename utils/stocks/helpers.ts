@@ -40,14 +40,15 @@ export async function getAggregatedStockData(
 
     return {
         symbol,
+        previousClose: quote.previousClose,
+        marketCap: quote.marketCap,
+        exchange: quote.exchange,
         name: profile.companyName,
         description: profile.description,
-        exchange: quote.exchange,
+        currency: profile.currency,
         country: profile.country,
         isEtf: profile.isEtf,
         image: profile.image,
-        previousClose: quote.previousClose,
-        marketCap: quote.marketCap,
         sector: profile.sector,
         dividendAmount: profile.lastDiv, // TO DO
         beta: profile.beta,

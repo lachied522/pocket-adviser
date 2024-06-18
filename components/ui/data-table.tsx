@@ -19,11 +19,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  emptyText?: string
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  emptyText
 }: DataTableProps<TData, TValue>) {
     // see https://ui.shadcn.com/docs/components/data-table
     const table = useReactTable({
@@ -69,9 +71,9 @@ export function DataTable<TData, TValue>({
                     ))
                 ) : (
                     <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                        No results.
-                    </TableCell>
+                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                            {emptyText? emptyText: "No results."}
+                        </TableCell>
                     </TableRow>
                 )}
                 </TableBody>

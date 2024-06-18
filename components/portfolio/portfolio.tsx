@@ -1,17 +1,18 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { DataTable } from "../ui/data-table";
+import { H3 } from "@/components/ui/typography";
+import { DataTable } from "@/components/ui/data-table";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import { columns } from "./columns";
+import SearchBar from "./seach-bar";
 
 import type { Holding } from "@prisma/client";
 import type { PopulatedHolding } from "@/types/helpers";
 
-
-export default function PortfolioTable() {
+export default function Portfolio() {
     const { state, getStockData } = useGlobalContext() as GlobalState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,7 +45,13 @@ export default function PortfolioTable() {
     }, [state, populateHoldings]);
 
     return (
-        <div>
+        <div className='flex flex-col gap-6'>
+            <div className='flex flex-row justify-between'>
+                <H3 className=''>My Portfolio</H3>
+
+                <SearchBar />
+            </div>
+
             <DataTable columns={columns} data={populatedHoldings} />
         </div>
     )

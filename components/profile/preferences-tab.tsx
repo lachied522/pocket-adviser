@@ -32,7 +32,11 @@ const formSchema = z.object({
     ),
 });
 
-export default function PreferencesTab() {
+interface PreferenceTabProps {
+    submitRef: React.RefObject<HTMLButtonElement>
+}
+
+export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
     const { state, updateProfileAndUpdateState } = useGlobalContext() as GlobalState;
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
@@ -55,7 +59,16 @@ export default function PreferencesTab() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-6'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-12'>
+                <Button
+                    ref={submitRef}
+                    type='submit'
+                    disabled={isLoading}
+                    className='hidden'
+                >
+                    Apply
+                </Button>
+
                 <FormField
                     control={form.control}
                     name="objective"
@@ -139,15 +152,6 @@ export default function PreferencesTab() {
                         </FormItem>
                     )}
                 />
-
-                <div className='flex flex-row justify-end'>
-                    <Button
-                        type='submit'
-                        disabled={isLoading}
-                    >
-                        Apply
-                    </Button>
-                </div>
             </form>
         </Form>
     )

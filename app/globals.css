@@ -48,3 +48,32 @@
     --ring: 224.3 76.3% 48%;
   }
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 99999px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(229 229 229);
+  border-radius: 99999px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(212 212 212);
+}
+
+/* Remove clock icon for time inputs */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  background: none;
+  display:none;
+}

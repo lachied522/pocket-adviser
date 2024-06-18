@@ -167,20 +167,8 @@ export default function ChatArea() {
     return (
         <div>
             <div className="w-full flex flex-row justify-between">
-                <div className='flex flex-row items-center gap-3.5'>
-                    <Button
-                        variant='secondary'
-                        // disabled
-                        onClick={() => setIsOpen(!isOpen)}
-                        className='h-8 w-8 p-0'
-                    >
-                        <ChevronDown size={16} className={cn('transition-transform duration-300', isOpen && '-rotate-180')} />
-                    </Button>
-
-                    <H3 className=''>My Adviser</H3>
-                </div>
-
-                {isOpen && (
+                <H3 className=''>My Adviser</H3>
+                
                 <div className='flex flex-row items-center gap-3.5'>
                     <GetAdviceDialog
                         onSubmit={onAdviceCallback}
@@ -201,7 +189,6 @@ export default function ChatArea() {
                         <SquarePen size={24} />
                     </Button>
                 </div>
-                )}
             </div>
 
             <div className="max-w-[960px] flex flex-col gap-3 mx-auto">
@@ -237,6 +224,7 @@ export default function ChatArea() {
                         key={`sample-prompt-${index}`}
                         variant='secondary'
                         onClick={() => setInput(prompt)}
+                        className='bg-sky-700 hover:bg-sky-700 text-white'
                     >
                         {prompt}
                     </Button>
@@ -249,7 +237,7 @@ export default function ChatArea() {
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
                         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') onSubmit(input) }}
                         placeholder='Ask me something!'
-                        className='h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                        className='h-12 w-full border-0 bg-slate-100 focus-visible:ring-0 focus-visible:ring-offset-0'
                     />
 
                     <Button

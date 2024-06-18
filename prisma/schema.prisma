@@ -85,6 +85,7 @@ model Stock {
   name           String
   description    String?
   exchange       String
+  currency       String    @default("USD")
   country        String
   isEtf          Boolean
   image          String?
