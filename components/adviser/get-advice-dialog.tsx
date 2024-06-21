@@ -33,12 +33,10 @@ import { formatDollar } from "@/utils/formatting";
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 const formSchema = z.object({
-    action: z.enum(["deposit", "withdraw", "review"]),
-    amount: z.coerce.number(),
-})
-.refine(({ action, amount }) => action === 'review' || amount > 0, {
-    message: "Please enter an amount above $0!",
-    path: ["amount"],
+    action: z.enum(["deposit", "withdrawal"]),
+    amount: z.coerce.number().min(0, {
+        message: "Please enter an amount above $0!"
+    }),
 });
 
 interface GetAdviceDialogProps {
@@ -60,7 +58,6 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
     const action = form.watch("action");
 
     const proposedValue = useMemo(() => {
-        if (action === "review") return portfolioValue;
         return action === "deposit"? portfolioValue + Number(amount): Math.max(portfolioValue - Number(amount), 0);
     }, [portfolioValue, amount, action]);
 
@@ -81,7 +78,7 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="min-w-[720px]">
+            <DialogContent className="">
                 <DialogHeader>
                     <DialogTitle>
                         Quickly Ask for Advice
@@ -91,7 +88,7 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className='min-h-[360px] flex flex-col gap-6'>
                         <p>I would like to...</p>
-                        <div className="grid grid-cols-3 gap-4 place-items-center">
+                        <div className="flex flex-row items-center justify-center gap-3">
                             <Button
                                 type="button"
                                 variant={action==='deposit' ? 'default': 'secondary'}
@@ -103,17 +100,8 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
                             </Button>
                             <Button
                                 type="button"
-                                variant={action==='review' ? 'default': 'secondary'}
-                                onClick={() => form.setValue('action', 'review')}
-                                className="grid grid-cols-[36px_1fr] items-center justify-center"
-                            >
-                                <RefreshCw size={18} />
-                                Review my portfolio
-                            </Button>
-                            <Button
-                                type="button"
-                                variant={action==='withdraw' ? 'default': 'secondary'}
-                                onClick={() => form.setValue('action', 'withdraw')}
+                                variant={action==='withdrawal' ? 'default': 'secondary'}
+                                onClick={() => form.setValue('action', 'withdrawal')}
                                 className="grid grid-cols-[36px_1fr] items-center justify-center"
                             >
                                 <PiggyBank size={24} />
@@ -133,7 +121,7 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
                                         <Input
                                             type="number"
                                             min={0}
-                                            disabled={action === "review"}
+                                            className="w-[180px]"
                                             {...field}
                                         />
                                     </FormControl>

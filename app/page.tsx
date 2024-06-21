@@ -3,9 +3,12 @@ import Container from "@/components/ui/container";
 
 import Header from "@/components/ui/header";
 import ProfileTabs from "@/components/profile/profile-tabs";
-import NewsCarousel from "@/components/adviser/news-carousel";
 import ChatArea from "@/components/adviser/chat-area";
 import Portfolio from "@/components/portfolio/portfolio";
+
+// Force the page to be dynamic and allow streaming responses up to 30 seconds
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 export default function Page() {
   return (

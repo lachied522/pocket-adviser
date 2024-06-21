@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-import { type Message } from '@ai-sdk/react';
+import { useActions, useUIState } from 'ai/rsc';
+import { generateId } from 'ai';
 
 import { ArrowBigUp, ChevronDown, RefreshCcw, SquarePen, Stethoscope, TrendingUp, X } from "lucide-react";
 
@@ -13,77 +14,63 @@ import { Button } from "@/components/ui/button";
 import { H3 } from "@/components/ui/typography";
 import { cn } from "@/components/utils";
 
+import type { ClientMessage } from "@/actions/ai/chat";
+
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import NewsCarousel from "./news-carousel";
 
 import type { StockNews } from "@/types/api";
 
-async function* readStream(reader: ReadableStreamDefaultReader<Uint8Array>) {
-    const decoder = new TextDecoder();
+// async function* readStream(reader: ReadableStreamDefaultReader<Uint8Array>) {
+//     const decoder = new TextDecoder();
 
-    try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            break;
-          }
-          const text = decoder.decode(value);
-          console.log('text', text);
-          yield text;
-        }
-    } catch (error) {
-        console.error('Error reading stream:', error);
-    }
-}
+//     try {
+//         while (true) {
+//           const { done, value } = await reader.read();
+//           if (done) {
+//             break;
+//           }
+//           const text = decoder.decode(value);
+//           console.log('text', text);
+//           yield text;
+//         }
+//     } catch (error) {
+//         console.error('Error reading stream:', error);
+//     }
+// }
 
-const ChatMessage = ({ message }: { message: Omit<Message, 'id'> }) => {
+const UserMessage = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div
-            className={cn(
-                'flex flex-row',
-                message.role === 'user' && 'justify-end'
-            )}
-        >
-            <div className="max-w-[75%]">
-                <span className='text-sm font-medium text-slate-600'>
-                    {message.role === "assistant"? "Pocket Adviser": "Me"}
-                </span>
-                {message.content && (
-                <Card>
-                    <CardContent
-                        className={cn("font-medium px-3 py-2", message.role === "user" && "bg-neutral-50 border-none")}
-                    >
-                        {message.content}
-                    </CardContent>
-                </Card>
-                )}
-            </div>
-        </div>
+        <Card>
+            <CardContent className="font-medium px-3 py-2 bg-neutral-50 border-none">
+                {children}
+            </CardContent>
+        </Card>
     )
 }
 
-const LoadingMessage = () => {
-    // return message to display when loading
-    const [text, setText] = useState<string>('. ');
+// const LoadingMessage = () => {
+//     // return message to display when loading
+//     const [text, setText] = useState<string>('. ');
 
-    useEffect(() => {
-        const c = '. ';
-        const interval = setInterval(() => {
-            setText((s) => {
-                return s==='. . . '? '. ': s + c;
-            })
-        }, 350);
+//     useEffect(() => {
+//         const c = '. ';
+//         const interval = setInterval(() => {
+//             setText((s) => {
+//                 return s==='. . . '? '. ': s + c;
+//             })
+//         }, 350);
 
-        return () => {
-            clearInterval(interval)
-        }
-    }, []);
+//         return () => {
+//             clearInterval(interval)
+//         }
+//     }, []);
 
-    return (
-        <ChatMessage message={{ role: "assistant", content: text }} />
-    )
-}
+//     return (
+//         <ChatMessage message={{ role: "assistant", content: text }} />
+//     )
+// }
 
 const SAMPLE_PROMPTS = [
     "Should I buy shares in BHP?",
@@ -93,88 +80,58 @@ const SAMPLE_PROMPTS = [
 ]
 
 const initialMessage = {
+    id: generateId(),
     role: "assistant" as const,
-    content: "Hey! How's it going?"
-}
+    display: (
+        <Card>
+            <CardContent className="font-medium px-3 py-2">
+                Hey! How's it going?
+            </CardContent>
+        </Card>
+    )
+} satisfies ClientMessage;
 
 export default function ChatArea() {
-    const [messages, setMessages] = useState<Omit<Message, 'id'>[]>([initialMessage]);
+    const [conversation, setConversation] = useUIState();
+    const { continueConversation } = useActions();
     const [input, setInput] = useState<string>('');
     const [article, setArticle] = useState<StockNews|null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const handleStream = async (_messages: typeof messages, stream: ReadableStream) => {
-        const reader = stream.getReader();
-
-        const finishedMessage = {
-            role: "assistant" as const,
-            content: "",
-        }
-
-        for await (const text of readStream(reader)) {
-            if (text.startsWith('!error')) {
-                // TO DO
-                break;
-            }
-
-            if (text.startsWith('!finish')) {
-                break;
-            }
-
-            finishedMessage.content += text;
-            setMessages([
-                ..._messages,
-                finishedMessage
-            ]);
-        }
-    }
+    useEffect(() => {
+        setConversation([initialMessage]);
+    }, []);
 
     const onSubmit = async (content: string) => {
         if (content.length === 0) return;
+        // clear input
+        setInput('');
+        
+        setConversation((currentConversation: ClientMessage[]) => [
+          ...currentConversation,
+          { id: generateId(), role: 'user', display: content },
+        ]);
 
-        try {
-            setIsLoading(true);
-            // add message to messages array
-            const message = {
-                role: 'user' as const,
-                content: content,
-            }
-            const _messages = [...messages, message];
-            setMessages(_messages);
-            // reset input
-            setInput('');
-            //
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                body: JSON.stringify({
-                    messages: _messages,
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            });
+        const message = await continueConversation(content);
 
-            if (!(response.ok && response.body)) {
-                // TO DO
-                return;
-            }
-
-            handleStream(_messages, response.body)
-            .then(() => setIsLoading(false));
-        } catch (e) {
-
-        }
+        setConversation((currentConversation: ClientMessage[]) => [
+          ...currentConversation,
+          message,
+        ]);
     }
 
-    const onAdviceCallback = ({ action, amount }: { action: 'deposit'|'withdraw'|'review',  amount: number }) => {
-        const content = action === 'review'? 'Can you review my portfolio?': `I would like to ${action} ${amount}. Can you provide some recommendations?`;
-        setInput(content);
+    const onAdviceCallback = ({ action, amount }: { action: 'deposit'|'withdrawal',  amount: number }) => {
+        const content = `I would like to ${action} ${amount}. Can you provide some recommendations?`;
+        onSubmit(content);
+    }
+
+    const onReviewCallback = () => {
+        const content = "Can you review my portfolio?";
         onSubmit(content);
     }
 
     const onReset = () => {
         setInput('');
-        setMessages([]);
+        setConversation([]);
     }
 
     const onArticleDrop = (e: React.DragEvent<HTMLInputElement>) => {
@@ -201,7 +158,7 @@ export default function ChatArea() {
                         New chat
                     </Button>
 
-                    <CheckupDialog onSubmit={() => onAdviceCallback({ action: 'review', amount: 0 })}>
+                    <CheckupDialog onSubmit={onReviewCallback}>
                         <Button
                             variant='ghost'
                             className='h-[42px] w-[180px] grid grid-cols-[32px_1fr] text-left gap-1 py-3'
@@ -227,13 +184,29 @@ export default function ChatArea() {
             <div onDrop={onArticleDrop}>
                 <div className="max-w-[960px] flex flex-col gap-3 mx-auto">
                     <ScrollArea className="h-[600px]">
-                        <div className=" flex flex-col justify-end gap-3 px-2 py-3">
-                            {messages.map((message, index) => (
-                            <ChatMessage key={`message-${index}`} message={message} />
+                        <div className="flex flex-col justify-end gap-3 px-2 py-3">
+                            {conversation.map((message: ClientMessage) => (
+                            <div
+                                key={message.id}
+                                className={cn(
+                                    'flex flex-row',
+                                    message.role === 'user' && 'justify-end'
+                                )}
+                            >
+                                <div className="">
+                                    <div className='text-sm font-medium text-slate-600'>
+                                        {message.role === "assistant"? "Pocket Adviser": "Me"}
+                                    </div>
+                                    {message.role === "assistant"? (
+                                    <>{message.display}</>
+                                    ) : (
+                                    <UserMessage>
+                                        {message.display}
+                                    </UserMessage>
+                                    )}
+                                </div>
+                            </div>
                             ))}
-                            {isLoading && messages.at(-1)?.role === 'user' && (
-                            <LoadingMessage />
-                            )}
                         </div>
                     </ScrollArea>
 

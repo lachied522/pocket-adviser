@@ -66,7 +66,7 @@ export default function StockTable<TData, TValue>({
                         key={row.id}
                         stockId={row.original.stockId}
                     >
-                        <TableRow data-state={row.getIsSelected() && "selected"} className=''>
+                        <TableRow data-state={row.getIsSelected() && "selected"} className='cursor-pointer'>
                             {row.getVisibleCells().map((cell) => (
                             <TableCell key={cell.id}>
                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

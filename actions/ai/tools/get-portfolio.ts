@@ -1,5 +1,3 @@
-/* Gets user portfolio for use in AI completion */
-
 import { getHoldingsWithStocks } from "@/utils/crud/holding";
 
 export const getPortfolioSchema = {
@@ -27,7 +25,7 @@ export async function getPortfolio(...args: any[]): Promise<any> {
             sector: obj.stock.sector,
             previousClose: obj.stock.previousClose,
             units: obj.units,
-            value: obj.stock.previousClose * obj.units,
+            value: (obj.stock.previousClose || 0) * obj.units,
         }));
     } catch (e) {
         console.log(e);

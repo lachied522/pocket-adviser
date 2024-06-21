@@ -7,6 +7,7 @@ import { GlobalProvider } from "../context/GlobalContext";
 import { Provider as SessionProvider } from "../context/SessionContext";
 
 import { getUserById } from "@/utils/crud/user";
+import { AIProvider } from '@/actions/ai/chat';
 
 import { COOKIE_NAME_FOR_GUEST_USER_ID } from "@/constants/cookies";
 
@@ -37,7 +38,9 @@ export default async function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <GlobalProvider initialState={data}>
-            {children}
+            <AIProvider>
+              {children}
+            </AIProvider>
           </GlobalProvider>
         </SessionProvider>
       </body>

@@ -10,3 +10,13 @@ export type UserData = (
         holdings: Holding[]
     }
 )
+
+export type Recommendation = {
+    stockId: number
+    transaction: "Buy"|"Sell"
+    symbol: string
+    name: string
+    units: number
+    price: number
+    value: number
+}

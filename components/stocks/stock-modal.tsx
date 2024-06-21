@@ -11,31 +11,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { formatDollar } from "@/utils/formatting";
+import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import type { Stock } from "@prisma/client";
-
-function formatMarketCap(marketCap: bigint|number|null) {
-    if (!marketCap) return 'N/A';
-
-    marketCap = Number(marketCap); // convert to Number type
-    const trillion = 1e12;
-    const billion = 1e9;
-    const million = 1e6;
-
-    if (Math.abs(marketCap) >= trillion) {
-      return `$${(marketCap / trillion).toFixed(2)}T`;
-    } else if (Math.abs(marketCap) >= billion) {
-      return `$${(marketCap / billion).toFixed(2)}B`;
-    } else if (Math.abs(marketCap) >= million) {
-      return `$${(marketCap / million).toFixed(2)}M`;
-    } else {
-      return `$${marketCap.toFixed(2)}`;
-    }
-}
 
 interface StockModalProps {
     children: React.ReactNode
@@ -109,8 +91,10 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                             </div>
                         </div>
                     </div>
-
-                    <p>{stockData.description || 'Company information not available'}</p>
+                    
+                    <ScrollArea className='h-[240px] p-3'>
+                        <p className='text-sm'>{stockData.description || 'Company information not available'}</p>
+                    </ScrollArea>
                 </DialogContent>
             </Dialog>
             ) : (
