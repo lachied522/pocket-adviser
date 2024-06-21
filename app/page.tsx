@@ -3,7 +3,7 @@ import Container from "@/components/ui/container";
 
 import Header from "@/components/ui/header";
 import ProfileTabs from "@/components/profile/profile-tabs";
-import NewsCarousel from "@/components/news/news-carousel";
+import NewsCarousel from "@/components/adviser/news-carousel";
 import ChatArea from "@/components/adviser/chat-area";
 import Portfolio from "@/components/portfolio/portfolio";
 
@@ -18,14 +18,8 @@ export default function Page() {
           </Container>
         </div>
 
-        <div className='px-6'>
-          <Container className='p-3.5'>
-            <NewsCarousel />
-          </Container>
-        </div>
-
         <div className='px-6 mb-24'>
-          <Container className='p-3.5'>
+          <Container className='p-7 border border-slate-200 rounded-xl'>
             <ChatArea />
           </Container>
         </div>

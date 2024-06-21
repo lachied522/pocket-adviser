@@ -1,7 +1,7 @@
 import type { Holding, Profile, Stock, User } from "@prisma/client";
 
 export type PopulatedHolding = (
-    Holding & Stock
+    Holding & Omit<Stock, 'id'>
 )
 
 export type UserData = (

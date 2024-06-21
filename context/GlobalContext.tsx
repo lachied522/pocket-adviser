@@ -29,8 +29,8 @@ export type GlobalState = {
   dispatch: React.Dispatch<Action>
   getStockData: (stockId: number) => Promise<Stock>
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
-  updateHoldingAndUpdateState: (holding: Holding) => Promise<void>
-  deleteHoldingAndUpdateState: (holding: Holding) => Promise<void>
+  updateHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
+  deleteHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
   updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
 }
 
@@ -83,7 +83,7 @@ export const GlobalProvider = ({
     return state.holdings.reduce(
       (acc, obj) => {
           if (obj.stockId in stockDataMap) {
-            return acc + stockDataMap[obj.stockId].previousClose * obj.units;
+            return acc + (stockDataMap[obj.stockId].previousClose || 0) * obj.units;
           }
           return 0;
       },
@@ -122,7 +122,6 @@ export const GlobalProvider = ({
         userId,
       });
 
-      console.log({res});
       // update state
       dispatch({
         type: 'INSERT_HOLDING',
@@ -133,29 +132,36 @@ export const GlobalProvider = ({
   );
 
   const updateHoldingAndUpdateState = useCallback(
-    async (holding: Holding) => {
-      const res = await updateHoldingAction(holding);
-      console.log(holding.id, res.id);
+    async (holding: Omit<Holding, 'userId'>) => {
+      if (!state) return; // this should not happen
+
+      const res = await updateHoldingAction({
+        ...holding,
+        userId: state.id,
+      });
       // update state
       dispatch({
         type: 'UPDATE_HOLDING',
         payload: res
       })
-      console.log('holding updated', res);
     },
-    [dispatch]
+    [state, dispatch]
   );
 
   const deleteHoldingAndUpdateState = useCallback(
-    async (holding: Holding) => {
-      const res = await deleteHoldingAction(holding);
+    async (holding: Omit<Holding, 'userId'>) => {
+      if (!state) return; //
+      const res = await deleteHoldingAction({
+        ...holding,
+        userId: state.id,
+      });
       // update state
       dispatch({
         type: 'DELETE_HOLDING',
         payload: res
       })
     },
-    [dispatch]
+    [state, dispatch]
   );
 
   const updateProfileAndUpdateState = useCallback(

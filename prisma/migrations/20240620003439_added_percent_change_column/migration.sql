@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Stock" ADD COLUMN     "changesPercentage" DOUBLE PRECISION,
+ADD COLUMN     "dividendYield" DOUBLE PRECISION,
+ALTER COLUMN "priceTarget" DROP NOT NULL,
+ALTER COLUMN "sector" DROP NOT NULL,
+ALTER COLUMN "country" DROP NOT NULL,
+ALTER COLUMN "currency" DROP DEFAULT;

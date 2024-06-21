@@ -80,24 +80,26 @@ model Profile {
 }
 
 model Stock {
-  id             Int       @id @default(autoincrement())
-  symbol         String    @unique
-  name           String
-  description    String?
-  exchange       String
-  currency       String    @default("USD")
-  country        String
-  isEtf          Boolean
-  image          String?
-  previousClose  Float?
-  priceTarget    Float
-  beta           Float?
-  dividendAmount Float?
-  marketCap      BigInt
-  sector         String
-  pe             Float?
-  epsGrowth      Float?
-  Holdings       Holding[]
+  id                Int       @id @default(autoincrement())
+  symbol            String    @unique
+  name              String
+  description       String?
+  exchange          String
+  currency          String
+  country           String?
+  isEtf             Boolean
+  image             String?
+  previousClose     Float?
+  changesPercentage Float?
+  priceTarget       Float?
+  beta              Float?
+  dividendAmount    Float?
+  dividendYield     Float?
+  marketCap         BigInt
+  sector            String?
+  pe                Float?
+  epsGrowth         Float?
+  Holdings          Holding[]
 
   @@index([name, symbol])
 }

@@ -1,5 +1,4 @@
 "use client";
-
 import {
   ColumnDef,
   flexRender,
@@ -16,20 +15,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import StockModal from "@/components/stocks/stock-modal";
+
+import type { PopulatedHolding } from "@/types/helpers";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  data: PopulatedHolding[]
   emptyText?: string
 }
 
-export function DataTable<TData, TValue>({
+export default function StockTable<TData, TValue>({
   columns,
   data,
   emptyText
 }: DataTableProps<TData, TValue>) {
     // see https://ui.shadcn.com/docs/components/data-table
-    const table = useReactTable({
+    const table = useReactTable<PopulatedHolding>({
         data,
+        // @ts-ignore
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
@@ -39,10 +43,10 @@ export function DataTable<TData, TValue>({
             <Table>
                 <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
+                    <TableRow key={headerGroup.id} className='bg-slate-50'>
                     {headerGroup.headers.map((header) => {
                         return (
-                        <TableHead key={header.id}>
+                        <TableHead key={header.id} className='py-5 font-medium'>
                             {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -58,16 +62,18 @@ export function DataTable<TData, TValue>({
                 <TableBody>
                 {table.getRowModel().rows?.length ? (
                     table.getRowModel().rows.map((row) => (
-                    <TableRow
+                    <StockModal
                         key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
+                        stockId={row.original.stockId}
                     >
-                        {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                        ))}
-                    </TableRow>
+                        <TableRow data-state={row.getIsSelected() && "selected"} className=''>
+                            {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                            ))}
+                        </TableRow>
+                    </StockModal>
                     ))
                 ) : (
                     <TableRow>

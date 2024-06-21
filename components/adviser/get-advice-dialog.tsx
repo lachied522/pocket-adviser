@@ -84,7 +84,7 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
             <DialogContent className="min-w-[720px]">
                 <DialogHeader>
                     <DialogTitle>
-                        Quickly Ask My Adviser for Advice
+                        Quickly Ask for Advice
                     </DialogTitle>
                 </DialogHeader>
 

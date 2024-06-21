@@ -7,6 +7,5 @@ export async function getStockByIdAction(id: number) {
 
 export async function searchStocksAction(query: string) {
     const data = await searchStocksBySymbolAndName(query);
-    console.log(data);
     return data;
 }

@@ -1,13 +1,7 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table";
 
-import { Pencil } from "lucide-react";
-
 import { formatDollar, formatPercent } from "@/utils/formatting";
-
-import { Button } from "../ui/button";
-
-import EditHoldingDialog from "./edit-holding-dialog";
 
 import type { PopulatedHolding } from "@/types/helpers";
 
@@ -16,46 +10,49 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
     accessorKey: "symbol",
     header: "Symbol",
     cell: ({ row }) => (
-      <>{(row.getValue('symbol') as string).toUpperCase()}</>
+      <div className='text-lg font-medium py-5'>
+        {(row.getValue('symbol') as string).toUpperCase()}
+      </div>
+    )
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => (
+      <div className='text-lg font-medium py-5'>
+        {(row.getValue('name') as string).toUpperCase()}
+      </div>
     )
   },
   {
     accessorKey: "previousClose",
     header: "Price",
     cell: ({ row }) => (
-      <>{formatDollar(row.getValue('previousClose'))}</>
+      <div className='text-lg font-medium py-5'>{formatDollar(row.getValue('previousClose'))}</div>
     )
   },
-  // {
-  //   accessorKey: "changesPercentage",
-  //   header: "Change",
-  //   cell: ({ row }) => (
-  //     <div>{formatPercent(row.getValue('changesPercentage'))}</div>
-  //   )
-  // },
+  {
+    accessorKey: "changesPercentage",
+    header: "Change (%)",
+    cell: ({ row }) => (
+      <div className='text-lg font-medium py-5'>{formatPercent(row.getValue('changesPercentage'))}</div>
+    )
+  },
   {
     accessorKey: "units",
     header: "Units",
+    cell: ({ row }) => (
+      <div className='text-lg font-medium py-5'>{row.getValue('units')}</div>
+    )
   },
   {
     header: "Value",
     cell: ({ row }) => (
-      <>{formatDollar(Number(row.getValue('units')) * Number(row.getValue('previousClose')))}</>
+      <div className='text-lg font-medium py-5'>{formatDollar(Number(row.getValue('units')) * Number(row.getValue('previousClose')))}</div>
     )
   },
   // {
   //   accessorKey: "cost",
   //   header: "Cost",
   // },
-  {
-    accessorKey: 'id',
-    header: 'Edit',
-    cell: ({ row }) => (
-      <EditHoldingDialog holding={row.original}>
-        <Button variant='ghost'>
-          <Pencil size={16} />
-        </Button>
-      </EditHoldingDialog>
-    )
-  }
 ]

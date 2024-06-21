@@ -50,7 +50,7 @@ export function GlobalReducer(state: UserData | null, action: Action) {
             return {
                 ...state,
                 holdings: state.holdings.map((holding) => {
-                    if (holding.id === action.payload.id) {
+                    if (holding.stockId === action.payload.stockId) {
                         return action.payload;
                     }
                     return holding;
@@ -61,7 +61,7 @@ export function GlobalReducer(state: UserData | null, action: Action) {
         case 'DELETE_HOLDING': {
             return {
                 ...state,
-                holdings: state.holdings.filter((holding) => holding.id !== action.payload.id),
+                holdings: state.holdings.filter((holding) => holding.stockId !== action.payload.stockId),
             }
         }
 

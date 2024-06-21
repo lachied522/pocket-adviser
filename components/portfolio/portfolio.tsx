@@ -1,13 +1,18 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { Pencil } from "lucide-react";
+
 import { H3 } from "@/components/ui/typography";
-import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+
+import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import { columns } from "./columns";
-import SearchBar from "./seach-bar";
+import StockTable from "./stock-table";
+import EditPortfolioDialog from "./edit-portfolio-dialog";
 
 import type { Holding } from "@prisma/client";
 import type { PopulatedHolding } from "@/types/helpers";
@@ -17,42 +22,49 @@ export default function Portfolio() {
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const populateHoldings = useCallback(async (holdings: Holding[]) => {
-        setIsLoading(true);
-
-        await Promise.all(holdings.map(async (holding) => {
-            // check that symbol is not already in populated holdings
-            // if (populatedHoldings.find((obj) => obj.symbol === holding.symbol)) return;
-
-            const data = await getStockData(holding.stockId);
-            const populatedHolding = { ...holding, ...data };
-            setPopulatedHoldings((curr) => {
-                const _holding = curr.find((obj) => obj.id === holding.stockId);
-                if (_holding) {
-                    // update existing holding instead of appending new one
-                    return curr.map((obj) => obj.id === holding.stockId? populatedHolding: obj);
-                }
-                return [...curr, populatedHolding];
-            });
-        }));
-
-        setIsLoading(false);
-    }, [setIsLoading, getStockData, setPopulatedHoldings]);
-
     useEffect(() => {
         // fetch stock data for each holding and update populated holdings
-        if (!isLoading) populateHoldings(state?.holdings || []);
-    }, [state, populateHoldings]);
+        (async function populateHoldings() {
+            if (!state) return;
+
+            setIsLoading(true);
+
+            const _holdings = await Promise.all(
+                state.holdings.map(async (holding) => {
+                    const data = await getStockData(holding.stockId);
+                    return { ...data, ...holding };
+                })
+            );
+
+            setPopulatedHoldings(_holdings);
+            setIsLoading(false);
+        })();
+    }, [state]);
+
+    const portfolioValue = useMemo(() => {
+        return populatedHoldings.reduce((acc, obj) => acc + (obj.units * (obj.previousClose || 0)), 0);
+    }, [populatedHoldings]);
 
     return (
         <div className='flex flex-col gap-6'>
-            <div className='flex flex-row justify-between'>
-                <H3 className=''>My Portfolio</H3>
+            <H3 className=''>My Portfolio</H3>
+            <div className='w-full flex flex-row justify-between'>
+                <div>
+                    Market Value {formatDollar(portfolioValue)}
+                </div>
 
-                <SearchBar />
+                <EditPortfolioDialog>
+                    <Button
+                        variant='ghost'
+                        className='flex flex-row gap-2'
+                    >
+                        <Pencil size={16} />
+                        Edit Portfolio
+                    </Button>
+                </EditPortfolioDialog>
             </div>
 
-            <DataTable columns={columns} data={populatedHoldings} />
+            <StockTable columns={columns} data={populatedHoldings} />
         </div>
     )
 }

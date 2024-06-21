@@ -11,6 +11,7 @@ export type StockSearchResult = {
 export type StockQuote = {
     symbol: string
     name: string
+    exchange: string // e.g. "NASDAQ"
     price: number
     changesPercentage: number // change in percent
     change: number // change in cents
@@ -18,8 +19,7 @@ export type StockQuote = {
     open: number
     previousClose: number
     eps: number
-    pe: number
-    exchange: string // e.g. "NASDAQ"
+    pe?: number
 }
 
 // see https://site.financialmodelingprep.com/developer/docs#company-profile-company-information
@@ -31,7 +31,7 @@ export type CompanyProfile = {
     currency: string // e.g. "USD"
     beta: number
     mktCap: bigint
-    lastDiv: number
+    lastDiv?: number
     dcf?: number // dcf value??
     dcfDiff?: number // difference between dcf and current price??
     volAvg: number // average volume??
@@ -42,8 +42,50 @@ export type CompanyProfile = {
     isEtf: boolean
 }
 
+// see https://site.financialmodelingprep.com/developer/docs#price-target-consensus
+export type PriceTargetConsesus = {
+    symbol: string
+    targetHigh: number
+    targetLow: number
+    targetConsensus: number
+    targetMedian: number
+}
+
+export type IncomeGrowth = {
+    symbol: string
+    date: string // YYYY-MM-DD
+    period: string // e.g. FY
+    calendarYear: number // e.g 1986
+    growthRevenue: number
+    growthEps: number
+}
+
+export type Ratios = {
+    symbol: string
+    period: string // e.g. Q3
+    currentRatio?: number
+    quickRatio?: number
+    cashRation?: number
+    grossProfitMargin?: number
+    operatingProfitMargin?: number
+    netProfitMargin?: number
+    returnOnEquity?: number
+    returnOnAssets?: number
+    debtRatio?: number
+    debtEquityRatio?: number
+    interestCoverage?: number
+    cashFlowToDebtRatio?: number
+    companyEquityMultiplier?: number
+    payoutRatio?: number
+    priceToBookRatio?: number
+    priceEarningsRatio?: number
+    priceToSalesRatio?: number
+    priceToFreeCashFlowsRatio?: number
+    dividendYield?: number
+}
+
 // https://intelligence.financialmodelingprep.com/developer/docs#price-target
-export type PriceTargetResult = {
+export type AnalystResearch = {
     symbol: string
     publishedDate: string
     newsURL: string // url to analyst research
@@ -53,4 +95,14 @@ export type PriceTargetResult = {
     adjPriceTarget: number
     newsPublisher: string
     analystCompany: string
+}
+
+export type StockNews = {
+    symbol: string,
+    publishedDate: string, // datestring
+    title: string,
+    image: string,
+    site: string,
+    text: string,
+    url: string
 }

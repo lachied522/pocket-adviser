@@ -1,4 +1,21 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    images: {
+        remotePatterns: [
+          {
+            protocol: 'https',
+            hostname: 'financialmodelingprep.com',
+            port: '',
+            pathname: '/image-stock/**',
+          },
+          {
+            protocol: 'https',
+            hostname: 'cdn.snapi.dev',
+            port: '',
+            pathname: '/images/**',
+          },
+        ],
+    },
+};
 
 export default nextConfig;

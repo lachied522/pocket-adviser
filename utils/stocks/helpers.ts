@@ -1,9 +1,11 @@
 import StockDataClient from "./client";
 
 import type { Stock } from "@prisma/client";
-import type { StockQuote, CompanyProfile, PriceTargetResult } from "@/types/api";
+import type { StockQuote, CompanyProfile, PriceTargetConsesus, IncomeGrowth, Ratios } from "@/types/api";
 
 type Exchange = 'NASDAQ'|'ASX';
+
+const client = new StockDataClient();
 
 export async function getAggregatedStockData(
     symbol: string,
@@ -13,25 +15,28 @@ export async function getAggregatedStockData(
     // aggregate data from required endpoints and format into db-friendly record
 
     // add '.AX' if exchange is ASX
-    if (exchange === 'ASX') {
+    if (exchange === 'ASX' && !symbol.endsWith('.AX')) {
         symbol = `${symbol}.AX`;
     }
 
     // ensure symbol is capitalised
     symbol = symbol.toUpperCase();
 
-    const client = new StockDataClient();
     const promises: [
-        Promise<StockQuote | null>,
-        Promise<CompanyProfile | null>,
-        // Promise<PriceTargetResult> // price target not available on starter plan
+        Promise<StockQuote|null>,
+        Promise<CompanyProfile|null>,
+        Promise<PriceTargetConsesus|null>,
+        Promise<IncomeGrowth|null>,
+        Promise<Ratios|null>,
     ] = [
         _quote? new Promise((res) => res(_quote)): client.getQuote(symbol),
         client.getCompanyProfile(symbol),
-        // client.getPriceTaget(symbol),
+        client.getPriceTarget(symbol),
+        client.getGrowthRates(symbol),
+        client.getRatios(symbol),
     ];
 
-    const [quote, profile] = await Promise.all(promises);
+    const [quote, profile, consensus, growth, ratios] = await Promise.all(promises);
 
     if (!(quote && profile)) {
         // stock not found
@@ -41,6 +46,7 @@ export async function getAggregatedStockData(
     return {
         symbol,
         previousClose: quote.previousClose,
+        changesPercentage: quote.changesPercentage,
         marketCap: quote.marketCap,
         exchange: quote.exchange,
         name: profile.companyName,
@@ -50,18 +56,16 @@ export async function getAggregatedStockData(
         isEtf: profile.isEtf,
         image: profile.image,
         sector: profile.sector,
-        dividendAmount: profile.lastDiv, // TO DO
         beta: profile.beta,
-        priceTarget: quote.previousClose * (1.07 + (Math.random() - 0.5) * 0.20),
-        pe: 20, // TO DO
-        epsGrowth: 0.20, // TO DO
+        priceTarget: consensus?.targetConsensus || null,
+        pe: quote.pe || null,
+        epsGrowth: growth?.growthEps || null,
+        dividendAmount: profile.lastDiv || null,
+        dividendYield: ratios?.dividendYield || null,
     }
 }
 
 export async function getStocksByExchange(exchange: 'ASX'|'NASDAQ' = 'NASDAQ') {
     const client = new StockDataClient();
-    const data = await client.getAllStocksByExchange(exchange);
-
-    console.log(data.slice(5));
-    return data;
+    return await client.getAllStocksByExchange(exchange);
 }
