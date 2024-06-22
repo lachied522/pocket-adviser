@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useActions, useUIState } from 'ai/rsc';
 import { generateId } from 'ai';
 
-import { ArrowBigUp, ChevronDown, RefreshCcw, SquarePen, Stethoscope, TrendingUp, X } from "lucide-react";
+import { ArrowBigUp, SquarePen, Stethoscope, TrendingUp, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,31 +14,13 @@ import { Button } from "@/components/ui/button";
 import { H3 } from "@/components/ui/typography";
 import { cn } from "@/components/utils";
 
-import type { ClientMessage } from "@/actions/ai/chat";
-
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import NewsCarousel from "./news-carousel";
+import NewsArticle from "./news-article";
 
+import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/api";
-
-// async function* readStream(reader: ReadableStreamDefaultReader<Uint8Array>) {
-//     const decoder = new TextDecoder();
-
-//     try {
-//         while (true) {
-//           const { done, value } = await reader.read();
-//           if (done) {
-//             break;
-//           }
-//           const text = decoder.decode(value);
-//           console.log('text', text);
-//           yield text;
-//         }
-//     } catch (error) {
-//         console.error('Error reading stream:', error);
-//     }
-// }
 
 const UserMessage = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -49,28 +31,6 @@ const UserMessage = ({ children }: { children: React.ReactNode }) => {
         </Card>
     )
 }
-
-// const LoadingMessage = () => {
-//     // return message to display when loading
-//     const [text, setText] = useState<string>('. ');
-
-//     useEffect(() => {
-//         const c = '. ';
-//         const interval = setInterval(() => {
-//             setText((s) => {
-//                 return s==='. . . '? '. ': s + c;
-//             })
-//         }, 350);
-
-//         return () => {
-//             clearInterval(interval)
-//         }
-//     }, []);
-
-//     return (
-//         <ChatMessage message={{ role: "assistant", content: text }} />
-//     )
-// }
 
 const SAMPLE_PROMPTS = [
     "Should I buy shares in BHP?",
@@ -84,7 +44,7 @@ const initialMessage = {
     role: "assistant" as const,
     display: (
         <Card>
-            <CardContent className="font-medium px-3 py-2">
+            <CardContent className="font-medium px-3 py-2 whitespace-pre-wrap">
                 Hey! How's it going?
             </CardContent>
         </Card>
@@ -93,7 +53,7 @@ const initialMessage = {
 
 export default function ChatArea() {
     const [conversation, setConversation] = useUIState();
-    const { continueConversation } = useActions();
+    const { continueConversation, clearConversation } = useActions();
     const [input, setInput] = useState<string>('');
     const [article, setArticle] = useState<StockNews|null>(null);
 
@@ -105,13 +65,26 @@ export default function ChatArea() {
         if (content.length === 0) return;
         // clear input
         setInput('');
+        setArticle(null);
+
+        if (article) {
+            // append article to conversation
+            setConversation((currentConversation: ClientMessage[]) => [
+                ...currentConversation,
+                {
+                    id: generateId(),
+                    role: 'user',
+                    display: <NewsArticle article={article} />
+                },
+            ]);
+        }
         
         setConversation((currentConversation: ClientMessage[]) => [
           ...currentConversation,
           { id: generateId(), role: 'user', display: content },
         ]);
 
-        const message = await continueConversation(content);
+        const message = await continueConversation(content, article);
 
         setConversation((currentConversation: ClientMessage[]) => [
           ...currentConversation,
@@ -129,8 +102,10 @@ export default function ChatArea() {
         onSubmit(content);
     }
 
-    const onReset = () => {
+    const onReset = async () => {
+        await clearConversation();
         setInput('');
+        setArticle(null);
         setConversation([]);
     }
 

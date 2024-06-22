@@ -3,24 +3,24 @@ import { useEffect, useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
-export function ChatMessage({ children }: { children: React.ReactNode }) {
+export function ChatMessage({ content }: { content: string }) {
     return (
         <Card>
-            <CardContent className="font-medium px-3 py-2">
-                {children}
+            <CardContent className="font-medium px-3 py-2 whitespace-pre-wrap">
+                {content}
             </CardContent>
         </Card>
     )
 }
 
-export function LoadingMessage() {
+export function LoadingMessage({ msg }: { msg?: string }) {
     // return message to display when loading
-    const [text, setText] = useState<string>('. ');
+    const [ellipsis, setEllipsis] = useState<string>('. ');
 
     useEffect(() => {
         const c = '. ';
         const interval = setInterval(() => {
-            setText((s) => {
+            setEllipsis((s) => {
                 return s==='. . . '? '. ': s + c;
             })
         }, 350);
@@ -31,8 +31,6 @@ export function LoadingMessage() {
     }, []);
 
     return (
-        <ChatMessage>
-            {text}
-        </ChatMessage>
+        <ChatMessage content={(msg? msg: "Thinking") + ellipsis} />
     )
 }

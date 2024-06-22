@@ -5,7 +5,7 @@ import { getStockBySymbol } from "@/utils/crud/stocks";
 
 import type { Stock } from "@prisma/client";
 
-export const description = "Get information about a stock";
+export const description = "Get financial information about a stock, including company description, price, price change, PE, EPS Growth, etc.";
 
 export const parameters = z.object({
     symbol: z.string().describe("Ticker symbol for the stock, e.g. AAPL, BHP"),
