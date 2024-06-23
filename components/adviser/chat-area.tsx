@@ -25,6 +25,7 @@ import NewsArticle from "./news-article";
 
 import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/api";
+import SamplePrompts from "./sample-prompts";
 
 const UserMessage = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -35,13 +36,6 @@ const UserMessage = ({ children }: { children: React.ReactNode }) => {
         </Card>
     )
 }
-
-const SAMPLE_PROMPTS = [
-    "Should I buy shares in BHP?",
-    "Should I invest more in ETFs?",
-    "Why is the market up/down today?",
-    "What does 'EPS' mean?"
-]
 
 const initialMessage = {
     id: generateId(),
@@ -127,16 +121,16 @@ export default function ChatArea() {
     }
 
     return (
-        <div className='grid grid-cols-[240px_1fr_240px] gap-3.5'>
-            <div>
-                <H3 className='mb-3'>My Adviser</H3>
+        <div className='grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] gap-6 xl:gap-3.5'>
+            <div className='flex flex-col md:flex-row xl:flex-col items-start md:items-center xl:items-start justify-between xl:justify-start gap-3 order-first'>
+                <H3 className=''>My Adviser</H3>
 
-                <div className='flex flex-col items-start gap-3.5'>
-                    <span className='text-sm font-medium text-slate-600'>Quick actions</span>
+                <div className='flex flex-wrap lg:flex-row xl:flex-col items-center xl:items-start gap-3.5'>
+                    <span className='w-full sm:w-auto text-sm font-medium text-slate-600'>Quick actions</span>
                     <Button
                         variant='ghost'
                         onClick={onReset}
-                        className='h-[42px] w-[180px] flex font-medium justify-start gap-1 py-3'
+                        className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
                     >
                         <span className='text-lg mr-2'>🌱</span>
                         New chat
@@ -145,7 +139,7 @@ export default function ChatArea() {
                     <CheckupDialog onSubmit={onReviewCallback}>
                         <Button
                             variant='ghost'
-                            className='h-[42px] w-[180px] flex font-medium justify-start gap-1 py-3'
+                            className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
                         >
                             <span className='text-lg mr-2'>🩺</span>
                             Checkup
@@ -155,19 +149,21 @@ export default function ChatArea() {
                     <GetAdviceDialog onSubmit={onAdviceCallback}>
                         <Button
                             variant='ghost'
-                            className='h-[42px] w-[180px] flex font-medium justify-start gap-1 py-3'
+                            className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
                         >
                             <span className='text-lg mr-2'>📈</span>
                             Advice
                         </Button>
                     </GetAdviceDialog>
                 </div>
+
+                <div className='hidden lg:block xl:hidden w-[100px]' />
             </div>
 
-            <div onDrop={onArticleDrop}>
-                <div className="max-w-[960px] flex flex-col gap-3 mx-auto">
-                    <ScrollArea className="h-[600px]">
-                        <div className="flex flex-col justify-end gap-3 px-2 py-3">
+            <div onDrop={onArticleDrop} className='md:px-6 xl:px-3 order-last xl:order-2'>
+                <div className="max-w-[960px] flex flex-col gap-3 mx-auto shadow-inner shadow-slate-50 rounded-lg">
+                    <ScrollArea>
+                        <div className="h-[600px] 2xl:h-[720px] flex flex-col justify-start gap-3 px-3 py-3">
                             {conversation.map((message: ClientMessage) => (
                             <div
                                 key={message.id}
@@ -193,21 +189,10 @@ export default function ChatArea() {
                         </div>
                     </ScrollArea>
 
-                    <div className="w-full flex flex-wrap justify-start gap-2">
-                        {SAMPLE_PROMPTS.map((prompt, index) => (
-                        <Button
-                            key={`sample-prompt-${index}`}
-                            variant='secondary'
-                            onClick={() => setInput(prompt)}
-                            className='bg-sky-600 hover:bg-sky-600 text-white hover:scale-[1.02] transition-transform duration-150'
-                        >
-                            {prompt}
-                        </Button>
-                        ))}
-                    </div>
+                    <SamplePrompts setInput={setInput} />
 
                     <div className={cn(
-                        "h-14 flex flex-row border border-neutral-100 rounded-lg overflow-hidden",
+                        "h-12 xl:h-14 flex flex-row border border-neutral-100 rounded-b-lg overflow-hidden",
                         article && "h-16"
                     )}>
                         {article && (
@@ -236,20 +221,22 @@ export default function ChatArea() {
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
                             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') onSubmit(input) }}
                             placeholder='Ask me something!'
-                            className='h-full w-full text-lg font-medium bg-slate-100 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                            className='h-full w-full text-base font-medium bg-slate-100 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                         />
 
                         <Button
                             onClick={() => onSubmit(input)}
                             className="h-full aspect-square bg-neutral-100 p-0 group rounded-none"
                         >
-                            <ArrowBigUp size={27} className={'text-black group-hover:text-white'} />
+                            <ArrowBigUp size={27} className={'text-black transition-colors duration-200 group-hover:text-white'} />
                         </Button>
                     </div>
                 </div>
             </div>
-
-            <NewsCarousel />
+            
+            <div className='xl:order-last'>
+                <NewsCarousel />
+            </div>
         </div>
 
     )

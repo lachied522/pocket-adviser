@@ -27,7 +27,7 @@ export default function SignupDialog({ children, initialTab }: GetAdviceDialogPr
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="min-w-[720px]">
+            <DialogContent className='max-w-sm'>
                 <DialogHeader>
                     <DialogTitle>
                         {tab === 'signup'? 'Sign up to save your data!': 'Login'}

@@ -70,69 +70,71 @@ export default function SignupForm({ onNavigateLogin }: SignupFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='min-h-[360px] flex flex-col gap-6'>
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Name
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="text"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col items-center gap-6'>
+                <div className='flex flex-col gap-3.5'>
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Name
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="text"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Email
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="email"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Email
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="email"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Password
-                            </FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="password"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Password
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="password"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <div>
-                    Already have an account? <span className="underline text-blue-400 cursor-pointer" onClick={onNavigateLogin}>Login</span>
+                    <div className='text-sm text-right'>
+                        Already have an account? <span className="underline text-blue-400 cursor-pointer" onClick={onNavigateLogin}>Login</span>
+                    </div>
                 </div>
 
-                <div className='h-full flex flex-row items-end justify-between'>
+                <div className='w-full flex flex-row items-end justify-between'>
                     <DialogClose asChild>
                         <Button
                             ref={closeRef}

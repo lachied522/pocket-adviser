@@ -6,14 +6,14 @@ interface LogoProps {
     withText?: boolean
 }
 
-export function Logo({
+export default function Logo({
     width = 40,
     height = 40,
     withText = false
 }: LogoProps) {
 
     return (
-        <div className='flex flex-row items-center gap-6'>
+        <div className='flex flex-row items-center gap-6 shrink-0'>
             <Image
                 src='/pocket-adviser-logo-white.png'
                 alt='Pocket Adviser Logo'

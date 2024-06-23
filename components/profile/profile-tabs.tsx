@@ -28,8 +28,8 @@ export default function ProfileTabs() {
 
     return (
         <div className='flex flex-col gap-6'>
-            <div className='h-16 flex flex-row items-center justify-between'>
-                <div className='flex flex-row items-center gap-3.5 -translate-x-[46px]'>
+            <div className='lg:h-16 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 py-2 lg:py-0'>
+                <div className='flex flex-row items-center gap-3.5 order-first shrink-0'>
                     <Button
                         variant='ghost'
                         onClick={() => setIsOpen(!isOpen)}
@@ -50,32 +50,32 @@ export default function ProfileTabs() {
                             ease: "easeOut",
                             duration: 0.32,
                         }}
-                        className='flex flex-row items-center gap-6'
+                        className='flex flex-row items-center gap-3 xl:gap-6 order-last xl:order-2'
                     >
-                        <div className='flex flex-col bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
-                            <span className='text-base font-medium'>Objective</span>
+                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                            <span className='text-sm xl:text-base font-medium'>Objective</span>
                             <span className='text-sm'>{OBJECTIVE_MAP[state?.profile?.objective || "RETIREMENT"].name}</span>
                         </div>
 
-                        <div className='flex flex-col bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
-                            <span className='text-base font-medium'>Passive (%)</span>
+                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                            <span className='text-sm xl:text-base font-medium'>Passive (%)</span>
                             <span className='text-sm'>{(state?.profile?.passive || 70)}%</span>
                         </div>
 
-                        <div className='flex flex-col bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
-                            <span className='text-base font-medium'>International (%)</span>
+                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                            <span className='text-sm xl:text-base font-medium'>International (%)</span>
                             <span className='text-sm'>{(state?.profile?.passive || 70)}%</span>
                         </div>
 
-                        <div className='flex flex-col bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
-                            <span className='text-base font-medium'>Preferences</span>
+                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                            <span className='text-sm xl:text-base font-medium'>Preferences</span>
                             <span className='text-sm'>{Object.keys(state?.profile?.preferences || {}).length}</span>
                         </div>
                     </motion.div>
                     )}
                 </AnimatePresence>
                 
-                <div className='w-[160px] flex flex-row justify-end'>
+                <div className='w-full lg:w-[160px] flex flex-row justify-end xl:order-last'>
                     <AnimatePresence>
                         {isOpen && isApplyButtonVisible && (
                         <motion.div
@@ -91,9 +91,8 @@ export default function ProfileTabs() {
                             <Button
                                 type='submit'
                                 onClick={onSubmit}
-                                disabled={submitRef.current?.disabled}
                             >
-                                Apply Changes
+                                Save
                             </Button>
                         </motion.div>
                         )}
@@ -113,6 +112,7 @@ export default function ProfileTabs() {
                         duration: 0.32,
                     }}
                     onAnimationComplete={() => setIsApplyButtonVisible((curr) => !curr)}
+                    className='pb-12'
                 >
                     <PreferencesTab submitRef={submitRef} />
                 </motion.div>

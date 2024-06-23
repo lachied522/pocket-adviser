@@ -118,13 +118,13 @@ export default function PreferencesSelector({ value, onChange }: PreferencesSele
   }
 
   return (
-      <div className="flex flex-wrap text-center items-center justify-center gap-2 sm:gap-3 p-2 mx-auto">
+      <div className="flex flex-wrap text-center items-center justify-center gap-3.5 sm:gap-3 px-2 py-6 mx-auto">
         {SECTORS.map((sector, index) => (
             <Card
                 key={`sector-preference-${index}`}
                 onClick={() => togglePreference(sector)}
                 className={cn(
-                    "flex items-center justify-center rounded-full cursor-pointer",
+                    "flex items-center justify-center rounded-xl cursor-pointer",
                     value?.[sector.key]==="like" && "text-green-400 bg-green-100 border-solid border-green-200",
                     value?.[sector.key]==="dislike" && "text-red-400 bg-red-100 border-red-200"
                 )}

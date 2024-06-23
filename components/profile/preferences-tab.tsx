@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -38,6 +38,7 @@ interface PreferenceTabProps {
 
 export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
     const { state, updateProfileAndUpdateState } = useGlobalContext() as GlobalState;
+    const [isDirty, setIsDirty] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -55,6 +56,7 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
             ...values,
         });
         setIsLoading(false);
+        setIsDirty(false);
     }
 
     return (

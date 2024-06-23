@@ -17,7 +17,7 @@ export default function Page() {
     <main className='min-h-screen'>
       <Header />
 
-      <div className='bg-slate-50 px-6'>
+      <div className='bg-slate-50/80 px-6 shadow-sm'>
         <Container className='p-3.5'>
           <ProfileTabs />
         </Container>
@@ -35,13 +35,13 @@ export default function Page() {
             />
         </div>
 
-        <div className='px-6'>
+        <div className='px-3 sm:px-6'>
           <Container className='p-7 bg-white border border-slate-200 rounded-xl'>
             <ChatArea />
           </Container>
         </div>
 
-        <div className='px-6'>
+        <div className='px-3 sm:px-6'>
           <Container className='flex flex-col gap-6 p-7 bg-white border border-slate-200 rounded-xl'>
             <Portfolio />
           </Container>

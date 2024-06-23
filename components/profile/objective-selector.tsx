@@ -16,17 +16,16 @@ export default function ObjectiveSelector({ value, onChange }: ObjectiveSelector
                 key={`objective-card-${index}`}
                 onClick={() => onChange(objective)}
                 className={cn(
-                    'w-[250px] h-[140px] flex flex-col items-center justify-between p-5 cursor-pointer hover:bg-blue-50',
+                    'h-[120px] md:h-[140px] w-[220px] md:w-[250px] flex flex-col items-center justify-between p-3.5 md:p-5 cursor-pointer hover:bg-blue-50',
                     value === objective && 'bg-blue-100 border-blue-200 hover:bg-blue-100'
                 )}
             >
-                <div className="flex flex-row items-start gap-3.5">
-                    <props.Icon size={24} />
-
-                    <h6 className="text-center">{props.name}</h6>
+                <div className="flex flex-row items-start gap-1 md:gap-3.5">
+                    {/* <props.Icon size={22} /> */}
+                    <h6 className="text-sm xs:text-lg font-medium text-center">{props.name}</h6>
                 </div>
 
-                <div className="text-sm text-center text-slate-700 mb-1">
+                <div className="text-xs md:text-sm text-center text-slate-700 line-clamp-2 mb-1">
                     {props.text}
                 </div>
 
