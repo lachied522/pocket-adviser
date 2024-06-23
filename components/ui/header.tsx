@@ -13,7 +13,7 @@ export default function Header() {
     const { data: session, status } = useSession();
 
     return (
-        <div className='bg-sky-700 p-3.5'>
+        <div className='bg-sky-600 p-3.5'>
             <div className='container flex flex-row items-center justify-between'>
                 <Logo />
 

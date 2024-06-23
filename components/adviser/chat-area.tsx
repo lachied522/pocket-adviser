@@ -14,6 +14,10 @@ import { Button } from "@/components/ui/button";
 import { H3 } from "@/components/ui/typography";
 import { cn } from "@/components/utils";
 
+import { formatDollar } from "@/utils/formatting";
+
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import NewsCarousel from "./news-carousel";
@@ -52,6 +56,7 @@ const initialMessage = {
 } satisfies ClientMessage;
 
 export default function ChatArea() {
+    const { state } = useGlobalContext() as GlobalState;
     const [conversation, setConversation] = useUIState();
     const { continueConversation, clearConversation } = useActions();
     const [input, setInput] = useState<string>('');
@@ -84,7 +89,11 @@ export default function ChatArea() {
           { id: generateId(), role: 'user', display: content },
         ]);
 
-        const message = await continueConversation(content, article);
+        const message = await continueConversation({
+            userId: state?.id,
+            input: content,
+            article
+        });
 
         setConversation((currentConversation: ClientMessage[]) => [
           ...currentConversation,
@@ -93,12 +102,12 @@ export default function ChatArea() {
     }
 
     const onAdviceCallback = ({ action, amount }: { action: 'deposit'|'withdrawal',  amount: number }) => {
-        const content = `I would like to ${action} ${amount}. Can you provide some recommendations?`;
+        const content = `I would like to ${action} ${formatDollar(amount)}. Can you provide some recommendations?`;
         onSubmit(content);
     }
 
     const onReviewCallback = () => {
-        const content = "Can you review my portfolio?";
+        const content = "Can you provide some recommendations for my portfolio?";
         onSubmit(content);
     }
 
@@ -127,19 +136,18 @@ export default function ChatArea() {
                     <Button
                         variant='ghost'
                         onClick={onReset}
-                        className='h-[42px] w-[180px] grid grid-cols-[32px_1fr] text-left gap-1 py-3'
+                        className='h-[42px] w-[180px] flex font-medium justify-start gap-1 py-3'
                     >
-                        <SquarePen size={22} />
+                        <span className='text-lg mr-2'>🌱</span>
                         New chat
                     </Button>
 
                     <CheckupDialog onSubmit={onReviewCallback}>
                         <Button
                             variant='ghost'
-                            className='h-[42px] w-[180px] grid grid-cols-[32px_1fr] text-left gap-1 py-3'
+                            className='h-[42px] w-[180px] flex font-medium justify-start gap-1 py-3'
                         >
-                            <Stethoscope size={22} />
-
+                            <span className='text-lg mr-2'>🩺</span>
                             Checkup
                         </Button>
                     </CheckupDialog>
@@ -147,10 +155,10 @@ export default function ChatArea() {
                     <GetAdviceDialog onSubmit={onAdviceCallback}>
                         <Button
                             variant='ghost'
-                            className='h-[42px] w-[180px] grid grid-cols-[32px_1fr] text-left gap-1 py-3'
+                            className='h-[42px] w-[180px] flex font-medium justify-start gap-1 py-3'
                         >
-                            <TrendingUp size={22} />
-                            Get advice
+                            <span className='text-lg mr-2'>📈</span>
+                            Advice
                         </Button>
                     </GetAdviceDialog>
                 </div>
@@ -168,7 +176,7 @@ export default function ChatArea() {
                                     message.role === 'user' && 'justify-end'
                                 )}
                             >
-                                <div className="">
+                                <div className=''>
                                     <div className='text-sm font-medium text-slate-600'>
                                         {message.role === "assistant"? "Pocket Adviser": "Me"}
                                     </div>
@@ -191,7 +199,7 @@ export default function ChatArea() {
                             key={`sample-prompt-${index}`}
                             variant='secondary'
                             onClick={() => setInput(prompt)}
-                            className='bg-sky-700 hover:bg-sky-700 text-white'
+                            className='bg-sky-600 hover:bg-sky-600 text-white hover:scale-[1.02] transition-transform duration-150'
                         >
                             {prompt}
                         </Button>
@@ -199,7 +207,7 @@ export default function ChatArea() {
                     </div>
 
                     <div className={cn(
-                        "h-12 flex flex-row border border-neutral-100 rounded-lg overflow-hidden",
+                        "h-14 flex flex-row border border-neutral-100 rounded-lg overflow-hidden",
                         article && "h-16"
                     )}>
                         {article && (
@@ -228,12 +236,12 @@ export default function ChatArea() {
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
                             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') onSubmit(input) }}
                             placeholder='Ask me something!'
-                            className='h-full w-full border-0 bg-slate-100 focus-visible:ring-0 focus-visible:ring-offset-0'
+                            className='h-full w-full text-lg font-medium bg-slate-100 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                         />
 
                         <Button
                             onClick={() => onSubmit(input)}
-                            className="h-full aspect-square bg-neutral-100 p-0 group rounded-l-none"
+                            className="h-full aspect-square bg-neutral-100 p-0 group rounded-none"
                         >
                             <ArrowBigUp size={27} className={'text-black group-hover:text-white'} />
                         </Button>

@@ -6,12 +6,13 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
@@ -53,7 +54,7 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                     </DialogHeader>
 
                     <div className='flex flex-row gap-3.5'>
-                        <div className='h-36 w-36 shrink-0 bg-slate-100 rounded-xl p-3'>
+                        <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
                             {stockData.image? (
                             <Image
                                 src={stockData.image}
@@ -95,6 +96,17 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                     <ScrollArea className='h-[240px] p-3'>
                         <p className='text-sm'>{stockData.description || 'Company information not available'}</p>
                     </ScrollArea>
+
+                    <DialogFooter>
+                        <div  className='w-full flex flex-row justify-around gap-3.5'>
+                            <Button variant='secondary'>
+                                What's new with {stockData.symbol}?
+                            </Button>
+                            <Button variant='secondary'>
+                                Should I buy {stockData.symbol}?
+                            </Button>
+                        </div>
+                </DialogFooter>
                 </DialogContent>
             </Dialog>
             ) : (

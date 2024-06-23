@@ -19,10 +19,10 @@ export const OBJECTIVE_MAP = {
         timeHorizon: "1-3 years",
         Icon: Vault
     },
-    FIRSTHOME: {
-        name: "First Home",
-        text: "Save for a deposit on your first home",
-        timeHorizon: "4-5 years",
+    DEPOSIT: {
+        name: "Upcoming Expense",
+        text: "Save for an upcoming expense, like a holiday or home deposit",
+        timeHorizon: "3-4 years",
         Icon: Home
     },
     CHILDREN: {

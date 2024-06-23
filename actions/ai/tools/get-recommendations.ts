@@ -1,46 +1,49 @@
 
 import { z } from "zod";
 
-import type { Recommendation } from "@/types/helpers";
-
-export const description = "Returns a list of recommended transactions for the user based on their current portfolio and investment profile."
+export const description = "Returns a list of recommended transactions for the user based on their current portfolio and investment profile.";
 
 export const parameters = z.object({
-    target: z.number().describe("The amount the user intends to deposit or withdraw from their portfolio"),
-    action: z.enum(["deposit", "withdrawal"]),
-})
+    action: z.enum(["deposit", "withdraw", "review"]).describe("The user may wish to deposit or withdraw from their portfolio, or simply have it reviewed.").default("review"),
+    target: z.number().optional().describe("The amount the user intends to deposit or withdraw from their portfolio, if any.").default(0),
+});
 
-async function fetchData(target: number, userID?: string) {
-    const url = `${process.env.BACKEND_URL}/get-recommendations`;
+async function fetchData(target: number, action: string, userId?: string|null) {
+    const url = new URL(`${process.env.BACKEND_URL}/get-recommendations`);
+    const params = new URLSearchParams();
+    if (userId) {
+        params.set("userId", userId);
+    }
+    url.search = params.toString();
 
     const response = await fetch(url, {
         method: "POST",
         body: JSON.stringify({
-            target
+            target,
+            action,
         }),
         headers: {
             "Content-Type": "application/json",
         }
     })
-    .then((res) => {
-        if (!res.ok) throw new Error(`Error calling function.`)
-        return res.json();
-    });
+    if (!response.ok) {
+        throw new Error(`Error getting recommendations.`)
+    }
 
-    if (process.env.NODE_ENV==="development") console.log(response);
-
-    return response;
+    return await response.json();
 }
 
-type ResolvedPromise<T> = T extends Promise<infer R> ? R: never;
-
-function formatResults(result: ResolvedPromise<ReturnType<typeof fetchData>>) {
+function formatResults(result: ReturnType<typeof fetchData>) {
     // format results for interpretation by AI
     return result;
 }
 
-// it is necessary to define return type as any since the recursiveAICall doesn't know which function it is calling
-export async function getRecommendations(target: number, action: "deposit"|"withdrawal"): Promise<Recommendation[]> {
-    const results = await fetchData(target);
-    return formatResults(results);
+export async function getRecommendations(target: number, action: string, userId?: string|null): Promise<any> {
+    try {
+        const res = await fetchData(target, action, userId);
+        if (process.env.NODE_ENV==="development") console.log(res);
+        return formatResults(res);
+    } catch (e) {
+        return null;
+    }
 }

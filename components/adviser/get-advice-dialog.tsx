@@ -132,12 +132,12 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
 
                         <div className="space-y-2">
                             <p>Current portfolio value</p>
-                            {formatDollar(portfolioValue)}
+                            {formatDollar(portfolioValue || 0)}
                         </div>
 
                         <div className="space-y-2">
                             <p>Proposed portfolio value</p>
-                            {formatDollar(proposedValue)}
+                            {formatDollar(proposedValue || 0)}
                         </div>
 
                         <div className='h-full flex flex-row items-end justify-between'>

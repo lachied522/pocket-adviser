@@ -17,7 +17,7 @@ export default function StockCard({ stockData }: StockCardProps) {
             <Card className='cursor-pointer'>
                 <CardContent className='flex flex-col gap-3.5 p-3'>
                     <div className='flex flex-row gap-3.5'>
-                        <div className='h-36 w-36 shrink-0 bg-slate-100 rounded-xl p-3'>
+                        <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
                             {stockData.image? (
                             <Image
                                 src={stockData.image}

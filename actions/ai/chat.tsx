@@ -3,15 +3,13 @@ import { generateId, streamText, type TextPart, type ToolResultPart, type ToolCa
 import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
 import { openai } from '@ai-sdk/openai';
 
-import { ChatMessage, LoadingMessage } from './components/messages';
-
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
 import { description as readArticleDescription, parameters as readArticleParams, readArticle } from './tools/read-article';
 import { description as getStockDescription, parameters as getStockParams, getStockInfo } from "./tools/get-stock-info";
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
+import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
 
-import StockCard from './components/stock-card';
-import RecommendationsTable from './components/recommendations-table';
+import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard } from './components/messages';
 
 import type { StockNews } from '@/types/api';
 
@@ -41,8 +39,9 @@ function getTodayDate() {
 const MODEL = openai('gpt-4-turbo');
 
 const SYSTEM_MESSAGE = (
-    `You are an investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
+    `You are an enthusiastic investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
     `Where you cannot answer the user's query, you can recommend the user contact a financial adviser to assist them. ` +
+    `Feel free to use emojis in your messages. ` +
     `Today's date is ${getTodayDate()}. `
 )
 
@@ -63,10 +62,15 @@ export async function clearConversation() {
     history.done(() => ([]));
 }
 
-export async function continueConversation(
+export async function continueConversation({
+    input,
+    userId,
+    article,
+} : {
     input: string,
+    userId?: string|null,
     article?: StockNews
-): Promise<ClientMessage> {
+}): Promise<ClientMessage> {
     "use server";
     // see https://sdk.vercel.ai/examples/next-app/interface/route-components
     const history = getMutableAIState();
@@ -147,6 +151,7 @@ export async function continueConversation(
         text: ({ content, done }) => {
             if (done) {
                 appendAssistantMessageToHistory(content);
+                commitHistory();
             }
             return <ChatMessage content={content} />
         },
@@ -207,33 +212,78 @@ export async function continueConversation(
                 description: getStockDescription,
                 parameters: getStockParams,
                 generate: async function* (args) {
-                    yield <LoadingMessage />;
+                    yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
                     const stockData = await getStockInfo(args.symbol, args.exchange);
                     // append tool call to history
-                    if (!stockData) {
-                        const content = "I'm sorry, I couldn't find any information on that stock.";
-                        appendToolCallToHistory("readArticle", args, JSON.stringify(stockData), true);
-                        appendAssistantMessageToHistory(content);
-                        return <ChatMessage content={content} />;
+                    appendToolCallToHistory("getStockInfo", args, JSON.stringify(stockData), !!stockData);
+                    let content = "";
+                    if (stockData) {
+                        // stream text response to chat and update content of message
+                        const stream = streamAI(conversationHistory);
+                        for await (const text of stream) {
+                            content += text;
+                            yield <MessageWithStockCard content={content} stockData={stockData} />;
+                        }
+                    } else {
+                        content = "I'm sorry, I couldn't find any information on that stock.";
                     }
-                    // update history before returning
-                    appendToolCallToHistory("getStockInfo", args, JSON.stringify(stockData));
-                    return <StockCard stockData={stockData} />;
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <MessageWithStockCard content={content} stockData={stockData} />;
+                },
+            },
+            shouldBuyOrSellStock: {
+                description: getStockAdviceDescription,
+                parameters: getStockAdviceParams,
+                generate: async function* (args) {
+                    yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
+                    // get stock advice
+                    const res = await getStockAdvice(args.symbol, args.amount, args.exchange, userId);
+                    // append tool call to history
+                    appendToolCallToHistory("shouldBuyOrSellStock", args, JSON.stringify(res), !!res);
+                    let content = "";
+                    let stockData: any = null;
+                    if (res) {
+                        stockData = res.stockData;
+                        // stream text response to chat and update content of message
+                        const stream = streamAI(conversationHistory);
+                        for await (const text of stream) {
+                            content += text;
+                            yield <MessageWithStockCard content={content} stockData={stockData} />;
+                        }
+                    } else {
+                        content = "I'm sorry, something went wrong. Please try again later.";
+                    }
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <MessageWithStockCard content={content} stockData={stockData} />;
                 },
             },
             getRecommendations: {
                 description: getRecommendationsDescription,
                 parameters: getRecommendationsParams,
                 generate: async function* (args) {
-                    yield <LoadingMessage />;
-                    try {
-                        const data = await getRecommendations(args.target, args.action);
-                        // update history before returning
-                        appendToolCallToHistory("getRecommendations", args, JSON.stringify(data));
-                        return <RecommendationsTable data={data} />;
-                    } catch (e) {
-                        // TO DO
+                    yield <LoadingMessage msg="Getting recommendations" />;
+                    console.log(args);
+                    const res = await getRecommendations(args.target, args.action, userId);
+                    // append tool call to history
+                    appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
+                    let content = "";
+                    if (res) {
+                        // stream text response to chat and update content of message
+                       content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have."
+                    } else {
+                        content = "I'm sorry, something went wrong. Please try again later.";
                     }
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <MessageWithRecommendations content={content} data={res} />;
                 },
             },
         },
