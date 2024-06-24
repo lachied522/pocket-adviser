@@ -9,7 +9,7 @@ import { description as getStockDescription, parameters as getStockParams, getSt
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
 import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
 
-import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard } from './components/messages';
+import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard } from '@/components/adviser/messages';
 
 import type { StockNews } from '@/types/api';
 
@@ -40,6 +40,7 @@ const MODEL = openai('gpt-4-turbo');
 
 const SYSTEM_MESSAGE = (
     `You are an enthusiastic investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
+    `Stock indexes advanced this week, with the S&P 500 up 0.8% and the Nasdaq up 1%, both setting new record highs. The Dow also moved up 0.5%. However, the S&P 500 ticked lower on Friday due to shares of market bellwether Nvidia slipping for a second day. Additionally, Wall Street experienced a roller-coaster ride following a massive expiration of options, leaving traders more cautious.` +
     `Where you cannot answer the user's query, you can recommend the user contact a financial adviser to assist them. ` +
     `Feel free to use emojis in your messages. ` +
     `Today's date is ${getTodayDate()}. `
@@ -156,6 +157,79 @@ export async function continueConversation({
             return <ChatMessage content={content} />
         },
         tools: {
+            getRecommendations: {
+                description: getRecommendationsDescription,
+                parameters: getRecommendationsParams,
+                generate: async function* (args) {
+                    yield <LoadingMessage msg="Getting recommendations" />;
+                    console.log(args);
+                    const res = await getRecommendations(args.target, args.action, userId);
+                    // append tool call to history
+                    appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
+                    let content = "";
+                    if (res) {
+                        // stream text response to chat and update content of message
+                       content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have."
+                    } else {
+                        content = "I'm sorry, something went wrong. Please try again later.";
+                    }
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <MessageWithRecommendations content={content} data={res} />;
+                },
+            },
+            shouldBuyOrSellStock: {
+                description: getStockAdviceDescription,
+                parameters: getStockAdviceParams,
+                generate: async function* (args) {
+                    yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
+                    // get stock advice
+                    const res = await getStockAdvice(args.symbol, args.amount, args.exchange, userId);
+                    // append tool call to history
+                    appendToolCallToHistory("shouldBuyOrSellStock", args, JSON.stringify(res), !!res);
+                    const stockData = res? res.stockData: null;
+                    // stream text response to chat and update content of message
+                    let content = "";
+                    const stream = streamAI(conversationHistory);
+                    for await (const text of stream) {
+                        content += text;
+                        yield <MessageWithStockCard content={content} stockData={stockData} />;
+                    }
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <MessageWithStockCard content={content} stockData={stockData} />;
+                },
+            },
+            getStockInfo: {
+                description: getStockDescription,
+                parameters: getStockParams,
+                generate: async function* (args) {
+                    yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
+                    const stockData = await getStockInfo(args.symbol, args.exchange, args.includeAnalystResearch);
+                    // append tool call to history
+                    appendToolCallToHistory("getStockInfo", args, JSON.stringify(stockData), !!stockData);
+                    let content = "";
+                    if (stockData) {
+                        // stream text response to chat and update content of message
+                        const stream = streamAI(conversationHistory);
+                        for await (const text of stream) {
+                            content += text;
+                            yield <MessageWithStockCard content={content} stockData={stockData} />;
+                        }
+                    } else {
+                        content = "I'm sorry, I couldn't find any information on that stock.";
+                    }
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <MessageWithStockCard content={content} stockData={stockData} />;
+                },
+            },
             searchWeb: {
                 description: searchWebDescription,
                 parameters: searchWebParams,
@@ -164,16 +238,12 @@ export async function continueConversation({
                     const res = await searchWeb(args.query, args.date);
                     // add tool to history
                     appendToolCallToHistory("searchWeb", args, JSON.stringify(res), !!res);
+                    // stream text response to chat and update content of message
                     let content = "";
-                    if (res) {
-                        // stream text response to chat and update content of message
-                        const stream = streamAI(conversationHistory);
-                        for await (const text of stream) {
-                            content += text;
-                            yield <ChatMessage content={content} />;
-                        }
-                    } else {
-                        content = "I'm sorry, I had trouble retrieving any information on that topic.";
+                    const stream = streamAI(conversationHistory);
+                    for await (const text of stream) {
+                        content += text;
+                        yield <ChatMessage content={content} />;
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
@@ -207,85 +277,7 @@ export async function continueConversation({
                     commitHistory();
                     return <ChatMessage content={content} />;
                 },
-            },
-            getStockInfo: {
-                description: getStockDescription,
-                parameters: getStockParams,
-                generate: async function* (args) {
-                    yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
-                    const stockData = await getStockInfo(args.symbol, args.exchange);
-                    // append tool call to history
-                    appendToolCallToHistory("getStockInfo", args, JSON.stringify(stockData), !!stockData);
-                    let content = "";
-                    if (stockData) {
-                        // stream text response to chat and update content of message
-                        const stream = streamAI(conversationHistory);
-                        for await (const text of stream) {
-                            content += text;
-                            yield <MessageWithStockCard content={content} stockData={stockData} />;
-                        }
-                    } else {
-                        content = "I'm sorry, I couldn't find any information on that stock.";
-                    }
-                    // add assistant response to history
-                    appendAssistantMessageToHistory(content);
-                    // commit history
-                    commitHistory();
-                    return <MessageWithStockCard content={content} stockData={stockData} />;
-                },
-            },
-            shouldBuyOrSellStock: {
-                description: getStockAdviceDescription,
-                parameters: getStockAdviceParams,
-                generate: async function* (args) {
-                    yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
-                    // get stock advice
-                    const res = await getStockAdvice(args.symbol, args.amount, args.exchange, userId);
-                    // append tool call to history
-                    appendToolCallToHistory("shouldBuyOrSellStock", args, JSON.stringify(res), !!res);
-                    let content = "";
-                    let stockData: any = null;
-                    if (res) {
-                        stockData = res.stockData;
-                        // stream text response to chat and update content of message
-                        const stream = streamAI(conversationHistory);
-                        for await (const text of stream) {
-                            content += text;
-                            yield <MessageWithStockCard content={content} stockData={stockData} />;
-                        }
-                    } else {
-                        content = "I'm sorry, something went wrong. Please try again later.";
-                    }
-                    // add assistant response to history
-                    appendAssistantMessageToHistory(content);
-                    // commit history
-                    commitHistory();
-                    return <MessageWithStockCard content={content} stockData={stockData} />;
-                },
-            },
-            getRecommendations: {
-                description: getRecommendationsDescription,
-                parameters: getRecommendationsParams,
-                generate: async function* (args) {
-                    yield <LoadingMessage msg="Getting recommendations" />;
-                    console.log(args);
-                    const res = await getRecommendations(args.target, args.action, userId);
-                    // append tool call to history
-                    appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
-                    let content = "";
-                    if (res) {
-                        // stream text response to chat and update content of message
-                       content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have."
-                    } else {
-                        content = "I'm sorry, something went wrong. Please try again later.";
-                    }
-                    // add assistant response to history
-                    appendAssistantMessageToHistory(content);
-                    // commit history
-                    commitHistory();
-                    return <MessageWithRecommendations content={content} data={res} />;
-                },
-            },
+            }, 
         },
     });
 

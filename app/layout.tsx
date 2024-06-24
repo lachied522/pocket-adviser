@@ -3,13 +3,14 @@ import { cookies } from "next/headers";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 
-import { GlobalProvider } from "../context/GlobalContext";
-import { Provider as SessionProvider } from "../context/SessionContext";
+import { COOKIE_NAME_FOR_GUEST_USER_ID } from "@/constants/cookies";
 
 import { getUserById } from "@/utils/crud/user";
-import { AIProvider } from '@/actions/ai/chat';
 
-import { COOKIE_NAME_FOR_GUEST_USER_ID } from "@/constants/cookies";
+import { Provider as SessionProvider } from "@/context/SessionContext";
+import { AIProvider } from '@/actions/ai/chat';
+import { GlobalProvider } from "@/context/GlobalContext";
+import { AdviserProvider } from "@/context/AdviserContext";
 
 import type { UserData } from "@/types/helpers";
 
@@ -39,7 +40,9 @@ export default async function RootLayout({
         <SessionProvider>
           <GlobalProvider initialState={data}>
             <AIProvider>
-              {children}
+              <AdviserProvider>
+                {children}
+              </AdviserProvider>
             </AIProvider>
           </GlobalProvider>
         </SessionProvider>

@@ -2,18 +2,30 @@
 import { useEffect, useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/components/utils";
 
 import StockCard from "./stock-card";
 import RecommendationsTable from "./recommendations-table";
 
 import type { Stock } from "@prisma/client";
 
-export function ChatMessage({ content }: { content: string }) {
+interface ChatMessageProps {
+    content: any
+    role?: "assistant"|"user"
+}
+
+export function ChatMessage({
+    content,
+    role = "assistant"
+}: ChatMessageProps) {
     if (content.length === 0) return null;
 
     return (
         <Card>
-            <CardContent className="font-medium px-3 py-2 whitespace-pre-wrap">
+            <CardContent className={cn(
+                "font-medium px-3 py-2 text-wrap whitespace-pre-wrap",
+                role === "user" && "bg-neutral-50 border-none"
+            )}>
                 {content}
             </CardContent>
         </Card>

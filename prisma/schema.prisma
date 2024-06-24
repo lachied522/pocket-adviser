@@ -88,7 +88,6 @@ model Stock {
   currency          String
   country           String?
   isEtf             Boolean
-  image             String?
   previousClose     Float?
   changesPercentage Float?
   priceTarget       Float?

@@ -5,13 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { PiggyBank, RefreshCw, TrendingUp } from "lucide-react";
+import { PiggyBank, TrendingUp } from "lucide-react";
 
 import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -19,7 +18,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
 
 const formSchema = z.object({
     action: z.enum(["deposit", "withdrawal"]),
@@ -41,11 +40,11 @@ const formSchema = z.object({
 
 interface GetAdviceDialogProps {
     children: React.ReactNode
-    onSubmit: (values: z.infer<typeof formSchema>) => void
 }
 
-export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogProps) {
+export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const { portfolioValue } = useGlobalContext() as GlobalState;
+    const { onSubmit } = useAdviserContext() as AdviserState;
     const closeRef = useRef<HTMLButtonElement>(null);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -62,8 +61,9 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
     }, [portfolioValue, amount, action]);
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
+        const content = `I would like to ${values.action} ${formatDollar(values.amount)}. Can you give me some ideas?`;
         // call onSubmit
-        onSubmit(values);
+        onSubmit(content);
         // close dialog and reset form
         if (closeRef.current) closeRef.current.click();
     }
@@ -78,7 +78,7 @@ export default function GetAdviceDialog({ children, onSubmit }: GetAdviceDialogP
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="">
+            <DialogContent className='max-w-md'>
                 <DialogHeader>
                     <DialogTitle>
                         Quickly Ask for Advice

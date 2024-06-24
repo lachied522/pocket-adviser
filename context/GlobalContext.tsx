@@ -10,17 +10,17 @@ import {
 } from "react";
 import { useSession } from "next-auth/react";
 
-import { type Action, GlobalReducer } from "./GlobalReducer";
-
-import { getUserDataAction } from "../actions/user";
-import { getStockByIdAction } from "../actions/stocks";``
-import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "../actions/holdings";
+import { getUserDataAction } from "@/actions/user";
+import { getStockByIdAction } from "@/actions/stocks";
+import { updateProfileAction } from "@/actions/profile";
+import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/holdings";
 
 import { useGuest } from "@/hooks/useGuest";
 
+import { type Action, GlobalReducer } from "./GlobalReducer";
+
 import type { Holding, Profile, Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
-import { updateProfileAction } from "@/actions/profile";
 
 export type GlobalState = {
   state: UserData | null

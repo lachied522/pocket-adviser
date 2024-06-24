@@ -28,7 +28,10 @@ export type CompanyProfile = {
     companyName: string
     description: string // company description
     price: number
+    changes: number
     currency: string // e.g. "USD"
+    exchange: string // e.g. NASDAQ Global Select
+    exchangeShortName: string // e.g. NASDAQ - use this one
     beta: number
     mktCap: bigint
     lastDiv?: number

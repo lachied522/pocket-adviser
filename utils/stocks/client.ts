@@ -92,11 +92,11 @@ export default class StockDataClient {
         return data;
     }
 
-    async getAnalystResearch(symbol: string): Promise<AnalystResearch|null> {
+    async getAnalystResearch(symbol: string, limit: number = 3): Promise<AnalystResearch[]|null> {
         // see https://intelligence.financialmodelingprep.com/developer/docs#price-target
         const params = new URLSearchParams({ symbol });
-        const data = await this.makeAuthenticatedAPIRequest('price-target', params, 4);
+        const data = await this.makeAuthenticatedAPIRequest('price-target', params, 4) as AnalystResearch[]|null;
         if (!(data && data.length)) return null;
-        return data[0];
+        return data.slice(0, limit);
     }
 }

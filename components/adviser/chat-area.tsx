@@ -1,116 +1,29 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
-import { useActions, useUIState } from 'ai/rsc';
-import { generateId } from 'ai';
-
-import { ArrowBigUp, SquarePen, Stethoscope, TrendingUp, X } from "lucide-react";
+import { ArrowBigUp, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { H3 } from "@/components/ui/typography";
 import { cn } from "@/components/utils";
 
-import { formatDollar } from "@/utils/formatting";
-
-import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
 
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import NewsCarousel from "./news-carousel";
-import NewsArticle from "./news-article";
+import SamplePrompts from "./sample-prompts";
 
 import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/api";
-import SamplePrompts from "./sample-prompts";
-
-const UserMessage = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <Card>
-            <CardContent className="font-medium px-3 py-2 bg-neutral-50 border-none">
-                {children}
-            </CardContent>
-        </Card>
-    )
-}
-
-const initialMessage = {
-    id: generateId(),
-    role: "assistant" as const,
-    display: (
-        <Card>
-            <CardContent className="font-medium px-3 py-2 whitespace-pre-wrap">
-                Hey! How's it going?
-            </CardContent>
-        </Card>
-    )
-} satisfies ClientMessage;
+import { ChatMessage } from "./messages";
 
 export default function ChatArea() {
-    const { state } = useGlobalContext() as GlobalState;
-    const [conversation, setConversation] = useUIState();
-    const { continueConversation, clearConversation } = useActions();
-    const [input, setInput] = useState<string>('');
+    const { input, conversation, isLoading, setInput, onSubmit, onReset } = useAdviserContext() as AdviserState;
     const [article, setArticle] = useState<StockNews|null>(null);
-
-    useEffect(() => {
-        setConversation([initialMessage]);
-    }, []);
-
-    const onSubmit = async (content: string) => {
-        if (content.length === 0) return;
-        // clear input
-        setInput('');
-        setArticle(null);
-
-        if (article) {
-            // append article to conversation
-            setConversation((currentConversation: ClientMessage[]) => [
-                ...currentConversation,
-                {
-                    id: generateId(),
-                    role: 'user',
-                    display: <NewsArticle article={article} />
-                },
-            ]);
-        }
-        
-        setConversation((currentConversation: ClientMessage[]) => [
-          ...currentConversation,
-          { id: generateId(), role: 'user', display: content },
-        ]);
-
-        const message = await continueConversation({
-            userId: state?.id,
-            input: content,
-            article
-        });
-
-        setConversation((currentConversation: ClientMessage[]) => [
-          ...currentConversation,
-          message,
-        ]);
-    }
-
-    const onAdviceCallback = ({ action, amount }: { action: 'deposit'|'withdrawal',  amount: number }) => {
-        const content = `I would like to ${action} ${formatDollar(amount)}. Can you provide some recommendations?`;
-        onSubmit(content);
-    }
-
-    const onReviewCallback = () => {
-        const content = "Can you provide some recommendations for my portfolio?";
-        onSubmit(content);
-    }
-
-    const onReset = async () => {
-        await clearConversation();
-        setInput('');
-        setArticle(null);
-        setConversation([]);
-    }
 
     const onArticleDrop = (e: React.DragEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -136,7 +49,7 @@ export default function ChatArea() {
                         New chat
                     </Button>
 
-                    <CheckupDialog onSubmit={onReviewCallback}>
+                    <CheckupDialog>
                         <Button
                             variant='ghost'
                             className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
@@ -146,7 +59,7 @@ export default function ChatArea() {
                         </Button>
                     </CheckupDialog>
 
-                    <GetAdviceDialog onSubmit={onAdviceCallback}>
+                    <GetAdviceDialog>
                         <Button
                             variant='ghost'
                             className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
@@ -168,8 +81,8 @@ export default function ChatArea() {
                             <div
                                 key={message.id}
                                 className={cn(
-                                    'flex flex-row',
-                                    message.role === 'user' && 'justify-end'
+                                    'flex flex-row md:pr-24',
+                                    message.role === 'user' && 'justify-end md:pr-0 md:pl-24'
                                 )}
                             >
                                 <div className=''>
@@ -179,9 +92,7 @@ export default function ChatArea() {
                                     {message.role === "assistant"? (
                                     <>{message.display}</>
                                     ) : (
-                                    <UserMessage>
-                                        {message.display}
-                                    </UserMessage>
+                                    <ChatMessage role="user" content={message.display} />
                                     )}
                                 </div>
                             </div>
@@ -219,13 +130,13 @@ export default function ChatArea() {
                         <Input
                             value={input}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') onSubmit(input) }}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && !isLoading) onSubmit(input) }}
                             placeholder='Ask me something!'
                             className='h-full w-full text-base font-medium bg-slate-100 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                         />
-
                         <Button
                             onClick={() => onSubmit(input)}
+                            disabled={isLoading}
                             className="h-full aspect-square bg-neutral-100 p-0 group rounded-none"
                         >
                             <ArrowBigUp size={27} className={'text-black transition-colors duration-200 group-hover:text-white'} />

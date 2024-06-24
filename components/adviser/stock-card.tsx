@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import StockModal from "@/components/stocks/stock-modal";
+import StockLogo from "@/components/stocks/stock-logo";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
@@ -18,23 +19,21 @@ export default function StockCard({ stockData }: StockCardProps) {
                 <CardContent className='flex flex-col gap-3.5 p-3'>
                     <div className='flex flex-row gap-3.5'>
                         <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
-                            {stockData.image? (
-                            <Image
-                                src={stockData.image}
-                                alt={stockData.symbol + " logo"}
-                                height={120}
-                                width={120}
-                            />
-                            ) : (
-                            <div className='h-full w-full flex items-center justify-center text-sm'>
-                                Logo not found
-                            </div>
-                            )}
+                            <StockLogo symbol={stockData.symbol} />
                         </div>
 
                         <div className='flex flex-col'>
                             <div className='text-lg font-medium'>{stockData.name}</div>
                             <div className=''>{stockData.symbol}</div>
+                            <div className='flex flex-row items-center gap-2'>
+                                <Image
+                                    src={stockData.exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+                                    alt='flag'
+                                    height={16}
+                                    width={16}
+                                />
+                                <span>{stockData.exchange}</span>
+                            </div>
                         </div>
                     </div>
 

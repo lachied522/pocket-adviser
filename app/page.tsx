@@ -23,8 +23,8 @@ export default function Page() {
         </Container>
       </div>
 
-      <div className='flex flex-col gap-12 py-12 relative'>
-        <div className='z-[-1] fixed inset-0 opacity-30 bg-slate-300'>
+      <div className='flex flex-col gap-6 xl:gap-10 py-6 xl:py-10 relative'>
+        <div className='z-[-1] fixed inset-0 opacity-40 bg-slate-300'>
             <Image
               src='/background-image-main.jpg'
               alt='background-image'

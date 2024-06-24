@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 import {
@@ -17,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
+
+import StockLogo from "./stock-logo";
 
 import type { Stock } from "@prisma/client";
 
@@ -27,17 +30,23 @@ interface StockModalProps {
 
 export default function StockModal({ children, stockId }: StockModalProps) {
     const { getStockData } = useGlobalContext() as GlobalState;
+    const { onSubmit } = useAdviserContext() as AdviserState;
     const [stockData, setStockData] = useState<Stock | null>(null);
+    const closeRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         (async function getData() {
-            console.log(typeof stockId);
             if (typeof stockId !== "number") return;
 
             const _data = await getStockData(stockId);
             if (_data) setStockData(_data);
         })();
     }, []);
+
+    const onButtonPress = (content: string) => {
+        onSubmit(content);
+        if (closeRef.current) closeRef.current.click();
+    }
 
     return (
         <>
@@ -55,18 +64,7 @@ export default function StockModal({ children, stockId }: StockModalProps) {
 
                     <div className='flex flex-row gap-3.5'>
                         <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
-                            {stockData.image? (
-                            <Image
-                                src={stockData.image}
-                                alt={stockData.symbol + " logo"}
-                                height={120}
-                                width={120}
-                            />
-                            ) : (
-                            <div className='h-full w-full flex items-center justify-center text-sm'>
-                                Logo not found
-                            </div>
-                            )}
+                            <StockLogo symbol={stockData.symbol} />
                         </div>
 
                         <div className='flex flex-col justify-between'>
@@ -106,15 +104,22 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                     </ScrollArea>
 
                     <DialogFooter>
-                        <div  className='w-full flex flex-row justify-around gap-3.5'>
-                            <Button className='text-black bg-neutral-100 transition-colors duration-200 hover:text-white shadow-none'>
+                        <DialogClose ref={closeRef} className='hidden' />
+                        <div className='w-full flex flex-row justify-around gap-3.5'>
+                            <Button
+                                onClick={() => onButtonPress(`What's new with ${stockData.symbol}?`)}
+                                className='text-black bg-neutral-100 transition-colors duration-200 hover:text-white shadow-none'
+                            >
                                 What's new with {stockData.symbol}?
                             </Button>
-                            <Button className='text-black bg-neutral-100 transition-colors duration-200 hover:text-white shadow-none'>
+                            <Button
+                                onClick={() => onButtonPress(`Should I buy ${stockData.symbol}?`)}
+                                className='text-black bg-neutral-100 transition-colors duration-200 hover:text-white shadow-none'
+                            >
                                 Should I buy {stockData.symbol}?
                             </Button>
                         </div>
-                </DialogFooter>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
             ) : (
