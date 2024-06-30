@@ -9,7 +9,7 @@ export const parameters = z.object({
 });
 
 async function fetchData(target: number, action: string, userId?: string|null) {
-    const url = new URL(`${process.env.BACKEND_URL}/get-recommendations`);
+    const url = new URL(`${process.env.BACKEND_URL}/get-advice`);
     const params = new URLSearchParams();
     if (userId) {
         params.set("userId", userId);
@@ -25,7 +25,8 @@ async function fetchData(target: number, action: string, userId?: string|null) {
         headers: {
             "Content-Type": "application/json",
         }
-    })
+    });
+
     if (!response.ok) {
         throw new Error(`Error getting recommendations.`)
     }
@@ -44,6 +45,7 @@ export async function getRecommendations(target: number, action: string, userId?
         if (process.env.NODE_ENV==="development") console.log(res);
         return formatResults(res);
     } catch (e) {
+        console.log(e);
         return null;
     }
 }

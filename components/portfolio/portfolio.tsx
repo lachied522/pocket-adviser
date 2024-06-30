@@ -55,7 +55,7 @@ export default function Portfolio() {
 
                 <EditPortfolioDialog>
                     <Button
-                        variant='ghost'
+                        variant='outline'
                         className='flex flex-row gap-2'
                     >
                         <Pencil size={16} />

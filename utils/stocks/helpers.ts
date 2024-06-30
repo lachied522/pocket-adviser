@@ -14,11 +14,6 @@ export async function getAggregatedStockData(
 ): Promise<Omit<Stock, 'id'> | null> {
     // aggregate data from required endpoints and format into db-friendly record
 
-    // add '.AX' if exchange is ASX
-    if (exchange === 'ASX' && !symbol.endsWith('.AX')) {
-        symbol = `${symbol}.AX`;
-    }
-
     // ensure symbol is capitalised
     symbol = symbol.toUpperCase();
 
@@ -54,7 +49,6 @@ export async function getAggregatedStockData(
         currency: profile.currency,
         country: profile.country,
         isEtf: profile.isEtf,
-        image: profile.image,
         sector: profile.sector,
         beta: profile.beta,
         priceTarget: consensus?.targetConsensus || null,

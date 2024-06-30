@@ -25,6 +25,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { searchStocksAction } from "@/actions/stocks";
 
@@ -112,7 +113,8 @@ export default function EditPortfolioDialog({ children }: {
     const [modifiedHoldings, setModifiedHoldings] = useState<ModifiedHolding[]>([]); // keep copy of user holdings with current modifications applied
     const [searchString, setSearchString] = useState<string>('');
     const [searchResults, setSearchResults] = useState<Stock[]>([]);
-    const [isLoadingSearch, setIsLoadingSearch] = useState<boolean>(false);
+    const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
+    const [isSearchEmpty, setIsSearchEmpty] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -151,13 +153,14 @@ export default function EditPortfolioDialog({ children }: {
     }
 
     const onSearch = async () => {
-        try {
-            const data = await searchStocksAction(searchString);
-            setSearchResults(data);
-        } catch (e) {
-            console.error(e);
-            // TO DO: handle error
+        setIsSearchEmpty(false);
+        setIsSearchLoading(true);
+        const data = await searchStocksAction(searchString);
+        if (data.length === 0) {
+            setIsSearchEmpty(true);
         }
+        setSearchResults(data);
+        setIsSearchLoading(false);
     }
 
     const clearSearch = () => {
@@ -211,93 +214,117 @@ export default function EditPortfolioDialog({ children }: {
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className='flex flex-col gap-2'>
-                    <span className='text-sm text-slate-600 font-medium'>Add a stock to your portfolio</span>
-                    <div className='w-full flex flex-row border border-neutral-200 rounded-lg overflow-hidden'>
-                        <Input
-                            type='text'
-                            value={searchString}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value)}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') onSearch() }}
-                            placeholder='e.g. AAPL, BHP'
-                            className='h-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
-                        />
-                        <Button
-                            variant='secondary'
-                            onClick={onSearch}
-                            className='h-full aspect-square p-3'
-                        >
-                            <Search size={22} color='black' />
-                        </Button>
-                    </div>
-                </div>
-
-                <div className='relative'>
+                <div className='flex flex-col'>
                     <div className='flex flex-col gap-2'>
-                        <span className='text-sm text-slate-600 font-medium'>Edit your portfolio</span>
-                        <div className='rounded-md border'>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Symbol</TableHead>
-                                        <TableHead>Units</TableHead>
-                                        <TableHead>Value ($)</TableHead>
-                                        <TableHead>Remove</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <>
-                                        {modifiedHoldings.length > 0? (
-                                        <>
-                                            {modifiedHoldings.filter((holding) => !holding.deleted).map((holding) => (
-                                            <EditHolding
-                                                key={`edit-holding-${holding.id}`}
-                                                holding={holding}
-                                                onUpdate={onUpdateHolding}
-                                                onRemove={() => onRemoveHolding(holding)}
-                                            />
-                                            ))}
-                                        </>
-                                        ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={4} className='p-6'>
-                                                <div className='w-full flex items-center justify-center text-center'>
-                                                    Use the search bar above to add stocks to your portfolio.
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                        )}
-                                    </>
-                                </TableBody>
-                            </Table>
+                        <span className='text-sm text-slate-600 font-medium'>Add a stock to your portfolio</span>
+                        <div className='w-full flex flex-row border border-neutral-200 rounded-lg overflow-hidden'>
+                            <Input
+                                type='text'
+                                value={searchString}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setSearchString(e.target.value);
+                                    setIsSearchEmpty(false);
+                                }}
+                                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Enter') onSearch();
+                                }}
+                                placeholder='e.g. AAPL, BHP'
+                                className='h-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                            />
+                            <Button
+                                variant='secondary'
+                                onClick={onSearch}
+                                className='h-full aspect-square p-3'
+                            >
+                                <Search size={22} color='black' />
+                            </Button>
                         </div>
                     </div>
 
-                    {searchString.length > 0 && (
-                    <div className='bg-white inset-0 absolute'>
-                        {searchResults.length > 0? (
-                        <ScrollArea className='h-[240px]'>
-                            {searchResults.map((stock) => (
-                            <Button
-                                key={`search-result-${stock.symbol}`}
-                                variant='ghost'
-                                onClick={() => onAddHolding(stock)}
-                                className='h-12 w-full grid grid-cols-[100px_1fr] place-items-start gap-2 p-3 mb-3'
-                            >
-                                <div className='text-lg font-medium'>{stock.symbol.toUpperCase()}</div>
-                                <div className='text-lg truncate'>
-                                    {stock.name}
-                                </div>
-                            </Button>
-                            ))}
-                        </ScrollArea>
-                        ) : (
-                        <div className='w-full text-center'>
-                            It looks like we don't cover this stock
+                    <div className='relative'>
+                        <div className='flex flex-col gap-2 mt-12'>
+                            <span className='text-sm text-slate-600 font-medium'>Edit your portfolio</span>
+                            <div className='rounded-md border'>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Symbol</TableHead>
+                                            <TableHead>Units</TableHead>
+                                            <TableHead>Value ($)</TableHead>
+                                            <TableHead>Remove</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <>
+                                            {modifiedHoldings.length > 0? (
+                                            <>
+                                                {modifiedHoldings.filter((holding) => !holding.deleted).map((holding) => (
+                                                <EditHolding
+                                                    key={`edit-holding-${holding.id}`}
+                                                    holding={holding}
+                                                    onUpdate={onUpdateHolding}
+                                                    onRemove={() => onRemoveHolding(holding)}
+                                                />
+                                                ))}
+                                            </>
+                                            ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className='p-6'>
+                                                    <div className='w-full flex items-center justify-center text-center'>
+                                                        Use the search bar above to add stocks to your portfolio.
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                            )}
+                                        </>
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+
+                        {searchString.length > 0 && (
+                        <div className='bg-white inset-0 absolute'>
+                            {isSearchLoading ? (
+                            <div className='h-[240px] w-full flex flex-col gap-3 py-3'>
+                                <Skeleton className='h-12 w-full bg-slate-100' />
+                                <Skeleton className='h-12 w-full bg-slate-100' />
+                                <Skeleton className='h-12 w-full bg-slate-100' />
+                            </div>
+                            ) : (
+                            <>
+                                {searchResults.length > 0? (
+                                <ScrollArea className='h-[240px] py-3'>
+                                    {searchResults.map((stock) => (
+                                    <Button
+                                        key={`search-result-${stock.symbol}`}
+                                        variant='ghost'
+                                        onClick={() => {
+                                            onAddHolding(stock);
+                                            setSearchResults([]);
+                                        }}
+                                        className='h-12 w-full grid grid-cols-[100px_1fr] place-items-start gap-2 p-3 mb-3'
+                                    >
+                                        <div className='text-lg font-medium'>{stock.symbol.toUpperCase()}</div>
+                                        <div className='text-lg truncate'>
+                                            {stock.name}
+                                        </div>
+                                    </Button>
+                                    ))}
+                                </ScrollArea>
+                                ) : (
+                                <>
+                                    {isSearchEmpty && (
+                                    <div className='w-full text-center p-20'>
+                                        It looks like we don't cover this stock
+                                    </div>
+                                    )}
+                                </>
+                                )}
+                            </>
+                            )}
                         </div>
                         )}
                     </div>
-                    )}
                 </div>
 
                 <DialogFooter>

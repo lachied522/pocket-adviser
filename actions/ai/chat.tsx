@@ -3,11 +3,12 @@ import { generateId, streamText, type TextPart, type ToolResultPart, type ToolCa
 import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
 import { openai } from '@ai-sdk/openai';
 
-import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
-import { description as readArticleDescription, parameters as readArticleParams, readArticle } from './tools/read-article';
-import { description as getStockDescription, parameters as getStockParams, getStockInfo } from "./tools/get-stock-info";
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
 import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
+import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from "./tools/get-portfolio";
+import { description as getStockDescription, parameters as getStockParams, getStockInfo } from "./tools/get-stock-info";
+import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
+import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
 import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard } from '@/components/adviser/messages';
 
@@ -17,7 +18,7 @@ export interface ServerMessage {
     role: 'user'|'assistant'|'tool'
     content: string|Array<TextPart|ToolCallPart>|ToolResultPart
 }
-  
+
 export interface ClientMessage {
     id: string
     role: 'user'|'assistant'
@@ -115,34 +116,36 @@ export async function continueConversation({
     }
 
     // if article exists, read article before and append to conversation history
-    if (article) {
-        // push user message to conversation history
-        conversationHistory.push({
-            role: 'user',
-            content: input,
-        });
-        // read article
-        const result = await readArticle(article.url);
-        if (!result) {
-            // TO DO
-        } else {
-            const id = generateId();
-            const args = { url: article.url };
-            // append assistant message
-            conversationHistory.push({
-                role: 'assistant',
-                content: [{ type: 'tool-call', toolCallId: id, toolName: "readArticle", args }]
-            });
-            // append tool response
-            conversationHistory.push({
-                role: 'tool',
-                content: [{ type: 'tool-result', toolCallId: id, toolName: "readArticle", args, result }]
-            });
-        }
-    } else {
-        // push user input to conversation history
-        conversationHistory.push({ role: 'user', content: input });
-    }
+    // if (article) {
+    //     // push user message to conversation history
+    //     conversationHistory.push({
+    //         role: 'user',
+    //         content: input,
+    //     });
+    //     // read article
+    //     const result = await readUrl(article.url);
+    //     if (!result) {
+    //         // TO DO
+    //     } else {
+    //         const id = generateId();
+    //         const args = { url: article.url };
+    //         // append assistant message
+    //         conversationHistory.push({
+    //             role: 'assistant',
+    //             content: [{ type: 'tool-call', toolCallId: id, toolName: "readUrl", args }]
+    //         });
+    //         // append tool response
+    //         conversationHistory.push({
+    //             role: 'tool',
+    //             content: [{ type: 'tool-result', toolCallId: id, toolName: "readUrl", args, result }]
+    //         });
+    //     }
+    // } else {
+    //     // push user input to conversation history
+    //     conversationHistory.push({ role: 'user', content: input });
+    // }
+
+    conversationHistory.push({ role: 'user', content: input });
 
     const result = await streamUI({
         model: MODEL,
@@ -162,7 +165,6 @@ export async function continueConversation({
                 parameters: getRecommendationsParams,
                 generate: async function* (args) {
                     yield <LoadingMessage msg="Getting recommendations" />;
-                    console.log(args);
                     const res = await getRecommendations(args.target, args.action, userId);
                     // append tool call to history
                     appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
@@ -175,7 +177,6 @@ export async function continueConversation({
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
-                    // commit history
                     commitHistory();
                     return <MessageWithRecommendations content={content} data={res} />;
                 },
@@ -199,10 +200,31 @@ export async function continueConversation({
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
-                    // commit history
                     commitHistory();
                     return <MessageWithStockCard content={content} stockData={stockData} />;
                 },
+            },
+            getPortfolio: {
+                description: getPortfolioDescription,
+                parameters: getPortfolioParams,
+                generate: async function* (args) {
+                    yield <LoadingMessage msg="Getting your portfolio" />;
+                    // get user's portfolio
+                    const res = await getPortfolio(userId);
+                    appendToolCallToHistory("getPortfolio", args, JSON.stringify(res), !!res);
+                    // stream text response
+                    let content = "";
+                    const stream = streamAI(conversationHistory);
+                    for await (const text of stream) {
+                        content += text;
+                        yield <ChatMessage content={content} />;
+                    }
+                    // add assistant response to history
+                    appendAssistantMessageToHistory(content);
+                    // commit history
+                    commitHistory();
+                    return <ChatMessage content={content} />;
+                }
             },
             getStockInfo: {
                 description: getStockDescription,
@@ -225,7 +247,6 @@ export async function continueConversation({
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
-                    // commit history
                     commitHistory();
                     return <MessageWithStockCard content={content} stockData={stockData} />;
                 },
@@ -252,14 +273,14 @@ export async function continueConversation({
                     return <ChatMessage content={content} />;
                 },
             },
-            readArticle: {
-                description: readArticleDescription,
-                parameters: readArticleParams,
+            readUrl: {
+                description: readUrlDescription,
+                parameters: readUrlParams,
                 generate: async function* (args) {
-                    yield <LoadingMessage msg="Retrieving article" />;
-                    const res = await readArticle(args.url);
+                    yield <LoadingMessage msg="Reading web page" />;
+                    const res = await readUrl(args.url);
                     // update history
-                    appendToolCallToHistory("readArticle", args, JSON.stringify(res), !!res);
+                    appendToolCallToHistory("readUrl", args, JSON.stringify(res), !!res);
                     let content = "";
                     if (res) {
                         // stream text response to chat and update content of message
@@ -277,7 +298,7 @@ export async function continueConversation({
                     commitHistory();
                     return <ChatMessage content={content} />;
                 },
-            }, 
+            },
         },
     });
 

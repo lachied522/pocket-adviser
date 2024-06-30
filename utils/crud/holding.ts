@@ -10,8 +10,9 @@ export async function getHoldingsByUserId(userId: string) {
   });
 }
 
-export async function getHoldingsWithStocks() {
+export async function getHoldingsWithStocks(userId: string) {
   return await prisma.holding.findMany({
+    where: { userId },
     relationLoadStrategy: "join",
     include: {
       stock: true,

@@ -13,19 +13,20 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  name           String?
-  email          String?   @unique
-  hashedPassword String?
-  emailVerified  DateTime?
-  image          String?
-  guest          Boolean   @default(false)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  accounts       Account[]
-  sessions       Session[]
-  holdings       Holding[]
-  profile        Profile?
+  id              String           @id @default(cuid())
+  name            String?
+  email           String?          @unique
+  hashedPassword  String?
+  emailVerified   DateTime?
+  image           String?
+  guest           Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  accounts        Account[]
+  sessions        Session[]
+  holdings        Holding[]
+  recommendations Advice[]
+  profile         Profile?
 }
 
 model Account {
@@ -113,6 +114,17 @@ model Holding {
   stock Stock @relation(fields: [stockId], references: [id], onDelete: Cascade)
 }
 
+model Advice {
+  id           Int      @id @default(autoincrement())
+  action       Action
+  amount       Float?
+  transactions Json[]
+  createdAt    DateTime @default(now())
+  userId       String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 enum Objective {
   RETIREMENT
   INCOME
@@ -120,4 +132,10 @@ enum Objective {
   DEPOSIT
   CHILDREN
   TRADING
+}
+
+enum Action {
+  DEPOSIT
+  WITHDRAW
+  REVIEW
 }
