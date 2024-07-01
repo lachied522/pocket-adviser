@@ -32,7 +32,7 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
 
 const formSchema = z.object({
-    action: z.enum(["deposit", "withdrawal"]),
+    action: z.enum(["deposit", "withdraw"]),
     amount: z.coerce.number().min(0, {
         message: "Please enter an amount above $0!"
     }),
@@ -100,8 +100,8 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             </Button>
                             <Button
                                 type="button"
-                                variant={action==='withdrawal' ? 'default': 'secondary'}
-                                onClick={() => form.setValue('action', 'withdrawal')}
+                                variant={action==='withdraw' ? 'default': 'secondary'}
+                                onClick={() => form.setValue('action', 'withdraw')}
                                 className="grid grid-cols-[36px_1fr] items-center justify-center"
                             >
                                 <PiggyBank size={24} />

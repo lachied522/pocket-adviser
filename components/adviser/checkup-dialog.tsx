@@ -33,15 +33,14 @@ export default function CheckupDialog({ children }: CheckupDialogProps) {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-w-xs'>
+            <DialogContent className='max-w-sm'>
                 <DialogHeader>
                     <DialogTitle className='flex flex-row items-center gap-2'>
                         🩺 Get a Portfolio Checkup
                     </DialogTitle>
-                    <DialogDescription>
-                        Review your portfolio and provide any recommendations.
-                    </DialogDescription>
                 </DialogHeader>
+
+                <p>Review your portfolio and provide any recommendations.</p>
 
                 <div className='h-full flex flex-row items-end justify-between'>
                     <DialogClose asChild>

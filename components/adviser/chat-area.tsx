@@ -10,27 +10,37 @@ import { Button } from "@/components/ui/button";
 import { H3 } from "@/components/ui/typography";
 import { cn } from "@/components/utils";
 
+import { useScrollAnchor } from "@/hooks/useScrollAnchor";
+
 import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
 
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import NewsCarousel from "./news-carousel";
 import SamplePrompts from "./sample-prompts";
+import NewsArticle from "./news-article";
+import { ChatMessage } from "./messages";
 
 import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/api";
-import { ChatMessage } from "./messages";
 
 export default function ChatArea() {
-    const { input, conversation, isLoading, setInput, onSubmit, onReset } = useAdviserContext() as AdviserState;
-    const [article, setArticle] = useState<StockNews|null>(null);
+    const { input, article, conversation, isLoading, setInput, setArticle, onSubmit, onReset } = useAdviserContext() as AdviserState;
+    const { scrollAreaRef, messagesRef, anchorRef, scrollToBottom } = useScrollAnchor();
 
     const onArticleDrop = (e: React.DragEvent<HTMLInputElement>) => {
         e.preventDefault();
         const articleData = e.dataTransfer.getData("text");
         const article = JSON.parse(articleData) as StockNews;
         setArticle(article);
-        setInput("Can you tell me about this article?");
+        setInput("Can you tell me about this article and the potential impacts it may have on my portfolio?");
+    }
+
+    const onSubmitButtonClick = () => {
+        // scroll to bottom
+        scrollToBottom();
+        // call onSubmit
+        onSubmit(input);
     }
 
     return (
@@ -75,28 +85,30 @@ export default function ChatArea() {
 
             <div onDrop={onArticleDrop} className='md:px-6 xl:px-3 order-last xl:order-2'>
                 <div className="max-w-[960px] flex flex-col gap-3 mx-auto shadow-inner shadow-slate-50 rounded-lg">
-                    <ScrollArea>
-                        <div className="h-[600px] 2xl:h-[720px] flex flex-col justify-start gap-3 px-3 py-3">
+                    <ScrollArea ref={scrollAreaRef} className='h-[600px] 2xl:h-[720px]'>
+                        <div ref={messagesRef} className='flex flex-col justify-start gap-3 px-3 py-3'>
                             {conversation.map((message: ClientMessage) => (
                             <div
                                 key={message.id}
                                 className={cn(
-                                    'flex flex-row md:pr-24',
-                                    message.role === 'user' && 'justify-end md:pr-0 md:pl-24'
+                                    'flex flex-col items-start md:pr-24 gap-2',
+                                    message.role === 'user' && 'items-end md:pr-0 md:pl-24'
                                 )}
                             >
-                                <div className=''>
-                                    <div className='text-sm font-medium text-slate-600'>
-                                        {message.role === "assistant"? "Pocket Adviser": "Me"}
-                                    </div>
-                                    {message.role === "assistant"? (
-                                    <>{message.display}</>
-                                    ) : (
-                                    <ChatMessage role="user" content={message.display} />
-                                    )}
+                                <div className='text-sm font-medium text-slate-600'>
+                                    {message.role === "assistant"? "Pocket Adviser": "Me"}
                                 </div>
+                                {message.role === "assistant"? (
+                                <>{message.display}</>
+                                ) : (
+                                <>
+                                    {message.article && <NewsArticle article={message.article} draggable={false} />}
+                                    <ChatMessage role="user" content={message.display} />
+                                </>
+                                )}
                             </div>
                             ))}
+                            <div className="w-full h-px" ref={anchorRef} />
                         </div>
                     </ScrollArea>
 
@@ -130,12 +142,12 @@ export default function ChatArea() {
                         <Input
                             value={input}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && !isLoading) onSubmit(input) }}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && !isLoading) onSubmitButtonClick() }}
                             placeholder='Ask me something!'
                             className='h-full w-full text-base font-medium bg-slate-100 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                         />
                         <Button
-                            onClick={() => onSubmit(input)}
+                            onClick={onSubmitButtonClick}
                             disabled={isLoading}
                             className="h-full aspect-square bg-neutral-100 p-0 group rounded-none"
                         >

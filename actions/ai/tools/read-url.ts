@@ -6,7 +6,7 @@ import { openai } from '@ai-sdk/openai';
 
 import { z } from "zod";
 
-export const description = "Get a  content summary of a web page";
+export const description = "Get a content summary of a web page";
 
 export const parameters = z.object({
     url: z.string().describe("Url of webpage to read"),
@@ -14,7 +14,7 @@ export const parameters = z.object({
 
 async function summariseContent(content: string) {
     const { text } = await generateText({
-        model: openai('gpt-4-turbo'),
+        model: openai('gpt-3.5-turbo'),
         prompt: (
             `The following is the text content that was scraped from a webpage.` +
             `Provide a summary of the web page and any important information.\n\n` +

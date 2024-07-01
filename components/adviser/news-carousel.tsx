@@ -24,9 +24,8 @@ export default function NewsCarousel() {
     const [page, setPage] = useState<number>(0);
 
     useEffect(() => {
-        getNews();
-
-        async function getNews() {
+        (async function getNews() {
+            setIsLoading(true);
             const symbols = [];
             if (state && state.holdings) {
                 for (const holding of state.holdings) {
@@ -34,11 +33,23 @@ export default function NewsCarousel() {
                     symbols.push(symbol);
                 }
             }
-            const _data = await getNewsAction(symbols);
-            setData(_data);
+            const _data = await getNewsAction(symbols, page);
+            // update state, ensuring only unique articles are returned
+            setData((curr) => {
+                if (curr) {
+                    const newData = [...curr];
+                    for (const article of _data) {
+                        if (!curr.find((obj) => obj.title === article.title)) {
+                            newData.push(article);
+                        }
+                    }
+                    return newData;
+                }
+                return _data;
+            });
             setIsLoading(false);
-        };
-    }, []);
+        })();
+    }, [page, getStockData]);
 
     return (
         <div className='flex flex-col items-stretch'>
@@ -78,6 +89,15 @@ export default function NewsCarousel() {
                                     animateOnHover
                                 />
                                 ))}
+
+                                <Button
+                                    variant='ghost'
+                                    disabled={isLoading || page >= 2}
+                                    onClick={() => setPage((curr) => curr + 1)}
+                                    className='text-sm mt-3.5'
+                                >
+                                    Get more
+                                </Button>
                             </div>
                             <ScrollBar orientation="horizontal" />
                         </ScrollArea>

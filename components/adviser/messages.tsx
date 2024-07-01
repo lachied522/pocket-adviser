@@ -66,8 +66,8 @@ export function MessageWithStockCard({ content, stockData }: { content: string, 
 export function MessageWithRecommendations({ content, data }: { content: string, data?: any }) {
     return (
         <div className="w-full flex flex-col items-start gap-2">
-            {data && <RecommendationsTable data={data} />}
             <ChatMessage content={content} />
+            {data && <RecommendationsTable data={data} />}
         </div>
     )
 }

@@ -37,11 +37,10 @@ export default function StockModal({ children, stockId }: StockModalProps) {
     useEffect(() => {
         (async function getData() {
             if (typeof stockId !== "number") return;
-
             const _data = await getStockData(stockId);
             if (_data) setStockData(_data);
         })();
-    }, []);
+    }, [stockId, getStockData]);
 
     const onButtonPress = (content: string) => {
         onSubmit(content);
@@ -70,7 +69,7 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                         <div className='flex flex-col justify-between'>
                             <div className='flex flex-row items-center gap-2'>
                                 <Image
-                                    src={stockData.exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+                                    src={stockData.exchange==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
                                     alt='flag'
                                     height={16}
                                     width={16}
@@ -116,7 +115,7 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                                 onClick={() => onButtonPress(`What's new with ${stockData.symbol}?`)}
                                 className='text-black bg-neutral-100 transition-colors duration-200 hover:text-white shadow-none'
                             >
-                                What's new with {stockData.symbol}?
+                                What&apos;s new with {stockData.symbol}?
                             </Button>
                             <Button
                                 onClick={() => onButtonPress(`Should I buy ${stockData.symbol}?`)}

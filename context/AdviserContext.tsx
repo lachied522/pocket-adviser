@@ -21,7 +21,7 @@ export type AdviserState = {
     conversation: ClientMessage[]
     isLoading: boolean
     setInput: React.Dispatch<React.SetStateAction<string>>
-    setArticle: React.Dispatch<React.SetStateAction<StockNews>>
+    setArticle: React.Dispatch<React.SetStateAction<StockNews|null>>
     onSubmit: (content: string) => void
     onReset: () => void
 }
@@ -50,7 +50,9 @@ export function AdviserProvider({
 
     useEffect(() => {
         // ask AI to introduce itself on first load
-        if (!saidHello) sayHello();
+        if (!saidHello && process.env.ENVIRONMENT !== "development") {
+            sayHello();
+        }
 
         async function sayHello() {
             setSaidHello(true); // prevent effect from running more than once
@@ -69,31 +71,35 @@ export function AdviserProvider({
     useEffect(() => {
         // TO DO: find a better way to handle loading state
         // whenever an update in conversation is detected, setIsLoading with a 3s cooldown
-        setIsLoading(true);
-        // Clear existing timeout to ensure there's only one
-        if (cooldownRef.current) {
-            clearTimeout(cooldownRef.current);
+        if (conversation.length > 0) {
+            setIsLoading(true);
+            // Clear existing timeout to ensure there's only one
+            if (cooldownRef.current) {
+                clearTimeout(cooldownRef.current);
+            }
+            // add new cooldown
+            cooldownRef.current = setTimeout(() => {
+                setIsLoading(false);
+                cooldownRef.current = null; // Clear the ref when done
+            }, 10000);
         }
-        // add new cooldown
-        cooldownRef.current = setTimeout(() => {
-            setIsLoading(false);
-            cooldownRef.current = null; // Clear the ref when done
-        }, 12000);
 
         return () => {
             if (cooldownRef.current) {
-              clearTimeout(cooldownRef.current);
+                clearTimeout(cooldownRef.current);
             }
-        };
+        };        
     }, [conversation, setIsLoading]);
 
     const onSubmit = async (content: string) => {
         // clear input
         setInput('');
+        // clear article
+        setArticle(null);
         // add user message to conversation
         setConversation((currentConversation: ClientMessage[]) => [
             ...currentConversation,
-            { id: generateId(), role: 'user', display: content },
+            { id: generateId(), role: 'user', display: content, article },
         ]);
 
         const message = await continueConversation({

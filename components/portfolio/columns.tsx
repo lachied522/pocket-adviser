@@ -1,4 +1,6 @@
-"use client"
+"use client";
+import Image from "next/image";
+
 import { ColumnDef } from "@tanstack/react-table";
 
 import { formatDollar, formatPercent } from "@/utils/formatting";
@@ -14,8 +16,16 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <div className='md:text-lg font-medium py-5 md:pl-3'>
-        {(row.getValue('symbol') as string).toUpperCase()}
+      <div className='flex flex-row items-center gap-2.5 md:pl-3 py-5'>
+        <Image
+            src={row.original["exchange"]==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+            alt='flag'
+            height={16}
+            width={16}
+        />
+        <span className='md:text-lg font-medium'>
+          {(row.getValue('symbol') as string).toUpperCase()}
+        </span>
       </div>
     )
   },
@@ -29,10 +39,22 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
     )
   },
   {
+    accessorKey: "sector",
+    header: "Sector",
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium capitalize line-clamp-1 py-5'>
+        {(row.getValue('sector') as string)}
+      </div>
+    )
+  },
+  {
     accessorKey: "previousClose",
     header: "Price",
     cell: ({ row }) => (
-      <div className='md:text-lg font-medium py-5'>{formatDollar(row.getValue('previousClose'))}</div>
+      <div className='md:text-lg font-medium py-5'>
+        {formatDollar(row.getValue('previousClose'))}
+        <span className='text-sm'>{` ${row.original['currency']}`}</span>
+      </div>
     )
   },
   {

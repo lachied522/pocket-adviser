@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { Pencil } from "lucide-react";
 
@@ -14,7 +14,6 @@ import { columns } from "./columns";
 import StockTable from "./stock-table";
 import EditPortfolioDialog from "./edit-portfolio-dialog";
 
-import type { Holding } from "@prisma/client";
 import type { PopulatedHolding } from "@/types/helpers";
 
 export default function Portfolio() {
@@ -39,7 +38,7 @@ export default function Portfolio() {
             setPopulatedHoldings(_holdings);
             setIsLoading(false);
         })();
-    }, [state]);
+    }, [state, getStockData]);
 
     const portfolioValue = useMemo(() => {
         return populatedHoldings.reduce((acc, obj) => acc + (obj.units * (obj.previousClose || 0)), 0);

@@ -25,7 +25,6 @@ import type { UserData } from "@/types/helpers";
 export type GlobalState = {
   state: UserData | null
   portfolioValue: number
-  // stockDataMap: { [symbol: string]: Stock }
   dispatch: React.Dispatch<Action>
   getStockData: (stockId: number) => Promise<Stock>
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
@@ -42,20 +41,23 @@ export const useGlobalContext = () => {
 
 interface GlobalProviderProps {
   children: React.ReactNode
-  initialState: UserData | null
+  initialUserData: UserData | null
+  initialStockData: { [id: number]: Stock }
 }
 
 export const GlobalProvider = ({
   children,
-  initialState,
+  initialUserData,
+  initialStockData,
 }: GlobalProviderProps) => {
   const { data: session, status } = useSession();
-  const [state, dispatch] = useReducer(GlobalReducer, initialState);
-  const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>({});
+  const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
+  const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
   const { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie, createGuestUserIfNecessary } = useCookies();
 
   useEffect(() => {
     (async function () {
+      if (state) return;
       let data: UserData|null = null;
       if (session) {
         data = await getUserDataAction(session.user.id);

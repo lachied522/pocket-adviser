@@ -3,6 +3,10 @@ import { generateId, streamText, type TextPart, type ToolResultPart, type ToolCa
 import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
 import { openai } from '@ai-sdk/openai';
 
+import { kv } from "@vercel/kv";
+
+import { format } from "date-fns";
+
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
 import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
 import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from "./tools/get-portfolio";
@@ -23,34 +27,46 @@ export interface ClientMessage {
     id: string
     role: 'user'|'assistant'
     display: React.ReactNode
+    article?: StockNews|null
 }
 
-function getTodayDate() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    let mm: string|number = today.getMonth() + 1; // Months start at 0!
-    let dd: string|number = today.getDate();
+const MODEL = openai('gpt-4o');
 
-    if (dd < 10) dd = '0' + dd;
-    if (mm < 10) mm = '0' + mm;
+async function getSystemMessage() {
+    const today = format(new Date(), "PPPP");
 
-    return dd + '/' + mm + '/' + yyyy;
+    let message = (
+        `You are an enthusiastic investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
+        `Where you cannot answer the user's query, you can recommend the user contact a financial adviser to assist them. ` +
+        `Feel free to use emojis in your messages. ` +
+        `Today's date is ${today}. `
+    );
+    
+    try {
+        let message = await kv.get("MESSAGES_SYSTEM");
+        if (!message) {
+            // create a new system message
+            const res = await searchWeb("What's happening in the stock market today?", today);
+            const context = res["answer"];
+            console.log({context})
+            message += context;
+
+            // update kv
+            kv.set("MESSAGES_SYSTEM", message, { ex: 24 * 60 * 60 });
+        }
+    } catch (e) {
+        console.error("Error fetching system message");
+    }   
+
+    return message.trim();
 }
-
-const MODEL = openai('gpt-4-turbo');
-
-const SYSTEM_MESSAGE = (
-    `You are an enthusiastic investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
-    `Stock indexes advanced this week, with the S&P 500 up 0.8% and the Nasdaq up 1%, both setting new record highs. The Dow also moved up 0.5%. However, the S&P 500 ticked lower on Friday due to shares of market bellwether Nvidia slipping for a second day. Additionally, Wall Street experienced a roller-coaster ride following a massive expiration of options, leaving traders more cautious.` +
-    `Where you cannot answer the user's query, you can recommend the user contact a financial adviser to assist them. ` +
-    `Feel free to use emojis in your messages. ` +
-    `Today's date is ${getTodayDate()}. `
-)
 
 async function* streamAI(messages: CoreMessage[]) {
+    const systemMessage = await getSystemMessage();
+
     const { textStream } = await streamText({
         model: MODEL,
-        system: SYSTEM_MESSAGE,
+        system: systemMessage,
         messages,
     });
 
@@ -76,6 +92,7 @@ export async function continueConversation({
     "use server";
     // see https://sdk.vercel.ai/examples/next-app/interface/route-components
     const history = getMutableAIState();
+    const systemMessage = await getSystemMessage();
 
     // create copy of conversation history
     let conversationHistory = [
@@ -116,40 +133,29 @@ export async function continueConversation({
     }
 
     // if article exists, read article before and append to conversation history
-    // if (article) {
-    //     // push user message to conversation history
-    //     conversationHistory.push({
-    //         role: 'user',
-    //         content: input,
-    //     });
-    //     // read article
-    //     const result = await readUrl(article.url);
-    //     if (!result) {
-    //         // TO DO
-    //     } else {
-    //         const id = generateId();
-    //         const args = { url: article.url };
-    //         // append assistant message
-    //         conversationHistory.push({
-    //             role: 'assistant',
-    //             content: [{ type: 'tool-call', toolCallId: id, toolName: "readUrl", args }]
-    //         });
-    //         // append tool response
-    //         conversationHistory.push({
-    //             role: 'tool',
-    //             content: [{ type: 'tool-result', toolCallId: id, toolName: "readUrl", args, result }]
-    //         });
-    //     }
-    // } else {
-    //     // push user input to conversation history
-    //     conversationHistory.push({ role: 'user', content: input });
-    // }
-
-    conversationHistory.push({ role: 'user', content: input });
+    if (article) {
+        // push user message to conversation history
+        conversationHistory.push({
+            role: 'user',
+            content: input + `\n\nUrl: ${article.url}`,
+        });
+        // read article
+        const text = await readUrl(article.url);
+        // update history
+        const args = { url: article.url };
+        const res = {
+            content: text,
+            title: article.title,
+        }
+        appendToolCallToHistory("readUrl", args, JSON.stringify(res), !!text);
+    } else {
+        // push user input to conversation history
+        conversationHistory.push({ role: 'user', content: input });
+    }
 
     const result = await streamUI({
         model: MODEL,
-        system: SYSTEM_MESSAGE,
+        system: systemMessage,
         messages: conversationHistory,
         initial: <LoadingMessage />,
         text: ({ content, done }) => {

@@ -88,7 +88,8 @@ export default class StockDataClient {
             page: String(page),
             limit: String(limit),
         });
-        const data = await this.makeAuthenticatedAPIRequest('stock_news', params);
+        const data = await this.makeAuthenticatedAPIRequest('stock_news', params) as StockNews[];
+        if (!(data && data.length)) return [];
         return data;
     }
 

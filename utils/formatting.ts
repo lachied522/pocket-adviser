@@ -1,4 +1,4 @@
-
+import { format } from "date-fns";
 
 const USDollar = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -36,4 +36,8 @@ export function formatMarketCap(marketCap: bigint|number|null) {
     } else {
       return `$${marketCap.toFixed(2)}`;
     }
+}
+
+export function formatDate(date: Date) {
+  return format(date, "PPPP");
 }

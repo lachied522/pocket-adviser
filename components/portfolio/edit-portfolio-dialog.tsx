@@ -50,10 +50,10 @@ function EditHolding({ holding, onUpdate, onRemove }: EditHoldingProps) {
                 const _data = await getStockData(holding.stockId);
                 setStockData(_data);
             } catch (e) {
-
+                // TO DO:
             }
         })();
-    }, []);
+    }, [holding.stockId, getStockData]);
 
     const onChangeUnits = (e: React.ChangeEvent<HTMLInputElement>) => {
         onUpdate({
@@ -321,7 +321,7 @@ export default function EditPortfolioDialog({ children }: {
                                 <>
                                     {isSearchEmpty && (
                                     <div className='w-full text-center p-20'>
-                                        It looks like we don't cover this stock
+                                        It looks like we don&apos;t cover this stock
                                     </div>
                                     )}
                                 </>

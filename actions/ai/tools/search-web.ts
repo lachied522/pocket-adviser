@@ -27,7 +27,7 @@ export const description = "Search the internet for market events and stock news
 
 export const parameters = z.object({
     query: z.string().describe("The phrase that will be used to search the internet."),
-    date: z.string().default(getTodayDate()).describe("The date you wish to receive results for in DD/MM/YYYY. Defaults to today."),
+    date: z.string().optional().default(getTodayDate()).describe("The date you wish to receive results for in DD/MM/YYYY. Defaults to today."),
 });
 
 function format(data: WebSearchResponse) {
