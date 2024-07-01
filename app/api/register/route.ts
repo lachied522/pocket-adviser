@@ -5,14 +5,14 @@ import bcrypt from "bcrypt";
 
 import { PrismaClient } from "@prisma/client";
 
-import { COOKIE_NAME_FOR_GUEST_USER_ID } from "@/constants/cookies";
+import { COOKIE_NAME_FOR_USER_ID, COOKIE_NAME_FOR_IS_GUEST } from "@/constants/cookies";
 
 const prisma = new PrismaClient();
 
 type Body = {
     name?: string
     email: string
-    password: string 
+    password: string
 }
 
 export async function POST(req: Request) {
@@ -33,11 +33,12 @@ export async function POST(req: Request) {
 
     let user;
     // check if user exists as a guest
-    const guestCookie = cookieStore.get(COOKIE_NAME_FOR_GUEST_USER_ID);
-    if (guestCookie) {
+    const isGuestCookie = cookieStore.get(COOKIE_NAME_FOR_IS_GUEST);
+    if (isGuestCookie && isGuestCookie.value === "true") {
         // add credentials to existing user
+        const userCookie = cookieStore.get(COOKIE_NAME_FOR_USER_ID);
         user = await prisma.user.update({
-            where: { id: guestCookie.value },
+            where: { id: userCookie!.value },
             data: {
                 name,
                 email,
@@ -46,8 +47,8 @@ export async function POST(req: Request) {
             }
         });
 
-        // clear guest user cookie
-        cookieStore.delete(COOKIE_NAME_FOR_GUEST_USER_ID);
+        // set is guest cookie to false
+        cookieStore.set(COOKIE_NAME_FOR_IS_GUEST, "false");
     } else {
         // create brand new user
         user = await prisma.user.create({

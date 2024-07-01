@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 
-import { COOKIE_NAME_FOR_GUEST_USER_ID } from "@/constants/cookies";
+import { COOKIE_NAME_FOR_USER_ID, COOKIE_NAME_FOR_IS_GUEST } from "@/constants/cookies";
 
 import { getUserById } from "@/utils/crud/user";
 
@@ -27,11 +27,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = cookies();
-  const guestCookie = cookieStore.get(COOKIE_NAME_FOR_GUEST_USER_ID);
+  const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID);
 
   let data: UserData|null = null;
-  if (guestCookie) {
-    data = await getUserById(guestCookie.value);
+  if (userId) {
+    data = await getUserById(userId.value);
   }
 
   return (

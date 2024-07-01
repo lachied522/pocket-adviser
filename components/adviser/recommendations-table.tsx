@@ -1,6 +1,8 @@
 "use client";
 import { useMemo } from "react";
 
+import { RefreshCw } from "lucide-react";
+
 import {
     Table,
     TableBody,
@@ -10,11 +12,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import StockModal from "@/components/stocks/stock-modal";
 
 import { formatDollar } from "@/utils/formatting";
 
+import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
+
 import type { Recommendation } from "@/types/helpers";
+import UtilityDialog from "./utility-dialog";
 
 interface RecommendationsTableProps {
     data: {
@@ -25,6 +31,8 @@ interface RecommendationsTableProps {
 }
 
 export default function RecommendationsTable({ data }: RecommendationsTableProps) {
+    const { onSubmit } = useAdviserContext() as AdviserState;
+
     const total = useMemo(() => {
         return data.transactions.reduce((acc, obj) => acc + (obj.units * obj.price), 0);
     }, [data]);
@@ -82,22 +90,50 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                         </StockModal>
                         ))}
                         <TableRow>
-                            <TableCell colSpan={6} className='w-full flex flex-col items-end p-6'>
-                                <div>
-                                    Utility before: {data.initial_adj_utility.toFixed(2)}
-                                </div>
-                                <div>
-                                    Utility after: {data.final_adj_utility.toFixed(2)}
-                                </div>
-                                <div className='text-lg font-medium'>
-                                    Total: {formatDollar(total)}
+                            <TableCell colSpan={5} className='p-6'>
+                                <div className='w-full flex flex-row justify-end'>
+                                    <div className='grid grid-cols-2 place-items-end gap-x-3.5'>
+                                        <div className='text-lg font-medium'>
+                                            Total
+                                        </div>
+                                        <div className='text-lg font-medium'>
+                                            {formatDollar(total)}
+                                        </div>
+                                        <div>
+                                            Utility before
+                                        </div>
+                                        <div>
+                                            {data.initial_adj_utility.toFixed(2)}
+                                        </div>
+                                        <div>
+                                            Utility after
+                                        </div>
+                                        <div>
+                                            {data.final_adj_utility.toFixed(2)}
+                                        </div>
+                                        <div className='col-span-2'>
+                                            <UtilityDialog>
+                                                What is utility?
+                                            </UtilityDialog>
+                                        </div>
+                                        <div className='col-span-2 flex items-end mt-3.5'>
+                                            <Button
+                                                variant='default'
+                                                onClick={() => onSubmit("Can you give me some more ideas?")}
+                                                className='flex flex-row items-center gap-2 shadow-none'
+                                            >
+                                                <RefreshCw size={16} />
+                                                Regenerate
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                             </TableCell>
                         </TableRow>
                     </>
                     ) : (
                     <TableRow>
-                        <TableCell colSpan={6} className='p-6'>
+                        <TableCell colSpan={5} className='p-6'>
                             <div className='w-full flex items-center justify-center text-center'>
                                 No recommendations.
                             </div>

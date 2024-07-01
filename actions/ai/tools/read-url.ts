@@ -42,7 +42,6 @@ export async function readUrl(url: string): Promise<string|null> {
 
         return await summariseContent(content);
     } catch (e) {
-        console.error(e);
         return null;
     }
 }

@@ -77,6 +77,12 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                                 />
                                 <span>{stockData.exchange}</span>
                             </div>
+
+                            <div className='flex flex-row items-center gap-2'>
+                                {/* <Factory size={18} /> */}
+                                <span className='text-base'>{stockData.sector}</span>
+                            </div>
+
                             <div className='w-full flex flex-row justify-between gap-3.5'>
                                 <div className='flex flex-col'>
                                     <span className='font-medium text-lg mr-1'>{formatMarketCap(stockData.marketCap)}</span>

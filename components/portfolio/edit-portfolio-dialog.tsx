@@ -171,9 +171,15 @@ export default function EditPortfolioDialog({ children }: {
     const onAddHolding = (stock: Stock) => {
         // check that stock is not already in portfolio
         if (!modifiedHoldings.find((obj) => obj.stockId === stock.id)) {
-            // app stock to modified holdings array
+            // add stock to modified holdings array
+            // create temporary id which will be overwritten when added to db
+            const existingIds = modifiedHoldings.map((obj) => obj.id);
+            let id = 1;
+            while (existingIds.includes(id)) {
+                id++;
+            }
             const newHolding: ModifiedHolding = {
-                id: -1,
+                id,
                 units: 0,
                 stockId: stock.id,
                 userId: '',

@@ -8,22 +8,34 @@ import { Text } from "@/components/ui/typography";
 import Logo from "@/components/ui/logo";
 import Container from "@/components/ui/container";
 
+import { useCookies } from "@/hooks/useCookies";
+
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+
 import AuthDialog from "../auth/auth-dialog";
 
 export default function Header() {
-    const { data: session, status } = useSession();
+    const { state } = useGlobalContext() as GlobalState;
+    const { isGuest, removeCookies } = useCookies();
+
+    const onSignOut = async () => {
+        // signout
+        await signOut();
+        // remove cookies
+        removeCookies();
+    }
 
     return (
         <div className='bg-sky-600/80 p-3.5'>
             <Container className='flex flex-row items-center justify-between'>
                 <Logo />
 
-                {session? (
+                {state && !isGuest ? (
                 <div className="flex flex-row items-center gap-3.5">
-                    <Text className="text-white">Welcome {session.user?.name}</Text>
+                    <Text className="text-white">Welcome {state.name}</Text>
                     <Button
                         variant='ghost'
-                        onClick={() => signOut()}
+                        onClick={onSignOut}
                         className="h-8 w-8 p-0 group"
                     >
                         <LogOut size={16} strokeWidth={3} className='text-white group-hover:text-red-600' />

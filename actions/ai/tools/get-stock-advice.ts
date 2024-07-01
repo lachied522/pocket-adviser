@@ -30,8 +30,6 @@ async function fetchData(symbol: string, amount: number, userId?: string|null) {
         return res.json();
     });
 
-    if (process.env.NODE_ENV==="development") console.log(response);
-
     return response;
 }
 
@@ -52,7 +50,6 @@ export async function getStockAdvice(symbol: string, amount: number, exchange: s
             symbol = `${symbol}.AX`;
         }
         const res = await fetchData(symbol, amount, userId);
-        if (process.env.NODE_ENV==="development") console.log(res);
         return formatResults(res);
     } catch (e) {
         return null;

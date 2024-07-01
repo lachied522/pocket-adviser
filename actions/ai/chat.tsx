@@ -165,7 +165,7 @@ export async function continueConversation({
                 parameters: getRecommendationsParams,
                 generate: async function* (args) {
                     yield <LoadingMessage msg="Getting recommendations" />;
-                    const res = await getRecommendations(args.target, args.action, userId);
+                    const res = await getRecommendations(args.amount, args.action, userId);
                     // append tool call to history
                     appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
                     let content = "";

@@ -15,7 +15,7 @@ import { getStockByIdAction } from "@/actions/stocks";
 import { updateProfileAction } from "@/actions/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/holdings";
 
-import { useGuest } from "@/hooks/useGuest";
+import { useCookies } from "@/hooks/useCookies";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
@@ -52,20 +52,22 @@ export const GlobalProvider = ({
   const { data: session, status } = useSession();
   const [state, dispatch] = useReducer(GlobalReducer, initialState);
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>({});
-  const { getGuestFromCookies, createGuestUserIfNecessary } = useGuest();
+  const { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie, createGuestUserIfNecessary } = useCookies();
 
   useEffect(() => {
-    // fetch initial data
     (async function () {
       let data: UserData|null = null;
       if (session) {
         data = await getUserDataAction(session.user.id);
+        setIsGuestCookie(false);
       } else {
-        const _guestId = getGuestFromCookies();
-        console.log('guest', _guestId)
+        // guest users do not have session, fetch from cookies instead
+        const _guestId = getUserIdFromCookies();
         if (_guestId) {
           // do not create a new guest if guestId does not exist - only create when necessary
           data = await getUserDataAction(_guestId);
+          // update cookie
+          setIsGuestCookie(true);
         }
       };
       
@@ -75,6 +77,9 @@ export const GlobalProvider = ({
         type: 'SET_DATA',
         payload: data,
       });
+
+      // ensure cookies are synced with session
+      setUserIdCookie(data.id);
     })();
   }, [session]);
 
@@ -115,7 +120,7 @@ export const GlobalProvider = ({
     async (holding: Omit<Holding, 'id'|'userId'>) => {
       let userId = state?.id;
       if (!userId) {
-        userId = await createGuestUserIfNecessary();
+        userId = await createGuestUserIfNecessary() as string;
       }
       const res = await insertHoldingAction({
         ...holding,
@@ -168,13 +173,14 @@ export const GlobalProvider = ({
     async (profile: Omit<Profile, 'userId'>) => {
       let userId = state?.id;
       if (!userId) {
-        userId = await createGuestUserIfNecessary();
+        userId = await createGuestUserIfNecessary() as string;
       }
 
       const res = await updateProfileAction({
         ...profile,
-        userId: userId,
-      })
+        userId,
+      });
+      // update state
       dispatch({
         type: 'UPDATE_PROFILE',
         payload: res

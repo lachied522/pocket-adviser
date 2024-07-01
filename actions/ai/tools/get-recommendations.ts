@@ -5,10 +5,10 @@ export const description = "Returns a list of recommended transactions for the u
 
 export const parameters = z.object({
     action: z.enum(["deposit", "withdraw", "review"]).describe("The user may wish to deposit or withdraw from their portfolio, or simply have it reviewed.").default("review"),
-    target: z.number().optional().describe("The amount the user intends to deposit or withdraw from their portfolio, if any.").default(0),
+    amount: z.number().optional().describe("The amount the user intends to deposit or withdraw from their portfolio, if any.").default(0),
 });
 
-async function fetchData(target: number, action: string, userId?: string|null) {
+async function fetchData(amount: number, action: string, userId?: string|null) {
     const url = new URL(`${process.env.BACKEND_URL}/get-advice`);
     const params = new URLSearchParams();
     if (userId) {
@@ -19,7 +19,7 @@ async function fetchData(target: number, action: string, userId?: string|null) {
     const response = await fetch(url, {
         method: "POST",
         body: JSON.stringify({
-            target,
+            amount,
             action,
         }),
         headers: {
@@ -34,15 +34,22 @@ async function fetchData(target: number, action: string, userId?: string|null) {
     return await response.json();
 }
 
-function formatResults(result: ReturnType<typeof fetchData>) {
+function formatResults(res: any) {
     // format results for interpretation by AI
-    return result;
+    return {
+        ...res,
+        total: res.transactions.reduce((acc: number, obj: any) => acc + (obj.units * obj.price), 0),
+        transactions: res.transactions.map((obj: any) => ({
+            ...obj,
+            amount: obj.units * obj.price,
+            transaction: obj.units > 0? "Buy": "Sell", // explicitly add 'buy' or 'sell' indicator for AI
+        })),
+    };
 }
 
-export async function getRecommendations(target: number, action: string, userId?: string|null): Promise<any> {
+export async function getRecommendations(amount: number, action: string, userId?: string|null): Promise<any> {
     try {
-        const res = await fetchData(target, action, userId);
-        if (process.env.NODE_ENV==="development") console.log(res);
+        const res = await fetchData(amount, action, userId);
         return formatResults(res);
     } catch (e) {
         console.log(e);
