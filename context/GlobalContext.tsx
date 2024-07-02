@@ -6,16 +6,20 @@ import {
   useContext,
   useReducer,
   useEffect,
-  useMemo
+  useMemo,
+  useRef
 } from "react";
 import { useSession } from "next-auth/react";
 
 import { getUserDataAction } from "@/actions/user";
 import { getStockByIdAction } from "@/actions/stocks";
+import { getForexPriceAction } from "@/actions/forex";
 import { updateProfileAction } from "@/actions/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/holdings";
 
 import { useCookies } from "@/hooks/useCookies";
+
+import WelcomeDialog from "@/components/modals/welcome-dialog";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
@@ -54,6 +58,7 @@ export const GlobalProvider = ({
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
   const { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie, createGuestUserIfNecessary } = useCookies();
+  const welcomeDialogRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     (async function () {
@@ -208,6 +213,7 @@ export const GlobalProvider = ({
       }}
     >
       {children}
+      <WelcomeDialog openRef={welcomeDialogRef} />
     </GlobalContext.Provider>
   );
 };

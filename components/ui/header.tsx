@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/typography";
 import Logo from "@/components/ui/logo";
 import Container from "@/components/ui/container";
+import AboutDialog from "@/components/modals/about-dialog";
+import AuthDialog from "@/components/auth/auth-dialog";
 
 import { useCookies } from "@/hooks/useCookies";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-
-import AuthDialog from "../auth/auth-dialog";
 
 export default function Header() {
     const { state } = useGlobalContext() as GlobalState;
@@ -29,6 +29,15 @@ export default function Header() {
         <div className='bg-sky-600/80 p-3.5'>
             <Container className='flex flex-row items-center justify-between'>
                 <Logo />
+
+                <AboutDialog>
+                    <Button
+                        variant='ghost'
+                        className='text-white hover:text-white hover:bg-transparent hover:opacity-90'
+                    >
+                        About
+                    </Button>
+                </AboutDialog>
 
                 {state && !isGuest ? (
                 <div className="flex flex-row items-center gap-3.5">

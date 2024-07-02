@@ -10,7 +10,7 @@ interface ObjectiveSelectorProps {
 
 export default function ObjectiveSelector({ value, onChange }: ObjectiveSelectorProps) {
     return (
-        <div className='flex flex-wrap gap-2 items-stretch justify-center p-2'>
+        <div className='md:max-w-[1000px] flex flex-wrap gap-2 items-stretch justify-center px-2 py-6 mx-auto'>
             {Object.entries(OBJECTIVE_MAP).map(([objective, props], index) => (
             <Card
                 key={`objective-card-${index}`}

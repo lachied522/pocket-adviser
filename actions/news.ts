@@ -2,6 +2,8 @@
 
 import StockDataClient from "@/utils/stocks/client";
 
+import type { StockNews } from "@/types/api";
+
 const client = new StockDataClient();
 
 export async function getNewsAction(symbols: string[], page: number = 0, limit: number = 12) {
@@ -10,11 +12,13 @@ export async function getNewsAction(symbols: string[], page: number = 0, limit: 
         const blacklist = [
             "www.youtube.com",
         ];
-        const filteredData = [];
+        const filteredData: StockNews[] = [];
+        const titles: string[] = []; // sometimes duplicate articles are returned, filter these out
         for (const article of data) {
             const url = new URL(article.url);
-            if (!blacklist.includes(url.host)) {
+            if (!(blacklist.includes(url.host) || titles.includes(article.title))) {
                 filteredData.push(article);
+                titles.push(article.title);
             }
         }
         return filteredData;

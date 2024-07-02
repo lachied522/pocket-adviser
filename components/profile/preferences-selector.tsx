@@ -118,7 +118,7 @@ export default function PreferencesSelector({ value, onChange }: PreferencesSele
   }
 
   return (
-      <div className="flex flex-wrap text-center items-center justify-center gap-3.5 sm:gap-3 px-2 py-6 mx-auto">
+      <div className="md:max-w-[1000px] flex flex-wrap text-center items-center justify-center gap-3.5 sm:gap-3 px-2 py-6 mx-auto">
         {SECTORS.map((sector, index) => (
             <Card
                 key={`sector-preference-${index}`}
@@ -129,7 +129,7 @@ export default function PreferencesSelector({ value, onChange }: PreferencesSele
                     value?.[sector.key]==="dislike" && "text-red-400 bg-red-100 border-red-200"
                 )}
             >
-              <CardContent className="p-3 text-sm font-medium">
+              <CardContent className="text-xs md:text-sm font-medium p-2 md:p-3">
                 {sector.name}
               </CardContent>
             </Card>

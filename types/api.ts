@@ -109,3 +109,14 @@ export type StockNews = {
     text: string,
     url: string
 }
+
+export type FXQuote = {
+    ticker: symbol // e.g. EUR/USD
+    bid: string // yes, string - e.g. "1.18"
+    ask: string
+    open: string
+    low: string
+    high: string
+    changes: number
+    date: string // isostring
+}

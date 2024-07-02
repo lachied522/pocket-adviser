@@ -14,7 +14,7 @@ import { description as getStockDescription, parameters as getStockParams, getSt
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
-import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard } from '@/components/adviser/messages';
+import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
 import type { StockNews } from '@/types/api';
 
@@ -270,13 +270,13 @@ export async function continueConversation({
                     const stream = streamAI(conversationHistory);
                     for await (const text of stream) {
                         content += text;
-                        yield <ChatMessage content={content} />;
+                        yield <MessageWithWebSearch content={content} res={res} />;
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
                     // commit history
                     commitHistory();
-                    return <ChatMessage content={content} />;
+                    return <MessageWithWebSearch content={content} res={res} />;
                 },
             },
             readUrl: {

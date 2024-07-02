@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,7 +24,7 @@ import ObjectiveSelector from "./objective-selector";
 import PreferencesSelector from "./preferences-selector";
 
 const formSchema = z.object({
-    objective: z.enum(['RETIREMENT', 'INCOME', 'PRESERVATION', 'FIRSTHOME', 'CHILDREN', 'TRADING']),
+    objective: z.enum(["RETIREMENT", "INCOME", "PRESERVATION", "DEPOSIT", "CHILDREN", "TRADING"]),
     passive: z.number().nullable(),
     international: z.number().nullable(),
     preferences: z.record(
@@ -44,8 +45,8 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             objective: state?.profile?.objective || 'RETIREMENT',
-            passive: state?.profile?.passive || 70,
-            international: state?.profile?.international || 30,
+            passive: null, // ignore this field for now
+            international: state?.profile?.international || 70,
             preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> || {},
         },
     });
@@ -67,17 +68,15 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
                     type='submit'
                     disabled={isLoading}
                     className='hidden'
-                >
-                    Apply
-                </Button>
+                />
 
                 <FormField
                     control={form.control}
                     name="objective"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Objective</FormLabel>
-                            <FormDescription>
+                            <FormLabel className='text-lg'>Objective</FormLabel>
+                            <FormDescription className='text-lg text-black'>
                                 This is the main thing you wish to achieve by investing.
                             </FormDescription>
                             <FormControl>
@@ -90,49 +89,52 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
 
                 <FormField
                     control={form.control}
-                    name="passive"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Preference for Passive Investments</FormLabel>
-                            <FormDescription>
-                                This is the proportion of your portfolio you wish to be invested in ETFs and other passive investments.
-                            </FormDescription>
-                            <FormControl>
-                                <Slider
-                                    min={0}
-                                    max={100}
-                                    step={1}
-                                    defaultValue={[field.value || 50]}
-                                    onValueChange={(value: number[]) => field.onChange(value[0])}
-                                    className="w-[240px] cursor-pointer"
-                                />
-                            </FormControl>
-                            <div className="font-semibold">{field.value || 50}</div>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
                     name="international"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Preference for International Investments</FormLabel>
-                            <FormDescription>
-                                This is the proportion of your portfolio you wish to be international investments.
+                            <FormLabel className='text-lg'>Investment Region</FormLabel>
+                            <FormDescription className='text-lg text-black'>
+                                Use this to select the proportion of your portfolio you wish to be invested in each country. We currently only cover stocks in US and Australia. 🙂
                             </FormDescription>
                             <FormControl>
-                                <Slider
-                                    min={0}
-                                    max={100}
-                                    step={1}
-                                    defaultValue={[field.value || 50]}
-                                    onValueChange={(value: number[]) => field.onChange(value[0])}
-                                    className="w-[240px] cursor-pointer"
-                                />
+                                <div className='flex flex-row items-center justify-center gap-5 py-5'>
+                                    <Image
+                                        src="/us-flag-icon.png"
+                                        alt='flag'
+                                        height={24}
+                                        width={24}
+                                    />
+                                    <Slider
+                                        min={0}
+                                        max={100}
+                                        step={1}
+                                        value={[field.value ?? 50]}
+                                        onValueChange={(value: number[]) => field.onChange(value[0])}
+                                        className="w-[240px] cursor-pointer"
+                                    />
+                                    <div className="w-6 font-semibold">{field.value ?? 50}%</div>
+                                </div>
                             </FormControl>
-                            <div className="font-semibold">{field.value || 50}</div>
+
+                            <FormControl>
+                                <div className='flex flex-row items-center justify-center gap-5 py-5'>
+                                    <Image
+                                        src="/aus-flag-icon.png"
+                                        alt='flag'
+                                        height={24}
+                                        width={24}
+                                    />
+                                    <Slider
+                                        min={0}
+                                        max={100}
+                                        step={1}
+                                        value={[100 - (field.value ?? 50)]}
+                                        onValueChange={(value: number[]) => field.onChange(100 - value[0])}
+                                        className="w-[240px] cursor-pointer"
+                                    />
+                                    <div className="w-6 font-semibold">{100 - (field.value ?? 50)}%</div>
+                                </div>
+                            </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -143,8 +145,8 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
                     name="preferences"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Likes/Dislikes</FormLabel>
-                            <FormDescription>
+                            <FormLabel className='text-lg'>Likes/Dislikes</FormLabel>
+                            <FormDescription className='text-lg text-black'>
                                 These are any likes or dislikes you may have for the type of investments you want.
                             </FormDescription>
                             <FormControl>

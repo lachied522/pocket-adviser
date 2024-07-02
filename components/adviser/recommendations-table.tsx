@@ -14,13 +14,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import StockModal from "@/components/stocks/stock-modal";
+import UtilityDialog from "@/components/modals/utility-dialog";
 
 import { formatDollar } from "@/utils/formatting";
 
 import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
 
 import type { Recommendation } from "@/types/helpers";
-import UtilityDialog from "./utility-dialog";
 
 interface RecommendationsTableProps {
     data: {

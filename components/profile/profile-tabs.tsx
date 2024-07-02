@@ -19,6 +19,8 @@ export default function ProfileTabs() {
     const { state } = useGlobalContext() as GlobalState;
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isApplyButtonVisible, setIsApplyButtonVisible] = useState<boolean>(false);
+    const [hasChanges, setHasChanges] = useState<boolean>(false);
+    const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
     // const [currentTab, setCurrentTab] = useState<'about'|'preferences'>('about');
     const submitRef = useRef<HTMLButtonElement>(null);
 

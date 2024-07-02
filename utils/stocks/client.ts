@@ -1,4 +1,4 @@
-import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios } from "@/types/api";
+import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote } from "@/types/api";
 
 export default class StockDataClient {
     API_KEY = process.env.FMP_API_KEY;
@@ -88,7 +88,7 @@ export default class StockDataClient {
             page: String(page),
             limit: String(limit),
         });
-        const data = await this.makeAuthenticatedAPIRequest('stock_news', params) as StockNews[];
+        const data = await this.makeAuthenticatedAPIRequest('stock_news', params) as StockNews[]|null;
         if (!(data && data.length)) return [];
         return data;
     }
@@ -99,5 +99,12 @@ export default class StockDataClient {
         const data = await this.makeAuthenticatedAPIRequest('price-target', params, 4) as AnalystResearch[]|null;
         if (!(data && data.length)) return null;
         return data.slice(0, limit);
+    }
+
+    async getForexPrice(symbol: "AUDUSD"|"USDAUD"): Promise<FXQuote|null> {
+        // see https://intelligence.financialmodelingprep.com/developer/docs#fx-price-quote
+        const data = await this.makeAuthenticatedAPIRequest(`fx/${symbol}`) as FXQuote[]|null;
+        if (!(data && data.length)) return null;
+        return data[0];
     }
 }

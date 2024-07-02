@@ -36,7 +36,8 @@ function format(data: WebSearchResponse) {
         answer: data.answer,
         results: {
             count: data.results.length,
-            data: data.results.map((obj) => ({
+            data: data.results.map((obj, index) => ({
+                reference: index + 1,
                 title: obj.title,
                 content: obj.content,
                 url: obj.url,
@@ -62,7 +63,7 @@ export async function searchWeb(query: string, date: string): Promise<any> {
                 include_answer: true,
                 max_results: 5,
             })
-        })
+        });
         if (!response.ok) {
             throw new Error("Error searching web");
         }
