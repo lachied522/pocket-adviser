@@ -62,7 +62,6 @@ export const GlobalProvider = ({
 
   useEffect(() => {
     (async function () {
-      if (state) return;
       let data: UserData|null = null;
       if (session) {
         data = await getUserDataAction(session.user.id);

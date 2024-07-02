@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
+import { type AdviserState, useChatContext } from "@/context/ChatContext";
 
 import StockLogo from "./stock-logo";
 
@@ -30,7 +30,7 @@ interface StockModalProps {
 
 export default function StockModal({ children, stockId }: StockModalProps) {
     const { getStockData } = useGlobalContext() as GlobalState;
-    const { onSubmit } = useAdviserContext() as AdviserState;
+    const { onSubmit } = useChatContext() as AdviserState;
     const [stockData, setStockData] = useState<Stock | null>(null);
     const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -103,7 +103,7 @@ export default function StockModal({ children, stockId }: StockModalProps) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <ScrollArea className='h-[240px] p-3'>
                         <p className='text-sm'>{stockData.description || 'Company information not available'}</p>
                     </ScrollArea>

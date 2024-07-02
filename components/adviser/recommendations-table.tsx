@@ -18,7 +18,7 @@ import UtilityDialog from "@/components/modals/utility-dialog";
 
 import { formatDollar } from "@/utils/formatting";
 
-import { type AdviserState, useAdviserContext } from "@/context/AdviserContext";
+import { type AdviserState, useChatContext } from "@/context/ChatContext";
 
 import type { Recommendation } from "@/types/helpers";
 
@@ -31,7 +31,7 @@ interface RecommendationsTableProps {
 }
 
 export default function RecommendationsTable({ data }: RecommendationsTableProps) {
-    const { onSubmit } = useAdviserContext() as AdviserState;
+    const { onSubmit } = useChatContext() as AdviserState;
 
     const total = useMemo(() => {
         return data.transactions.reduce((acc, obj) => acc + (obj.units * obj.price), 0);

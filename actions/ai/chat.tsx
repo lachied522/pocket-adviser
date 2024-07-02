@@ -3,7 +3,7 @@ import { generateId, streamText, type TextPart, type ToolResultPart, type ToolCa
 import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
 import { openai } from '@ai-sdk/openai';
 
-import { kv } from "@vercel/kv";
+import { kv } from '@vercel/kv';
 
 import { format } from "date-fns";
 
@@ -14,9 +14,12 @@ import { description as getStockDescription, parameters as getStockParams, getSt
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
+import { checkRateLimits } from './ratelimit';
+
 import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
 import type { StockNews } from '@/types/api';
+
 
 export interface ServerMessage {
     role: 'user'|'assistant'|'tool'
@@ -48,15 +51,14 @@ async function getSystemMessage() {
             // create a new system message
             const res = await searchWeb("What's happening in the stock market today?", today);
             const context = res["answer"];
-            console.log({context})
             message += context;
 
             // update kv
             kv.set("MESSAGES_SYSTEM", message, { ex: 24 * 60 * 60 });
         }
     } catch (e) {
-        console.error("Error fetching system message");
-    }   
+        console.error("Error fetching system message: ", e);
+    }
 
     return message.trim();
 }
@@ -83,13 +85,34 @@ export async function clearConversation() {
 export async function continueConversation({
     input,
     userId,
+    plan,
     article,
 } : {
-    input: string,
-    userId?: string|null,
-    article?: StockNews
+    input: string
+    article?: StockNews|null
+    userId?: string|null
+    plan?: "FREE"|"PAID"|"ADMIN"
 }): Promise<ClientMessage> {
     "use server";
+    // check rate limit
+    const [isWithinSlidingLimit, isWithinFixedLimit] = await checkRateLimits();
+
+    if (!isWithinSlidingLimit) {
+        return {
+            id: generateId(),
+            role: 'assistant',
+            display: <ChatMessage content="Slow down there! You have submitted too many requests, please try again later. 🏁" />
+        }
+    }
+
+    if (plan==="FREE" && !isWithinFixedLimit) {
+        return {
+            id: generateId(),
+            role: 'assistant',
+            display: <ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to a paid plan. 🙂" />
+        }
+    }
+
     // see https://sdk.vercel.ai/examples/next-app/interface/route-components
     const history = getMutableAIState();
     const systemMessage = await getSystemMessage();
@@ -312,7 +335,7 @@ export async function continueConversation({
         id: generateId(),
         role: 'assistant',
         display: result.value,
-    };
+    }
 }
 
 export const AIProvider = createAI<ServerMessage[], ClientMessage[]>({

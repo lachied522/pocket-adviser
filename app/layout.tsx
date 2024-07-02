@@ -11,7 +11,8 @@ import { getStockById } from "@/utils/crud/stocks";
 import { Provider as SessionProvider } from "@/context/SessionContext";
 import { AIProvider } from '@/actions/ai/chat';
 import { GlobalProvider } from "@/context/GlobalContext";
-import { AdviserProvider } from "@/context/AdviserContext";
+import { ChatProvider } from "@/context/ChatContext";
+import { UIProvider } from "@/context/UIContext";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -56,11 +57,13 @@ export default async function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <GlobalProvider initialUserData={userData} initialStockData={stockData}>
-            <AIProvider>
-              <AdviserProvider>
-                {children}
-              </AdviserProvider>
-            </AIProvider>
+            <UIProvider>
+              <AIProvider>
+                <ChatProvider>
+                  {children}
+                </ChatProvider>
+              </AIProvider>
+            </UIProvider>
           </GlobalProvider>
         </SessionProvider>
       </body>

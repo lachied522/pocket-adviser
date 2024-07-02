@@ -3,7 +3,7 @@ import type { Holding, Profile, Stock, User } from "@prisma/client";
 export type ResolvedPromise<T> = T extends Promise<infer R> ? R: never;
 
 export type UserData = (
-    Pick<User, 'id'|'name'|'email'> & {
+    User & {
         profile: Profile | null
         holdings: Holding[]
     }
