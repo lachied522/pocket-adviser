@@ -17,7 +17,7 @@ export default function NewsArticle({
     animateOnHover = false,
 }: NewsArticleProps) {
 
-    const handleDragStart = (e: React.DragEvent<HTMLElement>, article: StockNews) => {
+    const onDragStart = (e: React.DragEvent<HTMLElement>) => {
         // set data transfer
         e.dataTransfer.setData("text/plain", JSON.stringify(article));
     }
@@ -28,7 +28,7 @@ export default function NewsArticle({
             href={article.url}
             target="_blank"
             draggable={draggable}
-            onDragStart={(e: React.DragEvent<HTMLAnchorElement>) => handleDragStart(e, article)}
+            onDragStart={onDragStart}
             className="flex flex-col items-center justify-start p-2"
         >
             <div className={cn("h-24 md:h-36 w-36 md:w-48 rounded-xl relative overflow-hidden cursor-pointer", animateOnHover && "hover:scale-[1.05]")}>

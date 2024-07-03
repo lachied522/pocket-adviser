@@ -1,14 +1,10 @@
 "use client";
-import { useRef } from "react";
 import { signIn } from "next-auth/react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import {
-    DialogClose,
-} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -33,11 +29,11 @@ const formSchema = z.object({
 });
 
 interface SignupFormProps {
+    onSuccess: () => void
     onNavigateLogin: () => void
 }
 
-export default function SignupForm({ onNavigateLogin }: SignupFormProps) {
-    const closeRef = useRef<HTMLButtonElement>(null);
+export default function SignupForm({ onSuccess, onNavigateLogin }: SignupFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {},
@@ -53,6 +49,11 @@ export default function SignupForm({ onNavigateLogin }: SignupFormProps) {
         })
         .then((res) => res.json());
 
+        if (!response.ok) {
+            // TO DO
+            return;
+        }
+
         // sign in with credentials
         await signIn("credentials", {
             ...values,
@@ -60,96 +61,81 @@ export default function SignupForm({ onNavigateLogin }: SignupFormProps) {
         });
         
         // close dialog and reset form
-        if (closeRef.current) closeRef.current.click();
-    }
-
-    const onClose = () => {
+        onSuccess();
         // reset form after 1 sec
         setTimeout(() => form.reset(), 1000);
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col items-center gap-6'>
-                <div className='flex flex-col gap-3.5'>
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Name
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="text"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+            <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col items-stretch justify-between gap-5'>
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Name <span className='text-sm'>(optional)</span>
+                            </FormLabel>
+                            <FormControl>
+                                <Input
+                                    type="text"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Email
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="email"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Email
+                            </FormLabel>
+                            <FormControl>
+                                <Input
+                                    type="email"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Password
-                                </FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="password"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Password
+                            </FormLabel>
+                            <FormControl>
+                                <Input
+                                    type="password"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                    <div className='text-sm text-right'>
-                        Already have an account? <span className="underline text-blue-400 cursor-pointer" onClick={onNavigateLogin}>Login</span>
-                    </div>
+                <div className='text-sm text-right'>
+                    Already have an account? <span className="underline text-blue-400 cursor-pointer" onClick={onNavigateLogin}>Login</span>
                 </div>
 
-                <div className='w-full flex flex-row items-end justify-between'>
-                    <DialogClose asChild>
-                        <Button
-                            ref={closeRef}
-                            type='button'
-                            variant='secondary'
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </Button>
-                    </DialogClose>
-
-                    <Button type='submit'>
-                        Signup
-                    </Button>
-                </div>
+                <Button
+                    type='submit'
+                    className='h-10'
+                >
+                    Signup
+                </Button>
             </form>
         </Form>
     )

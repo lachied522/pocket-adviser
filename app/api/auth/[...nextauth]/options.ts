@@ -1,6 +1,10 @@
 import type { AuthOptions, DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
 import bcrypt from "bcrypt";
 
 import { PrismaClient } from "@prisma/client";
@@ -53,6 +57,16 @@ export const authOptions: AuthOptions = {
           // return user object with the their profile data
           return user;
         },
+      }),
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        allowDangerousEmailAccountLinking: true,
+      }),
+      GitHubProvider({
+        clientId: process.env.GITHUB_CLIENT_ID!,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+        allowDangerousEmailAccountLinking: true,
       }),
     ],
     callbacks: {

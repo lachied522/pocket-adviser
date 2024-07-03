@@ -26,7 +26,7 @@ import type { StockNews } from "@/types/api";
 
 export default function ChatArea() {
     const { input, article, conversation, isLoading, setInput, setArticle, onSubmit, onReset } = useChatContext() as AdviserState;
-    const { scrollAreaRef, messagesRef, anchorRef, scrollToBottom } = useScrollAnchor();
+    const { scrollAreaRef, messagesRef, anchorRef } = useScrollAnchor();
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 
     const onDrop = (e: React.DragEvent<HTMLInputElement>) => {
@@ -36,13 +36,6 @@ export default function ChatArea() {
         setArticle(article);
         setInput("Can you tell me about this article and the potential impacts it may have on my portfolio?");
         setIsDragging(false);
-    }
-
-    const onSubmitButtonClick = () => {
-        // scroll to bottom
-        scrollToBottom();
-        // call onSubmit
-        onSubmit(input);
     }
 
     return (
@@ -153,12 +146,12 @@ export default function ChatArea() {
                         <Input
                             value={input}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && !isLoading) onSubmitButtonClick() }}
+                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter' && !isLoading) onSubmit(input) }}
                             placeholder='Ask me something!'
                             className='h-full w-full text-base font-medium bg-slate-100 rounded-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                         />
                         <Button
-                            onClick={onSubmitButtonClick}
+                            onClick={() => onSubmit(input)}
                             disabled={isLoading}
                             className="h-full aspect-square bg-neutral-100 p-0 group rounded-none"
                         >

@@ -11,7 +11,7 @@ const nextConfig = {
           },
           {
             protocol: 'https',
-            hostname: 'cdn.snapi.dev',
+            hostname: '*.snapi.dev',
             port: '',
             pathname: '/images/**',
           },

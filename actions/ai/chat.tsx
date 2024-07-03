@@ -14,7 +14,7 @@ import { description as getStockDescription, parameters as getStockParams, getSt
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
-import { checkRateLimits } from './ratelimit';
+import { checkRateLimits, checkSlidingLimit } from './ratelimit';
 
 import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
@@ -93,7 +93,7 @@ export async function continueConversation({
 }): Promise<ClientMessage> {
     "use server";
     // check rate limit
-    const [isWithinSlidingLimit, isWithinFixedLimit] = await checkRateLimits();
+    const [isWithinSlidingLimit, isWithinFixedLimit] = await checkRateLimits(user);
 
     if (!isWithinSlidingLimit) {
         return {
@@ -103,7 +103,7 @@ export async function continueConversation({
         }
     }
 
-    if (!user || user.accountType==="FREE" && !isWithinFixedLimit) {
+    if (!isWithinFixedLimit) {
         return {
             id: generateId(),
             role: 'assistant',
