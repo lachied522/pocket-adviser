@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
-import StockCard from "./stock-card";
+import StockCard from "../stocks/stock-card";
 import RecommendationsTable from "./recommendations-table";
 
 import type { Stock } from "@prisma/client";

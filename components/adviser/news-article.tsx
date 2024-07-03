@@ -29,7 +29,7 @@ export default function NewsArticle({
             target="_blank"
             draggable={draggable}
             onDragStart={onDragStart}
-            className="flex flex-col items-center justify-start p-2"
+            className={cn("flex flex-col items-center justify-start", animateOnHover && "p-2")}
         >
             <div className={cn("h-24 md:h-36 w-36 md:w-48 rounded-xl relative overflow-hidden cursor-pointer", animateOnHover && "hover:scale-[1.05]")}>
                 <Image

@@ -10,17 +10,12 @@ interface StockLogoProps {
 
 export default function StockLogo({
     symbol,
-    height = 120,
-    width = 120,
+    height = 110,
+    width = 110,
 }: StockLogoProps) {
 
-    // remove .AX
-    if (symbol.endsWith('.AX')) {
-        symbol = symbol.split('.').slice(0, 1).join('');
-    }
-
     return (
-        <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
+        <>
             {symbol ? (
             <Image
                 src={BASE_URL + symbol + ".png"}
@@ -33,6 +28,6 @@ export default function StockLogo({
                 Logo not found
             </div>
             )}
-        </div>
+        </>
     )
 }

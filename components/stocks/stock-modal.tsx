@@ -23,20 +23,24 @@ import StockLogo from "./stock-logo";
 
 import type { Stock } from "@prisma/client";
 
+type StockWithoutId = Omit<Stock, 'id'> & { id?: number }
+
 interface StockModalProps {
     children: React.ReactNode
-    stockId: any
+    initialStockData?: StockWithoutId|null // data can be passed from parent or fetched by id
+    stockId?: any
 }
 
-export default function StockModal({ children, stockId }: StockModalProps) {
+export default function StockModal({ children, stockId, initialStockData }: StockModalProps) {
     const { getStockData } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as AdviserState;
-    const [stockData, setStockData] = useState<Stock | null>(null);
+    const [stockData, setStockData] = useState<StockWithoutId|null|undefined>(initialStockData);
     const closeRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
+        if (initialStockData) return; // data already populated
+        if (typeof stockId !== "number") return;
         (async function getData() {
-            if (typeof stockId !== "number") return;
             const _data = await getStockData(stockId);
             if (_data) setStockData(_data);
         })();

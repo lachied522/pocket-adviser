@@ -1,42 +1,56 @@
 import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/components/utils";
+
 import StockModal from "@/components/stocks/stock-modal";
 import StockLogo from "@/components/stocks/stock-logo";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
 import type { Stock } from "@prisma/client";
+import DirectionIndicator from "./direction-indicator";
 
 interface StockCardProps {
-    stockData: Stock
+    stockData: Omit<Stock, 'id'> & { id?: number }
+    size?: 'sm'|'lg'
 }
 
-export default function StockCard({ stockData }: StockCardProps) {
+export default function StockCard({ stockData, size = 'lg' }: StockCardProps) {
     return (
-        <StockModal stockId={stockData.id}>
-            <Card className='cursor-pointer'>
+        <StockModal initialStockData={stockData}>
+            <Card className='cursor-pointer shrink-0'>
                 <CardContent className='flex flex-col gap-3.5 p-3'>
-                    <div className='flex flex-row gap-3.5'>
-                        <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
-                            <StockLogo symbol={stockData.symbol} />
+                    <div className={cn('flex flex-row gap-3.5', size === 'sm' && 'items-center')}>
+                        <div className='flex items-center justify-center bg-slate-100 rounded-xl p-3 aspect-square shrink-0'>
+                            <StockLogo
+                                symbol={stockData.symbol}
+                                height={size ==='lg'? 120: 30}
+                                width={size ==='lg'? 120: 30}
+                            />
                         </div>
 
                         <div className='flex flex-col'>
-                            <div className='text-lg font-medium'>{stockData.name}</div>
-                            <div className=''>{stockData.symbol}</div>
-                            <div className='flex flex-row items-center gap-2'>
+                            <div className='max-w-[180px] md:text-lg font-medium truncate'>{stockData.name}</div>
+                            <div className={cn('flex flex-row items-center gap-2', size==='sm' && 'gap-3.5')}>
+                                <span className={cn(size === 'sm' && 'text-sm md:text-base')}>{stockData.symbol}</span>
                                 <Image
                                     src={stockData.exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
                                     alt='flag'
                                     height={16}
                                     width={16}
                                 />
-                                <span>{stockData.exchange}</span>
+                               {size === 'lg' && (<span>{stockData.exchange}</span>)}
+                               {size === 'sm' && (
+                                <div className=''>
+                                    <DirectionIndicator change={stockData.changesPercentage} size='sm' />
+                                </div>
+                               )}
                             </div>
                         </div>
                     </div>
 
+                    {size === 'lg' && (
                     <div className='w-full flex flex-row justify-between gap-3.5'>
                         <div className='flex flex-col'>
                             <span className='font-medium text-lg mr-1'>{formatMarketCap(stockData.marketCap)}</span>
@@ -46,7 +60,7 @@ export default function StockCard({ stockData }: StockCardProps) {
                         <div className='flex flex-col'>
                             <div className='inline'>
                                 <span className='font-medium text-lg mr-1'>{stockData.previousClose? formatDollar(stockData.previousClose): 'N/A'}</span>
-                                <span className='font-medium text-base'>{stockData.previousClose? stockData.currency: ''}</span>
+                                <span className='font-medium text-sm'>{stockData.previousClose? stockData.currency: ''}</span>
                             </div>
                             <span className='text-slate-600 text-sm'>Prev. Close</span>
                         </div>
@@ -56,7 +70,8 @@ export default function StockCard({ stockData }: StockCardProps) {
                             <span className='text-slate-600 text-sm'>Div. Amount</span>
                         </div>
                     </div>
-        </CardContent>
+                    )}
+                </CardContent>
             </Card>
         </StockModal>
     )

@@ -1,6 +1,8 @@
 "use server";
-import { getStockById, getStockBySymbol, searchStocksBySymbolAndName } from "@/utils/crud/stocks";
+import { getStockById, getStockBySymbol } from "@/utils/crud/stocks";
 import { getAggregatedStockData } from "@/utils/data/helpers";
+
+import { PrismaClient } from '@prisma/client';
 
 import type { Stock } from "@prisma/client";
 
@@ -28,6 +30,23 @@ export async function getStockBySymbolAction(
 }
 
 export async function searchStocksAction(query: string) {
-    const data = await searchStocksBySymbolAndName(query);
-    return data;
+    const prisma = new PrismaClient();
+    return await prisma.stock.findMany({
+        where: {
+            OR: [
+              {
+                symbol: {
+                  equals: query,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                name: {
+                  contains: query,
+                  mode: 'insensitive',
+                },
+              },
+            ],
+        }
+    });
 }

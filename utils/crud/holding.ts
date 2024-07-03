@@ -1,6 +1,7 @@
 
-import { type Holding } from '@prisma/client';
 import { getPrismaClient } from './client';
+
+import type { Holding } from '@prisma/client';
 
 const prisma = getPrismaClient();
  
