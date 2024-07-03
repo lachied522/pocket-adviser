@@ -2,7 +2,7 @@
 
 import { kv } from "@vercel/kv";
 
-import StockDataClient from "@/utils/stocks/client";
+import StockDataClient from "@/utils/data/client";
 import type { FXQuote } from "@/types/api";
 
 export async function getForexPriceAction(symbol: "AUDUSD"|"USDAUD") {

@@ -1,6 +1,6 @@
 "use server";
 import { getStockById, getStockBySymbol, searchStocksBySymbolAndName } from "@/utils/crud/stocks";
-import { getAggregatedStockData } from "@/utils/stocks/helpers";
+import { getAggregatedStockData } from "@/utils/data/helpers";
 
 import type { Stock } from "@prisma/client";
 

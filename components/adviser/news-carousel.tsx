@@ -78,7 +78,7 @@ export default function NewsCarousel() {
                 >
                     {data && data.length > 0 ? (
                     <>
-                        <div className='text-sm text-slate-600 xl:ml-4 xl:mb-3'>Tip: try dragging an article to the left</div>
+                        <div className='text-sm text-slate-600 xl:ml-4 xl:mb-3'>Tip: try dragging an article into the chat</div>
                         <ScrollArea className=''>
                             <div className='z-[-1] xl:h-[640px] flex flex-row xl:flex-col py-3 xl:px-3 xl:py-0'>
                                 {data.map((article) => (

@@ -7,6 +7,7 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 import { getUserById } from "@/utils/crud/user";
 import { getStockById } from "@/utils/crud/stocks";
+import { getForexRate } from "@/utils/data/helpers";
 
 import { Provider as SessionProvider } from "@/context/SessionContext";
 import { AIProvider } from '@/actions/ai/chat';
@@ -52,11 +53,14 @@ export default async function RootLayout({
     );
   }
 
+  // get forex rate
+  const forexRate = await getForexRate("USDAUD");
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
-          <GlobalProvider initialUserData={userData} initialStockData={stockData}>
+          <GlobalProvider initialUserData={userData} initialStockData={stockData} initalForexRate={forexRate}>
             <UIProvider>
               <AIProvider>
                 <ChatProvider>

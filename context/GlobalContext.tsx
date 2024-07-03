@@ -29,7 +29,9 @@ import type { UserData } from "@/types/helpers";
 export type GlobalState = {
   state: UserData | null
   portfolioValue: number
+  currency: 'USD'|'AUD'
   dispatch: React.Dispatch<Action>
+  setCurrency: React.Dispatch<React.SetStateAction<'USD'|'AUD'>>
   getStockData: (stockId: number) => Promise<Stock>
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
   updateHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
@@ -45,19 +47,23 @@ export const useGlobalContext = () => {
 
 interface GlobalProviderProps {
   children: React.ReactNode
-  initialUserData: UserData | null
+  initialUserData: UserData|null
   initialStockData: { [id: number]: Stock }
+  initalForexRate: number
 }
 
 export const GlobalProvider = ({
   children,
   initialUserData,
   initialStockData,
+  initalForexRate,
 }: GlobalProviderProps) => {
   const { data: session, status } = useSession();
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
-  const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
   const { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie, createGuestUserIfNecessary } = useCookies();
+  const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
+  const [forexRate, setForexRate] = useState<number>(initalForexRate); // USDAUD forex rate
+  const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
   const welcomeDialogRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -93,14 +99,21 @@ export const GlobalProvider = ({
     if (!state) return 0;
     return state.holdings.reduce(
       (acc, obj) => {
-          if (obj.stockId in stockDataMap) {
-            return acc + (stockDataMap[obj.stockId].previousClose || 0) * obj.units;
+          const stock = stockDataMap[obj.stockId];
+          if (stock) {
+              let multiplier = 1;
+              if (currency === "USD" && stock.exchange === "ASX") {
+                  multiplier /= forexRate;
+              } else if (currency === "AUD" && stock.exchange === "NASDAQ") {
+                  multiplier *= forexRate;
+              }
+              return acc + multiplier * (stock.previousClose || 0) * obj.units;
           }
           return 0;
       },
       0
     )
-  }, [state, stockDataMap]);
+  }, [state, stockDataMap, currency, forexRate]);
 
   const getStockData = useCallback(
     async (stockId: number) => {
@@ -203,7 +216,9 @@ export const GlobalProvider = ({
       value={{
         state,
         portfolioValue,
+        currency,
         getStockData,
+        setCurrency,
         insertHoldingAndUpdateState,
         updateHoldingAndUpdateState,
         deleteHoldingAndUpdateState,

@@ -1,10 +1,17 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 import { Pencil } from "lucide-react";
 
 import { H3 } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 import { formatDollar } from "@/utils/formatting";
 
@@ -17,7 +24,7 @@ import EditPortfolioDialog from "./edit-portfolio-dialog";
 import type { PopulatedHolding } from "@/types/helpers";
 
 export default function Portfolio() {
-    const { state, getStockData } = useGlobalContext() as GlobalState;
+    const { state, portfolioValue, currency, setCurrency, getStockData } = useGlobalContext() as GlobalState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -40,16 +47,23 @@ export default function Portfolio() {
         })();
     }, [state, getStockData]);
 
-    const portfolioValue = useMemo(() => {
-        return populatedHoldings.reduce((acc, obj) => acc + (obj.units * (obj.previousClose || 0)), 0);
-    }, [populatedHoldings]);
-
     return (
         <div className='flex flex-col gap-6'>
             <H3 className=''>My Portfolio</H3>
             <div className='w-full flex flex-row justify-between'>
-                <div>
-                    Market Value {formatDollar(portfolioValue)}
+                <div className='flex flex-row items-center gap-3.5'>
+                    <div className=''>
+                        Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>
+                    </div>
+                    <Select onValueChange={(value: "USD"|"AUD") => setCurrency(value)} defaultValue={currency}>
+                        <SelectTrigger className='w-[80px]'>
+                            <SelectValue placeholder="USD" />
+                        </SelectTrigger>
+                        <SelectContent className='w-[80px]'>
+                            <SelectItem value="USD">USD</SelectItem>
+                            <SelectItem value="AUD">AUD</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <EditPortfolioDialog>

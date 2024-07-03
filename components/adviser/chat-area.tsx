@@ -27,13 +27,15 @@ import type { StockNews } from "@/types/api";
 export default function ChatArea() {
     const { input, article, conversation, isLoading, setInput, setArticle, onSubmit, onReset } = useChatContext() as AdviserState;
     const { scrollAreaRef, messagesRef, anchorRef, scrollToBottom } = useScrollAnchor();
+    const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 
-    const onArticleDrop = (e: React.DragEvent<HTMLInputElement>) => {
+    const onDrop = (e: React.DragEvent<HTMLInputElement>) => {
         e.preventDefault();
         const articleData = e.dataTransfer.getData("text");
         const article = JSON.parse(articleData) as StockNews;
         setArticle(article);
         setInput("Can you tell me about this article and the potential impacts it may have on my portfolio?");
+        setIsDragging(false);
     }
 
     const onSubmitButtonClick = () => {
@@ -83,8 +85,17 @@ export default function ChatArea() {
                 <div className='hidden lg:block xl:hidden w-[100px]' />
             </div>
 
-            <div onDrop={onArticleDrop} className='md:px-6 xl:px-3 order-last xl:order-2'>
-                <div className="max-w-[960px] flex flex-col gap-3 mx-auto shadow-inner shadow-slate-50 rounded-lg">
+            <div className='md:px-6 xl:px-3 order-last xl:order-2'>
+                <div
+                    onDragEnter={() => setIsDragging(true)}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDragOver={(e) => {
+                        e.preventDefault(); // enable dropping
+                        setIsDragging(true);
+                    }}
+                    onDrop={onDrop}
+                    className={cn('max-w-[960px] flex flex-col gap-3 mx-auto rounded-lg border border-white shadow-inner shadow-slate-50', isDragging && 'border-slate-200')}
+                >
                     <ScrollArea ref={scrollAreaRef} className='h-[600px] 2xl:h-[720px]'>
                         <div ref={messagesRef} className='flex flex-col justify-start gap-3 px-3 py-3'>
                             {conversation.map((message: ClientMessage) => (

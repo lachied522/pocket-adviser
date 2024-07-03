@@ -1,5 +1,5 @@
 import { upsertStock } from "@/utils/crud/stocks";
-import { getAggregatedStockData } from "@/utils/stocks/helpers";
+import { getAggregatedStockData } from "@/utils/data/helpers";
 
 export async function GET(
     req: Request,

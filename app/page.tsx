@@ -13,17 +13,9 @@ export const maxDuration = 30;
 
 export default function Page() {
   return (
-    <main className='min-h-screen'>
-      <Header />
-
-      <div className='bg-slate-50/80 px-6 shadow-sm'>
-        <Container className='p-3.5'>
-          <ProfileTabs />
-        </Container>
-      </div>
-
-      <div className='flex flex-col gap-6 xl:gap-10 py-6 xl:py-10 relative'>
-        <div className='z-[-1] fixed inset-0 opacity-40 bg-slate-300'>
+    <main className='min-h-screen relative'>
+      {/* Background Image */}
+      <div className='z-[-1] absolute inset-0 opacity-40 bg-slate-300'>
             <Image
               src='/background-image-main.jpg'
               alt='background-image'
@@ -32,8 +24,17 @@ export default function Page() {
                 objectFit: 'cover',
               }}
             />
-        </div>
+      </div>
 
+      <Header />
+
+      <div className='bg-slate-50/80 px-6 shadow-sm'>
+        <Container className='p-3.5'>
+          <ProfileTabs />
+        </Container>
+      </div>
+
+      <div className='flex flex-col gap-6 xl:gap-10 py-6 xl:py-10'>
         <div className='px-3 sm:px-6'>
           <Container className='p-7 bg-white border border-slate-200 rounded-xl'>
             <ChatArea />

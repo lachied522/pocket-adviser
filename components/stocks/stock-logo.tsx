@@ -19,8 +19,6 @@ export default function StockLogo({
         symbol = symbol.split('.').slice(0, 1).join('');
     }
 
-    console.log(BASE_URL + symbol + ".png");
-
     return (
         <div className='h-36 w-36 flex items-center justify-center shrink-0 bg-slate-100 rounded-xl p-3'>
             {symbol ? (

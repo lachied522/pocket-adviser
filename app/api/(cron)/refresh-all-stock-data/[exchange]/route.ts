@@ -1,5 +1,5 @@
 import { upsertStock } from "@/utils/crud/stocks";
-import { getStocksByExchange, getAggregatedStockData } from "@/utils/stocks/helpers";
+import { getStocksByExchange, getAggregatedStockData } from "@/utils/data/helpers";
 
 const EXCHANGES = ['NASDAQ', 'ASX'] as const;
 

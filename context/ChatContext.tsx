@@ -68,8 +68,7 @@ export function ChatProvider({
             }
 
             const response = await continueConversation({
-                userId: state?.id,
-                plan: state?.accountType,
+                user: state,
                 input: content,
                 article,
             });
@@ -95,15 +94,10 @@ export function ChatProvider({
         async function sayHello() {
             setSaidHello(true); // prevent effect from running more than once
             const content = `Hello!${state? ' My name is ' + state.name: ''} Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market.`;
-            const message = await sendMessage({
+            await sendMessage({
                 content,
                 addUserMessage: false,
             });
-
-            setConversation((currentConversation: ClientMessage[]) => [
-                ...currentConversation,
-                message,
-            ]);
         };
     }, []);
 

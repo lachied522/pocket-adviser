@@ -27,7 +27,7 @@ export function useScrollAnchor() {
         if (scrollAreaRef.current) {
             const handleScroll = (event: Event) => {
                 const target = event.target as HTMLDivElement;
-                const offset = 25;
+                const offset = 50;
                 setIsAtBottom(target.scrollTop + target.clientHeight >= target.scrollHeight - offset);
             }
 

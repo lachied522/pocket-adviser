@@ -17,7 +17,8 @@ export default function NewsArticle({
     animateOnHover = false,
 }: NewsArticleProps) {
 
-    const handleDragStart = (e: React.DragEvent<HTMLAnchorElement>, article: StockNews) => {
+    const handleDragStart = (e: React.DragEvent<HTMLElement>, article: StockNews) => {
+        // set data transfer
         e.dataTransfer.setData("text/plain", JSON.stringify(article));
     }
 
@@ -35,6 +36,7 @@ export default function NewsArticle({
                     src={article.image}
                     alt="Article Image"
                     fill
+                    sizes="192px"
                     style={{
                         objectFit: "cover"
                     }}

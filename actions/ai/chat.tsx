@@ -19,7 +19,7 @@ import { checkRateLimits } from './ratelimit';
 import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
 import type { StockNews } from '@/types/api';
-
+import type { UserData } from '@/types/helpers';
 
 export interface ServerMessage {
     role: 'user'|'assistant'|'tool'
@@ -84,14 +84,12 @@ export async function clearConversation() {
 
 export async function continueConversation({
     input,
-    userId,
-    plan,
     article,
+    user
 } : {
     input: string
     article?: StockNews|null
-    userId?: string|null
-    plan?: "FREE"|"PAID"|"ADMIN"
+    user: UserData|null
 }): Promise<ClientMessage> {
     "use server";
     // check rate limit
@@ -105,7 +103,7 @@ export async function continueConversation({
         }
     }
 
-    if (plan==="FREE" && !isWithinFixedLimit) {
+    if (!user || user.accountType==="FREE" && !isWithinFixedLimit) {
         return {
             id: generateId(),
             role: 'assistant',
@@ -194,7 +192,7 @@ export async function continueConversation({
                 parameters: getRecommendationsParams,
                 generate: async function* (args) {
                     yield <LoadingMessage msg="Getting recommendations" />;
-                    const res = await getRecommendations(args.amount, args.action, userId);
+                    const res = await getRecommendations(args.amount, args.action, user?.id);
                     // append tool call to history
                     appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
                     let content = "";
@@ -216,7 +214,7 @@ export async function continueConversation({
                 generate: async function* (args) {
                     yield <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
                     // get stock advice
-                    const res = await getStockAdvice(args.symbol, args.amount, args.exchange, userId);
+                    const res = await getStockAdvice(args.symbol, args.amount, args.exchange, user?.id);
                     // append tool call to history
                     appendToolCallToHistory("shouldBuyOrSellStock", args, JSON.stringify(res), !!res);
                     const stockData = res? res.stockData: null;
@@ -239,7 +237,7 @@ export async function continueConversation({
                 generate: async function* (args) {
                     yield <LoadingMessage msg="Getting your portfolio" />;
                     // get user's portfolio
-                    const res = await getPortfolio(userId);
+                    const res = await getPortfolio(user?.id);
                     appendToolCallToHistory("getPortfolio", args, JSON.stringify(res), !!res);
                     // stream text response
                     let content = "";

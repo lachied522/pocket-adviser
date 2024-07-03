@@ -1,6 +1,6 @@
 "use server";
 
-import StockDataClient from "@/utils/stocks/client";
+import StockDataClient from "@/utils/data/client";
 
 import type { StockNews } from "@/types/api";
 

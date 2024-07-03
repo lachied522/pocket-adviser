@@ -49,7 +49,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
   },
   {
     accessorKey: "previousClose",
-    header: "Price",
+    header: "Previous Close",
     cell: ({ row }) => (
       <div className='md:text-lg font-medium py-5'>
         {formatDollar(row.getValue('previousClose'))}

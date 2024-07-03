@@ -1,7 +1,7 @@
 /* Gets user portfolio for use in AI completion */
 import { z } from "zod";
 
-import StockDataClient from "@/utils/stocks/client";
+import StockDataClient from "@/utils/data/client";
 
 import { getStockBySymbol } from "@/utils/crud/stocks";
 
