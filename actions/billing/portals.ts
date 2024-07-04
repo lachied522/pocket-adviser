@@ -30,16 +30,30 @@ export async function createCheckoutSession(
     user: User
 ) {
     // see https://github.com/vercel/next.js/blob/canary/examples/with-stripe-typescript/app/actions/stripe.ts
-
     const PRICE_ID = process.env.STRIPE_PRICE_ID;
     if (!PRICE_ID) {
         throw new Error('Price id undefined');
     }
 
+    if (!user.email) {
+        throw new Error('User email is not defined');
+    }
+
+    let stripeCustomerId = user.stripeCustomerId;
+    if (!stripeCustomerId) {
+        // create a new stripe customer
+        const customer = await stripe.customers.create({
+            ...(user.name? {name: user.name}: {}),
+            email: user.email,
+        });
+
+        stripeCustomerId = customer.id;
+    }
+
     const origin: string = headers().get("origin") as string;
 
     // create checkout object
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         line_items: [
             {
@@ -48,44 +62,21 @@ export async function createCheckoutSession(
             },
         ],
         success_url: origin,
-        ...(
-            user.stripeCustomerId ? {
-                customer: user.stripeCustomerId
-            } : {
-                ...(
-                    user.email? {
-                        customer_email: user.email
-                    } : {}
-                )
-            }
-        ),
+        customer: stripeCustomerId,
     });
 
-    return {
-        client_secret: checkoutSession.client_secret,
-        url: checkoutSession.url,
-    };
-}
-
-export async function handleCheckoutSuccess(
-    user: User,
-    checkoutSessionID: string,
-) {
-    // retrieve checkout session
-    const session = await stripe.checkout.sessions.retrieve(checkoutSessionID);
-
-    if (!session.customer) {
-        console.error(`Something went wrong generating Stripe customer ID for client ${user.id}`);
-        return;
-    }
-
-    // update db
-    if (user.stripeCustomerId !== session.customer.toString()) {
+    if (!user.stripeCustomerId) {
+        // update stripe customer id in db
         await prisma.user.update({
             where: { id: user.id },
             data: {
-                stripeCustomerId: session.customer.toString(),
+                stripeCustomerId,
             }
         });
     }
+        
+    return {
+        client_secret: session.client_secret,
+        url: session.url,
+    };
 }

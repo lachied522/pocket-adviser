@@ -14,9 +14,9 @@ import { description as getStockDescription, parameters as getStockParams, getSt
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
-import { checkRateLimits, checkSlidingLimit } from './ratelimit';
+import { checkRateLimits } from './ratelimit';
 
-import { ChatMessage, LoadingMessage, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
+import { ChatMessage, LoadingMessage, MessageWithStockAdvice, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
 import type { StockNews } from '@/types/api';
 import type { UserData } from '@/types/helpers';
@@ -197,8 +197,7 @@ export async function continueConversation({
                     appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
                     let content = "";
                     if (res) {
-                        // stream text response to chat and update content of message
-                       content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have."
+                       content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
                     } else {
                         content = "I'm sorry, something went wrong. Please try again later.";
                     }
@@ -217,18 +216,17 @@ export async function continueConversation({
                     const res = await getStockAdvice(args.symbol, args.amount, args.exchange, user?.id);
                     // append tool call to history
                     appendToolCallToHistory("shouldBuyOrSellStock", args, JSON.stringify(res), !!res);
-                    const stockData = res? res.stockData: null;
                     // stream text response to chat and update content of message
                     let content = "";
-                    const stream = streamAI(conversationHistory);
-                    for await (const text of stream) {
-                        content += text;
-                        yield <MessageWithStockCard content={content} stockData={stockData} />;
+                    if (res) {
+                        content = "Please note that this is not a formal recommendation. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
+                    } else {
+                        content = "I'm sorry, something went wrong. Please try again later.";
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
                     commitHistory();
-                    return <MessageWithStockCard content={content} stockData={stockData} />;
+                    return <MessageWithStockAdvice content={content} data={res} />;
                 },
             },
             getPortfolio: {

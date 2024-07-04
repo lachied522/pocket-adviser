@@ -40,7 +40,7 @@ export default function ChatArea() {
 
     return (
         <div className='grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] gap-6 xl:gap-3.5'>
-            <div className='flex flex-col md:flex-row xl:flex-col items-start md:items-center xl:items-start justify-between xl:justify-start gap-3 order-first'>
+            <div className='flex flex-col lg:flex-row xl:flex-col items-start lg:items-center xl:items-start justify-between xl:justify-start gap-3 order-first'>
                 <H3 className=''>My Adviser</H3>
 
                 <div className='flex flex-wrap lg:flex-row xl:flex-col items-center xl:items-start gap-3.5'>
@@ -48,18 +48,18 @@ export default function ChatArea() {
                     <Button
                         variant='ghost'
                         onClick={onReset}
-                        className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
+                        className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
                     >
-                        <span className='text-lg mr-2'>🌱</span>
+                        <span className='text-lg mr-1 lg:mr-2'>🌱</span>
                         New chat
                     </Button>
 
                     <CheckupDialog>
                         <Button
                             variant='ghost'
-                            className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
+                            className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
                         >
-                            <span className='text-lg mr-2'>🩺</span>
+                            <span className='text-lg mr-1 lg:mr-2'>🩺</span>
                             Checkup
                         </Button>
                     </CheckupDialog>
@@ -67,10 +67,10 @@ export default function ChatArea() {
                     <GetAdviceDialog>
                         <Button
                             variant='ghost'
-                            className='h-[42px] xl:w-[180px] flex font-medium justify-start gap-1 py-3'
+                            className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
                         >
-                            <span className='text-lg mr-2'>📈</span>
-                            Advice
+                            <span className='text-lg mr-1 lg:mr-2'>📈</span>
+                            Deposit/withdraw
                         </Button>
                     </GetAdviceDialog>
                 </div>
@@ -89,7 +89,7 @@ export default function ChatArea() {
                     onDrop={onDrop}
                     className={cn('max-w-[960px] flex flex-col gap-3 mx-auto rounded-lg border border-white shadow-inner shadow-slate-50', isDragging && 'border-slate-200')}
                 >
-                    <ScrollArea ref={scrollAreaRef} className='h-[600px] 2xl:h-[720px]'>
+                    <ScrollArea ref={scrollAreaRef} className='h-[600px] 2xl:h-[700px]'>
                         <div ref={messagesRef} className='flex flex-col justify-start gap-3 px-3 py-3'>
                             {conversation.map((message: ClientMessage) => (
                             <div
@@ -115,6 +115,8 @@ export default function ChatArea() {
                             <div className="w-full h-px" ref={anchorRef} />
                         </div>
                     </ScrollArea>
+
+                    <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
 
                     <SamplePrompts setInput={setInput} />
 

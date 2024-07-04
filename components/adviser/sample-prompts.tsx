@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 
 const SAMPLE_PROMPTS = [
     "Should I buy shares in AAPL?",
+    "Should I invest in NVDA?",
+    "What can I invest in with $100?",
     "What are the best dividend stocks?",
     "Should I invest more in ETFs?",
     "Why is the market up/down today?",

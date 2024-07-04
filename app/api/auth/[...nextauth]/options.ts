@@ -1,13 +1,17 @@
-import type { AuthOptions, DefaultSession } from "next-auth";
+import { cookies } from 'next/headers';
+
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 
+import type { AuthOptions, DefaultSession } from "next-auth";
+
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
 
 import bcrypt from "bcrypt";
 
-import { PrismaClient } from "@prisma/client";
+import { COOKIE_NAME_FOR_IS_GUEST, COOKIE_NAME_FOR_USER_ID } from '@/constants/cookies';
 
 const prisma = new PrismaClient();
 
@@ -70,6 +74,14 @@ export const authOptions: AuthOptions = {
       }),
     ],
     callbacks: {
+      signIn({ user }) {
+        // update cookies
+        const cookieStore = cookies();
+        const defaultExpiry = 7 * 24 * 60 * 60 * 1000; // one week
+        cookieStore.set({ name: COOKIE_NAME_FOR_USER_ID, value: user.id, maxAge: defaultExpiry });
+        cookieStore.set({ name: COOKIE_NAME_FOR_IS_GUEST, value: "false", maxAge: defaultExpiry });
+        return true;
+      },
       jwt({ token, user }) {
         token.id = user?.id;
         return token;

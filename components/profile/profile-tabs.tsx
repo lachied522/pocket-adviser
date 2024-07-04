@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
+import Image from "next/image";
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -54,22 +55,32 @@ export default function ProfileTabs() {
                         }}
                         className='flex flex-row items-center gap-3 xl:gap-6 order-last xl:order-2'
                     >
-                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                        <div className='min-w-[180px] flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
                             <span className='text-sm xl:text-base font-medium'>Objective</span>
                             <span className='text-sm'>{OBJECTIVE_MAP[state?.profile?.objective || "RETIREMENT"].name}</span>
                         </div>
 
-                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
-                            <span className='text-sm xl:text-base font-medium'>Passive (%)</span>
-                            <span className='text-sm'>{(state?.profile?.passive || 70)}%</span>
+                        <div className='min-w-[180px] flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                            <span className='text-sm xl:text-base font-medium'>Region</span>
+                            <div className='flex flex-row items-center gap-2'>
+                                <Image
+                                    src="/us-flag-icon.png"
+                                    alt='flag'
+                                    height={16}
+                                    width={16}
+                                />
+                                <span className='text-sm'>{(state?.profile?.international || 70)}%</span>
+                                <Image
+                                    src="/aus-flag-icon.png"
+                                    alt='flag'
+                                    height={16}
+                                    width={16}
+                                />
+                                <span className='text-sm'>{100 - (state?.profile?.international || 70)}%</span>
+                            </div>
                         </div>
 
-                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
-                            <span className='text-sm xl:text-base font-medium'>International (%)</span>
-                            <span className='text-sm'>{(state?.profile?.passive || 70)}%</span>
-                        </div>
-
-                        <div className='flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
+                        <div className='min-w-[180px] flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
                             <span className='text-sm xl:text-base font-medium'>Preferences</span>
                             <span className='text-sm'>{Object.keys(state?.profile?.preferences || {}).length}</span>
                         </div>

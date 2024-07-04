@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
 import StockCard from "../stocks/stock-card";
+import StockAdvice from "./stock-advice";
 import RecommendationsTable from "./recommendations-table";
 
 import type { Stock } from "@prisma/client";
@@ -63,11 +64,20 @@ export function MessageWithStockCard({ content, stockData }: { content: string, 
     )
 }
 
+export function MessageWithStockAdvice({ content, data }: { content: string, data?: any }) {
+    return (
+        <div className="w-full flex flex-col items-start gap-2">
+            {data && <StockAdvice data={data} />}
+            <ChatMessage content={content} />
+        </div>
+    )
+}
+
 export function MessageWithRecommendations({ content, data }: { content: string, data?: any }) {
     return (
         <div className="w-full flex flex-col items-start gap-2">
-            <ChatMessage content={content} />
             {data && <RecommendationsTable data={data} />}
+            <ChatMessage content={content} />
         </div>
     )
 }

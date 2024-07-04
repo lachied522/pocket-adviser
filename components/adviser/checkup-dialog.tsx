@@ -23,7 +23,7 @@ export default function CheckupDialog({ children }: CheckupDialogProps) {
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const handleSubmit = () => {
-        onSubmit("Can you provide some recommendations for my portfolio?");
+        onSubmit("Can you review my portfolio?");
         // close dialog
         if (closeRef.current) closeRef.current.click();
     }
@@ -40,7 +40,7 @@ export default function CheckupDialog({ children }: CheckupDialogProps) {
                     </DialogTitle>
                 </DialogHeader>
 
-                <p>Review your portfolio and provide any recommendations.</p>
+                <p>Review your portfolio and provide any actionable ideas.</p>
 
                 <div className='h-full flex flex-row items-end justify-between'>
                     <DialogClose asChild>

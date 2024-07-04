@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { H1, H3, Text } from "@/components/ui/typography";
 
-import { createBillingPortalSession } from "@/actions/billing/portals";
+import { createCheckoutSession } from "@/actions/billing/portals";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type UIState, useUIContext } from "@/context/UIContext";
@@ -24,15 +24,15 @@ interface PricingDialogProps {
 export default function PricingDialog({ children }: PricingDialogProps) {
     const { state } = useGlobalContext() as GlobalState;
     const { openSignup } = useUIContext() as UIState;
-    const [isBillingPortalLoading, setIsBillingPortalLoading] = useState<boolean>(false);
+    const [isCheckoutLoading, setIsCheckoutLoading] = useState<boolean>(false);
     const closeRef = useRef<HTMLButtonElement>(null);
 
-    const onBillingButtonClick = async () => {
-        if (isBillingPortalLoading) return; // prevent multiple requests
-        setIsBillingPortalLoading(true);
+    const onSubscribeButtonClick = async () => {
+        if (isCheckoutLoading) return; // prevent multiple requests
+        setIsCheckoutLoading(true);
 
         // create billing portal session and open in new tab
-        const res = await createBillingPortalSession(state!);
+        const res = await createCheckoutSession(state!);
 
         if (!(res && res.url)) {
             // TO DO
@@ -40,7 +40,7 @@ export default function PricingDialog({ children }: PricingDialogProps) {
         }
 
         window.open(res.url, '_blank');
-        setIsBillingPortalLoading(false);
+        setIsCheckoutLoading(false);
     }
 
     const onCreateAccountButtonClick = async () => {
@@ -68,20 +68,18 @@ export default function PricingDialog({ children }: PricingDialogProps) {
 
                         <div className='flex flex-col gap-6'>
                             <div className='flex flex-row items-center gap-2'>
-                                <H1>$0</H1>
+                                <H1>US$0</H1>
                                 <Text>per month</Text>
                             </div>
 
-                            <Button
-                                disabled={!state || state.accountType === "FREE"}
-                            >
+                            <Button disabled>
                                 {!state || state.accountType === "FREE"? "Subscribed": "Subscribe"}
                             </Button>
                         </div>
 
                         <div className='h-[160px] flex flex-col items-center gap-2'>
                             <Text className='w-full text-start text-lg'>Includes:</Text>
-                            <ol className='list-disc text-lg'>
+                            <ol className='list-disc text-lg pl-3'>
                                 <li>Up to 12 chat requests / day</li>
                                 <li>Up to 3 portfolio reviews / day</li>
                             </ol>
@@ -93,14 +91,14 @@ export default function PricingDialog({ children }: PricingDialogProps) {
 
                         <div className='flex flex-col gap-6'>
                             <div className='flex flex-row items-center gap-2'>
-                                <H1>$10</H1>
+                                <H1>US$10</H1>
                                 <Text>per month</Text>
                             </div>
 
                            {state? (
                             <Button
-                                onClick={onBillingButtonClick}
-                                disabled={isBillingPortalLoading || state.accountType === "PAID"}
+                                onClick={onSubscribeButtonClick}
+                                disabled={isCheckoutLoading || state.accountType === "PAID"}
                             >
                                 {state.accountType === "PAID"? "Subscribed": "Subscribe"}
                             </Button>
@@ -113,7 +111,7 @@ export default function PricingDialog({ children }: PricingDialogProps) {
 
                         <div className='h-[160px] flex flex-col items-center gap-2'>
                             <Text className='w-full text-start text-lg'>Includes:</Text>
-                            <ol className='list-disc text-lg'>
+                            <ol className='list-disc text-lg pl-3'>
                                 <li>Unlimited chat requests</li>
                                 <li>Unlimited portfolio reviews</li>
                                 <li>Many more features to come</li>

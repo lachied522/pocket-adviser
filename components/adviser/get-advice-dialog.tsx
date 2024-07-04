@@ -50,7 +50,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             action: 'deposit',
-            amount: 0,
+            amount: 1000,
         },
     });
     const amount = form.watch("amount");
@@ -81,7 +81,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
             <DialogContent className='max-w-md'>
                 <DialogHeader>
                     <DialogTitle>
-                        Quickly Ask for Advice
+                        Quickly Ask for Ideas
                     </DialogTitle>
                 </DialogHeader>
 
@@ -114,14 +114,12 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             name="amount"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Amount deposit/withdraw
-                                    </FormLabel>
+                                    <span className='text-lg font-medium'>Amount to deposit/withdraw</span>
                                     <FormControl>
                                         <Input
                                             type="number"
                                             min={0}
-                                            className="w-[180px]"
+                                            className="w-[180px] h-[36px] text-base"
                                             {...field}
                                         />
                                     </FormControl>
@@ -130,13 +128,13 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             )}
                         />
 
-                        <div className="space-y-2">
-                            <p>Current portfolio value</p>
+                        <div className="flex flex-col gap-2 space-y-2">
+                            <span className='text-lg font-medium'>Current portfolio value</span>
                             {formatDollar(portfolioValue || 0)}
                         </div>
 
-                        <div className="space-y-2">
-                            <p>Proposed portfolio value</p>
+                        <div className="flex flex-col gap-2 space-y-2">
+                            <span className='text-lg font-medium'>Proposed portfolio value</span>
                             {formatDollar(proposedValue || 0)}
                         </div>
 
@@ -153,7 +151,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             </DialogClose>
 
                             <Button type='submit'>
-                                Get Advice
+                                Submit
                             </Button>
                         </div>
                     </form>

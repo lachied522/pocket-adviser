@@ -1,11 +1,15 @@
 "use client";
-import React, {
+import {
   createContext,
   useContext,
   useState,
   useRef,
   useEffect,
 } from "react";
+
+import { useCookies } from "@/hooks/useCookies";
+
+import WelcomeDialog from "@/components/modals/welcome-dialog";
 
 export type UIState = {
     signupRef: React.RefObject<HTMLButtonElement>
@@ -25,7 +29,18 @@ interface UIProviderProps {
 export function UIProvider({
   children,
 }: UIProviderProps) {
+    const { getUserIdFromCookies } = useCookies();
+    const welcomeDialogRef = useRef<HTMLButtonElement>(null);
     const signupRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (!getUserIdFromCookies()) {
+            // open welcome dialog after three seconds
+            setTimeout(() => {
+                if (welcomeDialogRef.current) welcomeDialogRef.current.click();
+            }, 3000);
+        }
+    }, []);
 
     const openSignup = () => {
         if (signupRef.current) signupRef.current.click();
@@ -39,6 +54,7 @@ export function UIProvider({
             }}
         >
             {children}
+            <WelcomeDialog openRef={welcomeDialogRef} />
         </UIContext.Provider>
     )
 }

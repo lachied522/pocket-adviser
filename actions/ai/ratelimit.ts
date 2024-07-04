@@ -30,15 +30,17 @@ export async function checkFixedLimit(ip: string) {
 
 export async function checkRateLimits(user: UserData|null) {
     const ip = headers().get("x-forwarded-for");
-    if (user && user.accountType==="PAID") {
+    const key = user? user.id: ip!;
+
+    if (user && user.accountType!=="FREE") {
         // just apply sliding limit
-        const passesSliding = await checkFixedLimit(ip!);
+        const passesSliding = await checkSlidingLimit(key);
         return [passesSliding, true];
     }
 
     // apply both rate limits
     return await Promise.all([
-        checkSlidingLimit(ip!),
-        checkFixedLimit(ip!)
+        checkSlidingLimit(key),
+        checkFixedLimit(key)
     ]);
 } 

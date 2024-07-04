@@ -6,15 +6,17 @@ import { createUserAction } from "@/actions/user";
 import { COOKIE_NAME_FOR_USER_ID, COOKIE_NAME_FOR_IS_GUEST } from "@/constants/cookies";
 
 function getCookie(name: string) {
-    if (!document) return null;
-
-    const cookieValue = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith(`${name}=`))
-    ?.split('=')[1];
-
-    if (cookieValue) return cookieValue;
-    return null;
+    try {
+        const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith(`${name}=`))
+        ?.split('=')[1];
+    
+        if (cookieValue) return cookieValue;
+        return null;
+    } catch (e) {
+        return null;
+    }
 }
 
 function setCookie(name: string, value: string, days: number = 7) {
@@ -29,10 +31,6 @@ function removeCookie(name: string) {
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
 }
 
-const getUserIdFromCookies = () => {
-    return getCookie(COOKIE_NAME_FOR_USER_ID);
-}
-
 export const useCookies = () => {
     // store user id in cookies so that server can pre-fetch user data
     const [userId, setUserId] = useState<string | null>(null);
@@ -40,11 +38,13 @@ export const useCookies = () => {
     const createRef = useRef<ReturnType<typeof createUserAction> | null>(null); // keep track of any existing requests to create a guest user
 
     useEffect(() => {
-        // check if userId exists in cookies
-        setUserId(getUserIdFromCookies());
-        // check for isGuest
-        setIsGuest(!getCookie(COOKIE_NAME_FOR_IS_GUEST));
+        setUserId(getCookie(COOKIE_NAME_FOR_USER_ID));
+        setIsGuest(getCookie(COOKIE_NAME_FOR_IS_GUEST) === "true");
     }, []);
+
+    const getUserIdFromCookies = () => {
+        return getCookie(COOKIE_NAME_FOR_USER_ID);
+    }
 
     const setUserIdCookie = (value: string) => {
         setCookie(COOKIE_NAME_FOR_USER_ID, value);
@@ -58,7 +58,7 @@ export const useCookies = () => {
 
     const createGuestUserIfNecessary = async () => {
         // check if userId already exists in cookies to avoid unnecessary user creation
-        const _userId = getUserIdFromCookies();
+        const _userId = getCookie(COOKIE_NAME_FOR_USER_ID);
         if (_userId) {
             console.log('user retrieved from cookies');
             return _userId;

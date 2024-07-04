@@ -30,7 +30,7 @@ export default function TrendingStocks() {
             <H3 className=''>Trending Stocks</H3>
 
             <ScrollArea>
-                <div className='flex flex-row items-center p-3 gap-3.5 md:gap-6'>
+                <div className='flex flex-row items-center p-2 gap-3.5 md:gap-6'>
                     {data && data.length > 0? (
                     <>
                         {data.map((stock) => (
@@ -54,7 +54,7 @@ export default function TrendingStocks() {
                     </>
                     )}
                 </div>
-                <ScrollBar orientation="horizontal" />
+                <ScrollBar orientation="horizontal" className="h-2" />
             </ScrollArea>
         </div>
     )

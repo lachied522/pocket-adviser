@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { signOut } from "next-auth/react";
 
-import { LogOut } from "lucide-react";
+import { LogOut, ScrollText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/typography";
@@ -72,17 +72,38 @@ export default function Header() {
                             Pricing
                         </Button>
                     </PricingDialog>
+
+                    <a href="mailto:lachie@pocketadviser.com.au">
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            className='text-white hover:text-white hover:bg-transparent hover:opacity-90'
+                        >
+                            Contact
+                        </Button>
+                    </a>
                 </div>
 
                 {state && !isGuest ? (
                 <div className="flex flex-row items-center gap-3.5">
-                    <Text className="text-white">Welcome {state.name}</Text>
+                    <Text className="text-white mr-2">Welcome {state.name}</Text>
                     <Button
+                        title='Billing'
+                        aria-label='billing'
+                        variant='ghost'
+                        onClick={onBillingButtonClick}
+                        className='h-8 w-8 p-0 hover:bg-slate-100/10'
+                    >
+                        <ScrollText size={18} strokeWidth={2} color='white' />
+                    </Button>
+                    <Button
+                        title='Logout'
+                        aria-label='logout'
                         variant='ghost'
                         onClick={onSignOut}
-                        className="h-8 w-8 p-0 group"
+                        className="h-8 w-8 p-0 hover:bg-slate-100/10"
                     >
-                        <LogOut size={16} strokeWidth={3} className='text-white group-hover:text-red-600' />
+                        <LogOut size={16} strokeWidth={2.5} color='white' />
                     </Button>
                 </div>
                 ) : (

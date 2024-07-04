@@ -19,8 +19,6 @@ import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@
 
 import { useCookies } from "@/hooks/useCookies";
 
-import WelcomeDialog from "@/components/modals/welcome-dialog";
-
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
 import type { Holding, Profile, Stock } from "@prisma/client";
@@ -64,7 +62,6 @@ export const GlobalProvider = ({
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
   const [forexRate, setForexRate] = useState<number>(initalForexRate); // USDAUD forex rate
   const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
-  const welcomeDialogRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     (async function () {
@@ -227,7 +224,6 @@ export const GlobalProvider = ({
       }}
     >
       {children}
-      <WelcomeDialog openRef={welcomeDialogRef} />
     </GlobalContext.Provider>
   );
 };

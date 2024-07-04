@@ -96,7 +96,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                                         Total
                                     </div>
                                 </TableCell>
-                                <TableCell colSpan={1} className='p-3.5'>
+                                <TableCell colSpan={1} className='p-y-3.5'>
                                     <div className='text-lg font-medium'>
                                         {formatDollar(total)}
                                     </div>

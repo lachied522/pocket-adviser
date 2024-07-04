@@ -1,3 +1,4 @@
+import { CircleFadingPlus, ClipboardList, MessageCircleMore } from "lucide-react";
 
 import {
     Dialog,
@@ -33,8 +34,24 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
                 </DialogHeader>
 
                 <p>Hello! 👋</p>
-                <p>Welcome to Pocket Adviser! Pocket Adviser was created to be a guide for young investors as they get started on their investing journeys.</p>
+                <p>Welcome to Pocket Adviser! Pocket Adviser is your personal stock market guide to assist you on your investing journey.</p>
                 <p>Pocket Adviser can help you find investments that fit your objectives and preferences, explain financial concepts, and navigate market events.</p>
+                <p>Get started in <b>three easy steps</b>.</p>
+
+                <div className='grid grid-cols-3 gap-2 mt-6'>
+                    <div className='flex flex-col items-center gap-2 px-2 py-3 border-2 border-slate-200 rounded-xl'>
+                        <ClipboardList size={48} strokeWidth={1.5} />
+                        <span className='font-medium text-center'>1. Adjust your profile</span>
+                    </div>
+                    <div className='flex flex-col items-center gap-2 px-2 py-3 border-2 border-slate-200 rounded-xl'>
+                        <CircleFadingPlus size={48} strokeWidth={1.5} />
+                        <span className='font-medium text-center'>2. Add stocks to your portfolio</span>
+                    </div>
+                    <div className='flex flex-col items-center gap-2 px-2 py-3 border-2 border-slate-200 rounded-xl'>
+                        <MessageCircleMore size={48} strokeWidth={1.5} />
+                        <span className='font-medium text-center'>3. Chat with your adviser</span>
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
     )

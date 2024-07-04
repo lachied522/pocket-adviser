@@ -93,7 +93,7 @@ export function ChatProvider({
 
         async function sayHello() {
             setSaidHello(true); // prevent effect from running more than once
-            const content = `Hello!${state? ' My name is ' + state.name: ''} Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market.`;
+            const content = `Hello!${state? ' My name is ' + state.name: ' '}Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market.`;
             await sendMessage({
                 content,
                 addUserMessage: false,
@@ -114,7 +114,7 @@ export function ChatProvider({
             cooldownRef.current = setTimeout(() => {
                 setIsLoading(false);
                 cooldownRef.current = null; // Clear the ref when done
-            }, 10000);
+            }, 3000);
         }
 
         return () => {
@@ -126,6 +126,7 @@ export function ChatProvider({
 
     const onSubmit = useCallback(
         async (content: string) => {
+            if (isLoading) return;
             // clear input
             setInput('');
             // clear article
@@ -133,7 +134,7 @@ export function ChatProvider({
             // send message
             await sendMessage({ content });
         },
-        [setInput, setArticle, sendMessage]
+        [isLoading, setInput, setArticle, sendMessage]
     );
 
     const onReset = useCallback(

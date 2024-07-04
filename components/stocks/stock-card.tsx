@@ -5,11 +5,11 @@ import { cn } from "@/components/utils";
 
 import StockModal from "@/components/stocks/stock-modal";
 import StockLogo from "@/components/stocks/stock-logo";
+import ChangeIndicator from "@/components/stocks/change-indicator";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
 import type { Stock } from "@prisma/client";
-import DirectionIndicator from "./direction-indicator";
 
 interface StockCardProps {
     stockData: Omit<Stock, 'id'> & { id?: number }
@@ -43,7 +43,7 @@ export default function StockCard({ stockData, size = 'lg' }: StockCardProps) {
                                {size === 'lg' && (<span>{stockData.exchange}</span>)}
                                {size === 'sm' && (
                                 <div className=''>
-                                    <DirectionIndicator change={stockData.changesPercentage} size='sm' />
+                                    <ChangeIndicator change={stockData.changesPercentage} size='sm' />
                                 </div>
                                )}
                             </div>
@@ -66,8 +66,8 @@ export default function StockCard({ stockData, size = 'lg' }: StockCardProps) {
                         </div>
 
                         <div className='flex flex-col'>
-                            <span className='font-medium text-lg mr-1'>{formatDollar(stockData.dividendAmount || 0)}</span>
-                            <span className='text-slate-600 text-sm'>Div. Amount</span>
+                            <ChangeIndicator change={stockData.changesPercentage} withIcon={false} />
+                            <span className='text-slate-600 text-sm'>Change</span>
                         </div>
                     </div>
                     )}

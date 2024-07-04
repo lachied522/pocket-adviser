@@ -84,7 +84,7 @@ export default function SignupDialog({ children, initialTab }: GetAdviceDialogPr
                         className='h-10 flex flex-row items-center gap-2'
                     >
                         <Image
-                            src='/google-logo.jpg'
+                            src='/google-logo.png'
                             alt="Google logo"
                             height={18}
                             width={18}
