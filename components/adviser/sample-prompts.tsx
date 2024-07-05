@@ -15,7 +15,7 @@ const SAMPLE_PROMPTS = [
     "What is value investing?",
     "What is the PE ratio?",
     "What stocks are on the move?",
-    "How does inflation impact my stock portfolio?",
+    "How does inflation impact my portfolio?",
     "What is diversification?",
     "Should I diversify my portfolio?",
     "What does Beta mean?",
@@ -47,7 +47,7 @@ export default function SamplePrompts({ setInput }: SamplePromptsProps) {
                 key={`sample-prompt-${prompt}`}
                 variant='secondary'
                 onClick={() => setInput(prompt)}
-                className='bg-sky-600 hover:bg-sky-600 text-white hover:scale-[1.02] transition-transform duration-150'
+                className='text-xs px-2 py-3 md:px-4 md:text-base bg-sky-600 hover:bg-sky-600 text-white hover:scale-[1.02] transition-transform duration-150'
             >
                 {prompt}
             </Button>

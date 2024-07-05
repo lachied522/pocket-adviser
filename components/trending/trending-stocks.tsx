@@ -26,7 +26,7 @@ export default function TrendingStocks() {
     }, []);
 
     return (
-        <div className='flex flex-row items-center gap-12'>
+        <div className='flex flex-col md:flex-row md:items-center md:gap-12'>
             <H3 className=''>Trending Stocks</H3>
 
             <ScrollArea>

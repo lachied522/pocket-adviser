@@ -54,7 +54,8 @@ export default function Header() {
             <Container className='flex flex-row items-center justify-between'>
                 <Logo />
 
-                <div className="flex flex-row items-center gap-3.5">
+                {/* TO DO: add a dropdown menu for these items */}
+                <div className="hidden md:flex flex-row items-center gap-3.5">
                     <AboutDialog>
                         <Button
                             variant='ghost'

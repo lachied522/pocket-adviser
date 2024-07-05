@@ -50,7 +50,7 @@ export default function Portfolio() {
     return (
         <div className='flex flex-col gap-6'>
             <H3 className=''>My Portfolio</H3>
-            <div className='w-full flex flex-row justify-between'>
+            <div className='w-full flex flex-col sm:flex-row justify-between gap-6'>
                 <div className='flex flex-row items-center gap-3.5'>
                     <div className=''>
                         Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>

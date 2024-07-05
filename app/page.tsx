@@ -43,7 +43,7 @@ export default function Page() {
         </div>
 
         <div className='px-3 sm:px-6'>
-          <Container className='p-7 bg-white border border-slate-200 rounded-xl'>
+          <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
             <ChatArea />
           </Container>
         </div>
