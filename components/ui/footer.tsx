@@ -1,9 +1,6 @@
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 
 export default function Footer() {
-
-
     return (
         <div className='w-full flex items-center justify-center px-6 py-6 md:py-12 mt-12 bg-sky-800 opacity-90'>
             <div className='max-w-md md:max-w-lg flex flex-col items-stretch gap-3.5'>

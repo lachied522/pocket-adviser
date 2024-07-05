@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Markdown from 'react-markdown'
 
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
@@ -9,6 +10,43 @@ import StockAdvice from "./stock-advice";
 import RecommendationsTable from "./recommendations-table";
 
 import type { Stock } from "@prisma/client";
+
+function H3(props: any) {
+    return (
+        <h3 className="text-xl font-semibold">
+            {props.children}
+        </h3>
+    )
+}
+
+function OrderedList(props: any) {
+    return (
+        <ol className="whitespace-normal leading-loose">
+            {props.children}
+        </ol>
+    )
+}
+
+function UnorderedList(props: any) {
+    return (
+        <ul className="whitespace-normal leading-loose">
+            {props.children}
+        </ul>
+    )
+}
+
+function Link(props: any) {
+    return (
+      <a
+        href={props.href}
+        target="_blank"
+        rel="noreferrer"
+        className="text-sky-600 underline"
+    >
+        {props.children}
+      </a>
+    );
+}
 
 interface ChatMessageProps {
     content: any
@@ -24,10 +62,12 @@ export function ChatMessage({
     return (
         <Card>
             <CardContent className={cn(
-                "font-medium px-3 py-2 text-wrap whitespace-pre-wrap",
+                "max-w-[900px] font-medium px-3 py-2 text-wrap whitespace-pre-line",
                 role === "user" && "bg-neutral-50 border-none"
             )}>
-                {content}
+                <Markdown components={{ h3: H3, ol: OrderedList, ul: UnorderedList, a: Link }}>
+                    {content}
+                </Markdown>
             </CardContent>
         </Card>
     )
