@@ -36,7 +36,7 @@ export async function searchStocksAction(query: string) {
             OR: [
               {
                 symbol: {
-                  equals: query,
+                  in: [query, `${query}.AX`],
                   mode: 'insensitive',
                 },
               },

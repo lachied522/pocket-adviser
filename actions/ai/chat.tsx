@@ -99,7 +99,7 @@ export async function continueConversation({
         return {
             id: generateId(),
             role: 'assistant',
-            display: <ChatMessage content="Slow down there! You have submitted too many requests, please try again later. 🏁" />
+            display: <ChatMessage content="Slow down there! You have submitted too many requests, please try again in a couple of seconds. 🏁" />
         }
     }
 

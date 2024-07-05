@@ -63,12 +63,15 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-12'>
+                {/* Hidden submit button */}
                 <Button
                     ref={submitRef}
                     type='submit'
                     disabled={isLoading}
                     className='hidden'
                 />
+
+                <p className='text-lg'>Tell Pocket Adviser your preferences so that it can provide personalised responses.</p>
 
                 <FormField
                     control={form.control}
@@ -146,8 +149,9 @@ export default function PreferencesTab({ submitRef }: PreferenceTabProps) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel className='text-lg'>Likes/Dislikes</FormLabel>
-                            <FormDescription className='text-lg text-black'>
+                            <FormDescription className='xl:max-w-[75%] text-lg text-black'>
                                 These are any likes or dislikes you may have for the type of investments you want.
+                                Your selections will increase/decrease the likelihood that stocks with these themes will be selected for you.
                             </FormDescription>
                             <FormControl>
                                 <PreferencesSelector value={field.value} onChange={field.onChange} />
