@@ -20,7 +20,7 @@ export type Action = {
     payload: UserData['profile']
 }
 
-export function GlobalReducer(state: UserData | null, action: Action) {
+export function GlobalReducer(state: UserData|null, action: Action) {
     if (!state) {
         if (action.type === 'SET_DATA') {
             return action.payload;

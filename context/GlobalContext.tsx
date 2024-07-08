@@ -11,17 +11,17 @@ import {
 } from "react";
 import { useSession } from "next-auth/react";
 
-import { getUserDataAction } from "@/actions/user";
-import { getStockByIdAction } from "@/actions/stocks";
-import { getForexPriceAction } from "@/actions/forex";
-import { updateProfileAction } from "@/actions/profile";
-import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/holdings";
+import { getUserDataAction, updateUserAction } from "@/actions/crud/user";
+import { updateProfileAction } from "@/actions/crud/profile";
+import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
+import { getStockByIdAction } from "@/actions/data/stocks";
+import { getForexPriceAction } from "@/actions/data/forex";
 
 import { useCookies } from "@/hooks/useCookies";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
-import type { Holding, Profile, Stock } from "@prisma/client";
+import type { Holding, Profile, Stock, User } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
 
 export type GlobalState = {
@@ -31,10 +31,11 @@ export type GlobalState = {
   dispatch: React.Dispatch<Action>
   setCurrency: React.Dispatch<React.SetStateAction<'USD'|'AUD'>>
   getStockData: (stockId: number) => Promise<Stock>
+  updateUserAndUpdateState: (user: Partial<User>) => Promise<void>
+  updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
   updateHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
   deleteHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
-  updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
 }
 
 const GlobalContext = createContext<any>(null);
@@ -132,6 +133,47 @@ export const GlobalProvider = ({
     [stockDataMap, setStockDataMap]
   );
 
+  const updateUserAndUpdateState = useCallback(
+    async (data: Partial<User>) => {
+        if (!state) return;
+
+        await updateUserAction(state.id, data);
+        
+        // update state
+        dispatch({
+            type: 'SET_DATA',
+            payload: {
+                ...state,
+                ...data,
+            }
+        })
+    },
+    [state, dispatch]
+  );
+
+  const updateProfileAndUpdateState = useCallback(
+    async (profile: Omit<Profile, 'userId'>) => {
+      let userId = state?.id;
+      if (!userId) {
+        userId = await createGuestUserIfNecessary() as string;
+      }
+
+      const res = await updateProfileAction({
+        ...profile,
+        userId,
+      });
+      // update state
+      dispatch({
+        type: 'UPDATE_PROFILE',
+        payload: res
+      });
+
+      console.log('state updated', profile);
+
+    },
+    [state]
+  );
+
   const insertHoldingAndUpdateState = useCallback(
     async (holding: Omit<Holding, 'id'|'userId'>) => {
       let userId = state?.id;
@@ -185,29 +227,6 @@ export const GlobalProvider = ({
     [state, dispatch]
   );
 
-  const updateProfileAndUpdateState = useCallback(
-    async (profile: Omit<Profile, 'userId'>) => {
-      let userId = state?.id;
-      if (!userId) {
-        userId = await createGuestUserIfNecessary() as string;
-      }
-
-      const res = await updateProfileAction({
-        ...profile,
-        userId,
-      });
-      // update state
-      dispatch({
-        type: 'UPDATE_PROFILE',
-        payload: res
-      });
-
-      console.log('state updated', profile);
-
-    },
-    [state]
-  );
-
   return (
     <GlobalContext.Provider
       value={{
@@ -216,10 +235,11 @@ export const GlobalProvider = ({
         currency,
         getStockData,
         setCurrency,
+        updateUserAndUpdateState,
+        updateProfileAndUpdateState,
         insertHoldingAndUpdateState,
         updateHoldingAndUpdateState,
         deleteHoldingAndUpdateState,
-        updateProfileAndUpdateState,
         dispatch
       }}
     >

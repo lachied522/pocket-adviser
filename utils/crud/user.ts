@@ -20,3 +20,10 @@ export async function getUserById(id: string) {
         }
     });
 }
+
+export async function updateUser(userId: string, data: Partial<User>) {
+    return await prisma.user.update({
+        where: { id: userId },
+        data,
+    })
+}

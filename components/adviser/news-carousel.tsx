@@ -8,7 +8,7 @@ import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-import { getNewsAction } from "@/actions/news";
+import { getNewsAction } from "@/actions/data/news";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 

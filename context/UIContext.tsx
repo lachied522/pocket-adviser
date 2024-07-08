@@ -13,7 +13,9 @@ import WelcomeDialog from "@/components/modals/welcome-dialog";
 
 export type UIState = {
     signupRef: React.RefObject<HTMLButtonElement>
+    pricingRef: React.RefObject<HTMLButtonElement>
     openSignup: () => void
+    openPricing: () => void
 }
 
 const UIContext = createContext<any>(null);
@@ -32,6 +34,7 @@ export function UIProvider({
     const { getUserIdFromCookies } = useCookies();
     const welcomeDialogRef = useRef<HTMLButtonElement>(null);
     const signupRef = useRef<HTMLButtonElement>(null);
+    const pricingRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         if (!getUserIdFromCookies()) {
@@ -46,11 +49,17 @@ export function UIProvider({
         if (signupRef.current) signupRef.current.click();
     }
 
+    const openPricing = () => {
+        if (pricingRef.current) pricingRef.current.click();
+    }
+
     return (
         <UIContext.Provider
             value={{
                 signupRef,
+                pricingRef,
                 openSignup,
+                openPricing,
             }}
         >
             {children}

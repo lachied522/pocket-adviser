@@ -1,6 +1,6 @@
 "use server";
 
-import { createUser, getUserById } from "@/utils/crud/user";
+import { createUser, getUserById, updateUser } from "@/utils/crud/user";
 
 import type { User } from "@prisma/client";
 
@@ -10,4 +10,8 @@ export async function createUserAction(data: any) {
 
 export async function getUserDataAction(id: string) {
     return await getUserById(id);
+}
+
+export async function updateUserAction(userId: string, data: Partial<User>) {
+    return await updateUser(userId, data);
 }

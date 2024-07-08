@@ -22,7 +22,7 @@ interface GetAdviceDialogProps {
     initialTab?: 'login'|'signup'
 }
 
-export default function SignupDialog({ children, initialTab }: GetAdviceDialogProps) {
+export default function AuthDialog({ children, initialTab }: GetAdviceDialogProps) {
     const [tab, setTab] = useState<'login'|'signup'>(initialTab || 'signup');
     const closeRef = useRef<HTMLButtonElement>(null);
 

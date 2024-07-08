@@ -3,15 +3,23 @@ import { useState } from "react";
 
 import { signOut } from "next-auth/react";
 
-import { LogOut, ScrollText } from "lucide-react";
+import { LogOut, Mail, ScrollText, Settings } from "lucide-react";
 
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/typography";
+import { Separator } from "@/components/ui/separator";
+
 import Logo from "@/components/ui/logo";
 import Container from "@/components/ui/container";
 import AboutDialog from "@/components/modals/about-dialog";
-import AuthDialog from "@/components/auth/auth-dialog";
 import PricingDialog from "@/components/modals/pricing-dialog";
+import EmailsDialog from "@/components/modals/emails-dialog";
+import AuthDialog from "@/components/auth/auth-dialog";
 
 import { useCookies } from "@/hooks/useCookies";
 
@@ -22,7 +30,7 @@ import { type UIState, useUIContext } from "@/context/UIContext";
 
 export default function Header() {
     const { state } = useGlobalContext() as GlobalState;
-    const { signupRef } = useUIContext() as UIState;
+    const { signupRef, pricingRef } = useUIContext() as UIState;
     const { isGuest, removeCookies } = useCookies();
     const [isBillingPortalLoading, setIsBillingPortalLoading] = useState<boolean>(false);
 
@@ -66,6 +74,7 @@ export default function Header() {
 
                     <PricingDialog>
                         <Button
+                            ref={pricingRef}
                             variant='ghost'
                             className='text-white hover:text-white hover:bg-transparent hover:opacity-90'
                         >
@@ -87,15 +96,42 @@ export default function Header() {
                 {state && !isGuest ? (
                 <div className="flex flex-row items-center gap-3.5">
                     <Text className="text-white mr-2">Welcome {state.name}</Text>
-                    <Button
-                        title='Billing'
-                        aria-label='billing'
-                        variant='ghost'
-                        onClick={onBillingButtonClick}
-                        className='h-8 w-8 p-0 hover:bg-slate-100/10'
-                    >
-                        <ScrollText size={18} strokeWidth={2} color='white' />
-                    </Button>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                title='Settings'
+                                aria-label='settings'
+                                variant='ghost'
+                                className='h-8 w-8 p-0 hover:bg-slate-100/10'
+                            >
+                                <Settings size={18} strokeWidth={2} color='white' />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-fit flex flex-col p-2 bg-slate-100'>
+                            <Button
+                                aria-label='billing'
+                                variant='ghost'
+                                size='sm'
+                                onClick={onBillingButtonClick}
+                                className='h-[42px] w-full flex font-medium justify-start gap-2'
+                            >
+                                <ScrollText size={18} strokeWidth={2} />
+                                <span className='text-xs'>Billing</span>
+                            </Button>
+                            <Separator className='my-1' />
+                            <EmailsDialog>
+                                <Button
+                                    aria-label='email-preferences'
+                                    variant='ghost'
+                                    size='sm'
+                                    className='h-[42px] flex font-medium justify-start gap-2'
+                                >
+                                    <Mail size={16} strokeWidth={2} />
+                                    <span className='text-xs'>Email</span>
+                                </Button>
+                            </EmailsDialog>
+                        </PopoverContent>
+                    </Popover>
                     <Button
                         title='Logout'
                         aria-label='logout'

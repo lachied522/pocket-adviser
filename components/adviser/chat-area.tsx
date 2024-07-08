@@ -59,8 +59,8 @@ export default function ChatArea() {
                             variant='ghost'
                             className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
                         >
-                            <span className='text-lg mr-1 lg:mr-2'>🩺</span>
-                            Checkup
+                            <span className='text-lg mr-1 lg:mr-2'>📝</span>
+                            Portfolio review
                         </Button>
                     </CheckupDialog>
 

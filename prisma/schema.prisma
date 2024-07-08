@@ -24,6 +24,7 @@ model User {
   updatedAt        DateTime    @updatedAt
   stripeCustomerId String?
   accountType      AccountType @default(FREE)
+  mailFrequency    MailFrequency?
   accounts         Account[]
   sessions         Session[]
   holdings         Holding[]
@@ -131,6 +132,12 @@ enum AccountType {
   FREE
   PAID
   ADMIN
+}
+
+enum MailFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
 }
 
 enum Objective {

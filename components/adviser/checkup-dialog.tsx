@@ -36,7 +36,7 @@ export default function CheckupDialog({ children }: CheckupDialogProps) {
             <DialogContent className='h-64 max-w-sm'>
                 <DialogHeader>
                     <DialogTitle className='flex flex-row items-center gap-2'>
-                        🩺 Get a Portfolio Checkup
+                        📝 Get a Portfolio Review
                     </DialogTitle>
                 </DialogHeader>
 

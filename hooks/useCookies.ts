@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 
-import { createUserAction } from "@/actions/user";
+import { createUserAction } from "@/actions/crud/user";
 
 import { COOKIE_NAME_FOR_USER_ID, COOKIE_NAME_FOR_IS_GUEST } from "@/constants/cookies";
 

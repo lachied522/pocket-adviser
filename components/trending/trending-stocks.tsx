@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import { getTrendingStocksAction } from "@/actions/trending";
+import { getTrendingStocksAction } from "@/actions/data/trending";
 
 import { H3 } from "@/components/ui/typography";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
