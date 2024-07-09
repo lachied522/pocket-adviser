@@ -16,7 +16,7 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/api";
 
-export type AdviserState = {
+export type ChatState = {
     input: string
     article: StockNews
     conversation: ClientMessage[]

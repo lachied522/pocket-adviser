@@ -1,7 +1,7 @@
 
 import { z } from "zod";
 
-export const description = "Returns a list of recommended transactions for the user based on their current portfolio and investment profile.";
+export const description = "Display a list of trade ideas to the user based on their current portfolio and investment profile.";
 
 export const parameters = z.object({
     action: z.enum(["deposit", "withdraw", "review"]).describe("The user may wish to deposit or withdraw from their portfolio, or simply have it reviewed.").default("review"),

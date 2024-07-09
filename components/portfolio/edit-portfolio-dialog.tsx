@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Search, Trash } from "lucide-react";
 
@@ -106,7 +106,9 @@ type ModifiedHolding = Holding & {
     deleted?: boolean
 }
 
-export default function EditPortfolioDialog({ children }: {
+export default function EditPortfolioDialog({
+    children
+}: {
     children: React.ReactNode
 }) {
     const { state, insertHoldingAndUpdateState, updateHoldingAndUpdateState, deleteHoldingAndUpdateState } = useGlobalContext() as GlobalState;
@@ -116,11 +118,18 @@ export default function EditPortfolioDialog({ children }: {
     const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
     const [isSearchEmpty, setIsSearchEmpty] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(0);
     const closeRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         if (state) setModifiedHoldings(state.holdings);
     }, [state]);
+
+    const currentPage = useMemo(() => {
+        return modifiedHoldings
+        .filter((holding) => !holding.deleted)
+        .slice(5 * page, 5 * (page + 1));
+    }, [modifiedHoldings, page]);
 
     const onSubmit = async () => {
         setIsLoading(true);
@@ -169,6 +178,7 @@ export default function EditPortfolioDialog({ children }: {
     }
 
     const onAddHolding = (stock: Stock) => {
+        let newValue = [...modifiedHoldings];
         // check that stock is not already in portfolio
         if (!modifiedHoldings.find((obj) => obj.stockId === stock.id)) {
             // add stock to modified holdings array
@@ -185,10 +195,14 @@ export default function EditPortfolioDialog({ children }: {
                 userId: '',
                 inserted: true,
             }
-            setModifiedHoldings((curr) => ([...curr, newHolding]));
+            newValue.push(newHolding);
         }
+        // update state
+        setModifiedHoldings(newValue);
         // clear search
         clearSearch();
+        // navigate to last page if necessary
+        if (page < Math.floor((Math.max(newValue.filter((holding) => !holding.deleted).length, 1) - 1) / 5)) setPage((curr) => curr + 1);
     }
 
     const onUpdateHolding = (holding: Holding) => {
@@ -201,6 +215,8 @@ export default function EditPortfolioDialog({ children }: {
         setModifiedHoldings((curr) => (
             curr.map((obj) => obj.id === holding.id? { ...holding, deleted: true }: obj)
         ));
+        // navigate to first page
+        setPage(0);
     }
 
     const onCancel = () => {
@@ -215,7 +231,7 @@ export default function EditPortfolioDialog({ children }: {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='min-h-[540px] flex flex-col gap-12'>
+            <DialogContent className='min-h-[540px] flex flex-col gap-6'>
                 <DialogHeader>
                     <DialogTitle>
                         Edit Your Portfolio
@@ -251,10 +267,9 @@ export default function EditPortfolioDialog({ children }: {
                 </div>
 
                 <div className='relative'>
-                    <div className='flex flex-col gap-2'>
-                        <span className='text-lg font-medium'>Edit or remove stocks</span>
-                        {/* TO DO: add a proper scrollarea here */}
-                        <div className='max-h-[540px] rounded-md border overflow-auto'>
+                    <div className='text-lg font-medium mb-2'>Edit or remove stocks</div>
+                    <div className='h-[380px] grid grid-cols-1 items-start gap-2'>
+                        <div className='rounded-md border'>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -268,7 +283,7 @@ export default function EditPortfolioDialog({ children }: {
                                     <>
                                         {modifiedHoldings.length > 0? (
                                         <>
-                                            {modifiedHoldings.filter((holding) => !holding.deleted).map((holding) => (
+                                            {currentPage.map((holding) => (
                                             <EditHolding
                                                 key={`edit-holding-${holding.id}`}
                                                 holding={holding}
@@ -289,6 +304,28 @@ export default function EditPortfolioDialog({ children }: {
                                     </>
                                 </TableBody>
                             </Table>
+                        </div>
+
+                        <div className="flex items-center justify-end space-x-2 py-4 place-self-end">
+                            <div className='text-xs'>
+                                Showing {currentPage.length} of {modifiedHoldings.filter((holding) => !holding.deleted).length}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((curr) => curr - 1)}
+                                disabled={page === 0}
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((curr) => curr + 1)}
+                                disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / 5)}
+                            >
+                                Next
+                            </Button>
                         </div>
                     </div>
 

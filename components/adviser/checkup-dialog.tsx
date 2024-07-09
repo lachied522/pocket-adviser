@@ -12,18 +12,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import { type AdviserState, useChatContext } from "@/context/ChatContext";
+import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 interface CheckupDialogProps {
     children: React.ReactNode
 }
 
 export default function CheckupDialog({ children }: CheckupDialogProps) {
-    const { onSubmit } = useChatContext() as AdviserState;
+    const { onSubmit } = useChatContext() as ChatState;
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const handleSubmit = () => {
-        onSubmit("Can you review my portfolio?");
+        onSubmit("Can you give me some trade ideas for my portfolio?");
         // close dialog
         if (closeRef.current) closeRef.current.click();
     }

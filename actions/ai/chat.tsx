@@ -191,13 +191,17 @@ export async function continueConversation({
                 description: getRecommendationsDescription,
                 parameters: getRecommendationsParams,
                 generate: async function* (args) {
-                    yield <LoadingMessage msg="Getting recommendations" />;
+                    yield <LoadingMessage msg="Getting trade ideas" />;
                     const res = await getRecommendations(args.amount, args.action, user?.id);
                     // append tool call to history
                     appendToolCallToHistory("getRecommendations", args, JSON.stringify(res), !!res);
                     let content = "";
                     if (res) {
-                       content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
+                        if (res["transactions"] && res["transactions"].length === 0) {
+                            content = "It looks like you have no recommendations at this time."
+                        } else {
+                            content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
+                        }
                     } else {
                         content = "I'm sorry, something went wrong. Please try again later.";
                     }

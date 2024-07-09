@@ -12,7 +12,7 @@ import { cn } from "@/components/utils";
 
 import { useScrollAnchor } from "@/hooks/useScrollAnchor";
 
-import { type AdviserState, useChatContext } from "@/context/ChatContext";
+import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
@@ -25,7 +25,7 @@ import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/api";
 
 export default function ChatArea() {
-    const { input, article, conversation, isLoading, setInput, setArticle, onSubmit, onReset } = useChatContext() as AdviserState;
+    const { input, article, conversation, isLoading, setInput, setArticle, onSubmit, onReset } = useChatContext() as ChatState;
     const { scrollAreaRef, messagesRef, anchorRef } = useScrollAnchor();
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 

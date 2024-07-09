@@ -9,7 +9,7 @@ const ratelimit = {
     slider: new Ratelimit({
         redis: kv,
         prefix: "RATELIMIT_SLIDER_",
-        limiter: Ratelimit.slidingWindow(1, '10 s'),
+        limiter: Ratelimit.slidingWindow(3, '30 s'),
     }),
     fixed: new Ratelimit({
         redis: kv,

@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input";
 import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type AdviserState, useChatContext } from "@/context/ChatContext";
+import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 const formSchema = z.object({
     action: z.enum(["deposit", "withdraw"]),
@@ -44,7 +44,7 @@ interface GetAdviceDialogProps {
 
 export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const { portfolioValue } = useGlobalContext() as GlobalState;
-    const { onSubmit } = useChatContext() as AdviserState;
+    const { onSubmit } = useChatContext() as ChatState;
     const closeRef = useRef<HTMLButtonElement>(null);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),

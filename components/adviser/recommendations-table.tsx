@@ -18,7 +18,7 @@ import UtilityDialog from "@/components/modals/utility-dialog";
 
 import { formatDollar } from "@/utils/formatting";
 
-import { type AdviserState, useChatContext } from "@/context/ChatContext";
+import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import type { Recommendation } from "@/types/helpers";
 
@@ -31,7 +31,7 @@ interface RecommendationsTableProps {
 }
 
 export default function RecommendationsTable({ data }: RecommendationsTableProps) {
-    const { onSubmit } = useChatContext() as AdviserState;
+    const { onSubmit } = useChatContext() as ChatState;
 
     const total = useMemo(() => {
         return data.transactions.reduce((acc, obj) => acc + (obj.units * obj.price), 0);
@@ -70,7 +70,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                             <StockModal key={`recommendation-${obj.stockId}`} stockId={obj.stockId}>
                                 <TableRow className='cursor-pointer'>
                                     <TableCell className='text-lg font-semibold p-3.5'>
-                                        {obj.units > 0? "✨ Buy": "🤑 Sell"}
+                                        {obj.units > 0? "📈  Buy": "📉  Sell"}
                                     </TableCell>
                                     <TableCell className='text-lg font-medium py-3.5'>
                                         {obj.symbol}

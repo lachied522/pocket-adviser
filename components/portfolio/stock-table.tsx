@@ -22,13 +22,13 @@ import type { PopulatedHolding } from "@/types/helpers";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: PopulatedHolding[]
-  emptyText?: string
+  emptyComponent?: JSX.Element
 }
 
 export default function StockTable<TData, TValue>({
   columns,
   data,
-  emptyText
+  emptyComponent
 }: DataTableProps<TData, TValue>) {
     // see https://ui.shadcn.com/docs/components/data-table
     const table = useReactTable<PopulatedHolding>({
@@ -78,7 +78,7 @@ export default function StockTable<TData, TValue>({
                 ) : (
                     <TableRow>
                         <TableCell colSpan={columns.length} className="h-24 text-center">
-                            {emptyText? emptyText: "No results."}
+                            {emptyComponent? emptyComponent: "Portfolio empty."}
                         </TableCell>
                     </TableRow>
                 )}

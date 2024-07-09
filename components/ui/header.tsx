@@ -35,10 +35,10 @@ export default function Header() {
     const [isBillingPortalLoading, setIsBillingPortalLoading] = useState<boolean>(false);
 
     const onSignOut = async () => {
+        // must remove cookies before calling signout
+        removeCookies();
         // signout
         await signOut();
-        // remove cookies
-        removeCookies();
     }
 
     const onBillingButtonClick = async () => {
