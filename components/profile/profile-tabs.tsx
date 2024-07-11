@@ -53,7 +53,7 @@ export default function ProfileTabs() {
                             ease: "easeOut",
                             duration: 0.32,
                         }}
-                        className='flex flex-row items-center gap-3 xl:gap-6 order-last xl:order-2'
+                        className='hidden md:flex flex-row items-center gap-3 xl:gap-6 order-last xl:order-2'
                     >
                         <div className='min-w-[180px] flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
                             <span className='text-sm xl:text-base font-medium'>Objective</span>
