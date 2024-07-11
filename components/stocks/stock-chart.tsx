@@ -1,19 +1,32 @@
 "use client";
 import { useEffect, useRef, memo } from 'react';
 
-function formatSymbol(symbol: string) {
+import type { Stock } from '@prisma/client';
+
+function formatSymbol(symbol: string, exchange:'ASX'|'NASDAQ'|'NYSE') {
     // tradingview symbols are prefixed with exchange, e.g. ASX:BHP or NASDAQ:AAPL
-    if (symbol.includes('.AX')) {
-        const parts = symbol.split('.');
-        symbol = 'ASX:' + parts[0];
-    } else {
-        symbol = 'NASDAQ:' + symbol;
+    switch (exchange) {
+        case 'ASX': {
+            const parts = symbol.split('.');
+            symbol = 'ASX:' + parts[0];
+            break;
+        }
+        case 'NASDAQ': {
+            symbol = 'NASDAQ:' + symbol;
+            break;
+        }
+        case 'NYSE': {
+            symbol = 'NYSE:' + symbol;
+            break;
+        }
+        default:
+            // pass
     }
-    console.log(symbol);
+
     return symbol;
 }
 
-function StockSchart({ symbol }: { symbol: string }) {
+function StockChart({ stockData }: { stockData: Omit<Stock, 'id'> }) {
     // see https://www.tradingview.com/widget-docs/widgets/charts/mini-chart/
     let mountedRef = useRef<boolean>(false); // useEffect triggers twice in dev mode
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -26,7 +39,7 @@ function StockSchart({ symbol }: { symbol: string }) {
             script.async = true;
             script.innerHTML = `
                 {
-                    "symbol": "${formatSymbol(symbol)}",
+                    "symbol": "${formatSymbol(stockData.symbol, stockData.exchange as 'ASX'|'NASDAQ'|'NYSE')}",
                     "width": "100%",
                     "height": "100%",
                     "locale": "en",
@@ -42,7 +55,7 @@ function StockSchart({ symbol }: { symbol: string }) {
             if (!mountedRef.current && containerRef.current) containerRef.current.appendChild(script);
             mountedRef.current = true;
         },
-        [symbol]
+        [stockData]
     );
 
     return (
@@ -53,4 +66,4 @@ function StockSchart({ symbol }: { symbol: string }) {
     );
 }
 
-export default memo(StockSchart);
+export default memo(StockChart);

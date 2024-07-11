@@ -33,27 +33,21 @@ function removeCookie(name: string) {
 
 export const useCookies = () => {
     // store user id in cookies so that server can pre-fetch user data
-    const [userId, setUserId] = useState<string | null>(null);
-    const [isGuest, setIsGuest] = useState<boolean>(false);
-    const createRef = useRef<ReturnType<typeof createUserAction> | null>(null); // keep track of any existing requests to create a guest user
-
-    useEffect(() => {
-        setUserId(getCookie(COOKIE_NAME_FOR_USER_ID));
-        setIsGuest(getCookie(COOKIE_NAME_FOR_IS_GUEST) === "true");
-    }, []);
-
+    const createRef = useRef<ReturnType<typeof createUserAction>|null>(null); // keep track of any existing requests to create a guest user
     const getUserIdFromCookies = () => {
         return getCookie(COOKIE_NAME_FOR_USER_ID);
     }
 
+    const getIsGuestFromCookies = () => {
+        return getCookie(COOKIE_NAME_FOR_IS_GUEST) === "true";
+    }
+
     const setUserIdCookie = (value: string) => {
         setCookie(COOKIE_NAME_FOR_USER_ID, value);
-        setUserId(value);
     }
 
     const setIsGuestCookie = (value: boolean) => {
         setCookie(COOKIE_NAME_FOR_IS_GUEST, String(value));
-        setIsGuest(value);
     }
 
     const createGuestUserIfNecessary = async () => {
@@ -82,15 +76,11 @@ export const useCookies = () => {
         // remove cookies from doc
         removeCookie(COOKIE_NAME_FOR_USER_ID);
         removeCookie(COOKIE_NAME_FOR_IS_GUEST);
-        // update state
-        setUserId(null);
-        setIsGuest(false);
     }
 
     return {
-        userId,
-        isGuest,
         getUserIdFromCookies,
+        getIsGuestFromCookies,
         setUserIdCookie,
         setIsGuestCookie,
         createGuestUserIfNecessary,

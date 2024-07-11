@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -80,6 +81,8 @@ export const authOptions: AuthOptions = {
         const defaultExpiry = 7 * 24 * 60 * 60 * 1000; // one week
         cookieStore.set({ name: COOKIE_NAME_FOR_USER_ID, value: user.id, maxAge: defaultExpiry });
         cookieStore.set({ name: COOKIE_NAME_FOR_IS_GUEST, value: "false", maxAge: defaultExpiry });
+        // revalidate path
+        revalidatePath('/', 'layout');
         return true;
       },
       jwt({ token, user }) {

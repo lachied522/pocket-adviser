@@ -1,6 +1,4 @@
 "use client";
-import { signIn } from "next-auth/react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,7 +23,7 @@ const formSchema = z.object({
 });
 
 interface LoginFormProps {
-    onSuccess: () => void
+    onSuccess: (provider: "credentials"|"github"|"google", values: any) => Promise<void>
     onNavigateSignup: () => void
 }
 
@@ -38,21 +36,13 @@ export default function LoginForm({ onSuccess, onNavigateSignup }: LoginFormProp
         },
     });
 
-    const onSigninWithEmail = async (values: z.infer<typeof formSchema>) => {
-        await signIn("credentials", {
-            ...values,
-            redirect: false,
-        });
-
-        // close dialog and reset form
-        onSuccess();
-        // reset form after 1 sec
-        setTimeout(() => form.reset(), 1000);
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        onSuccess("credentials", values);
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSigninWithEmail)} className='w-full flex flex-col items-stretch justify-between gap-5'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='w-full flex flex-col items-stretch justify-between gap-5'>
                 <FormField
                     control={form.control}
                     name="email"

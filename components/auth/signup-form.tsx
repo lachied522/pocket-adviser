@@ -1,6 +1,4 @@
 "use client";
-import { signIn } from "next-auth/react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -29,7 +27,7 @@ const formSchema = z.object({
 });
 
 interface SignupFormProps {
-    onSuccess: () => void
+    onSuccess: (provider: "credentials"|"github"|"google", values: any) => Promise<void>
     onNavigateLogin: () => void
 }
 
@@ -55,13 +53,11 @@ export default function SignupForm({ onSuccess, onNavigateLogin }: SignupFormPro
         }
 
         // sign in with credentials
-        await signIn("credentials", {
+        onSuccess("credentials", {
             ...values,
             redirect: false,
         });
-        
-        // close dialog and reset form
-        onSuccess();
+
         // reset form after 1 sec
         setTimeout(() => form.reset(), 1000);
     }

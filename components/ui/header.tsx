@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { signOut } from "next-auth/react";
 
@@ -31,8 +31,15 @@ import { type UIState, useUIContext } from "@/context/UIContext";
 export default function Header() {
     const { state } = useGlobalContext() as GlobalState;
     const { signupRef, pricingRef } = useUIContext() as UIState;
-    const { isGuest, removeCookies } = useCookies();
+    const { getIsGuestFromCookies, removeCookies } = useCookies();
+    const [isGuest, setIsGuest] = useState<boolean>(true);
     const [isBillingPortalLoading, setIsBillingPortalLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (state) {
+            setIsGuest(getIsGuestFromCookies());
+        }
+    }, [state]);
 
     const onSignOut = async () => {
         // must remove cookies before calling signout

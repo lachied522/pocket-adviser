@@ -9,9 +9,8 @@ import {
   useMemo,
   useRef
 } from "react";
-import { useSession } from "next-auth/react";
 
-import { getUserDataAction, updateUserAction } from "@/actions/crud/user";
+import { updateUserAction } from "@/actions/crud/user";
 import { updateProfileAction } from "@/actions/crud/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { getStockByIdAction } from "@/actions/data/stocks";
@@ -57,41 +56,11 @@ export const GlobalProvider = ({
   initialStockData,
   initalForexRate,
 }: GlobalProviderProps) => {
-  const { data: session, status } = useSession();
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
-  const { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie, createGuestUserIfNecessary } = useCookies();
+  const { createGuestUserIfNecessary } = useCookies();
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
   const [forexRate, setForexRate] = useState<number>(initalForexRate); // USDAUD forex rate
   const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
-
-  useEffect(() => {
-    (async function () {
-      let data: UserData|null = null;
-      if (session) {
-        data = await getUserDataAction(session.user.id);
-        setIsGuestCookie(false);
-      } else {
-        // guest users do not have session, fetch from cookies instead
-        const _guestId = getUserIdFromCookies();
-        if (_guestId) {
-          // do not create a new guest if guestId does not exist - only create when necessary
-          data = await getUserDataAction(_guestId);
-          // update cookie
-          setIsGuestCookie(true);
-        }
-      };
-      
-      if (!data) return;
-      // update state
-      dispatch({
-        type: 'SET_DATA',
-        payload: data,
-      });
-
-      // ensure cookies are synced with session
-      setUserIdCookie(data.id);
-    })();
-  }, [session]);
 
   const portfolioValue = useMemo(() => {
     if (!state) return 0;
@@ -178,18 +147,30 @@ export const GlobalProvider = ({
     async (holding: Omit<Holding, 'id'|'userId'>) => {
       let userId = state?.id;
       if (!userId) {
-        userId = await createGuestUserIfNecessary() as string;
+          userId = await createGuestUserIfNecessary() as string;
       }
       const res = await insertHoldingAction({
-        ...holding,
-        userId,
+          ...holding,
+          userId,
       });
 
-      // update state
-      dispatch({
-        type: 'INSERT_HOLDING',
-        payload: res,
-      })
+      if (!state) {
+          // set state
+          dispatch({
+            type: 'SET_DATA',
+            payload: {
+                id: userId,
+                holdings: [res],
+                profile: null,
+            } as UserData,
+          });
+      } else {
+          // update state
+          dispatch({
+              type: 'INSERT_HOLDING',
+              payload: res,
+          });
+      }
     },
     [state, dispatch]
   );

@@ -26,14 +26,17 @@ export default function AuthDialog({ children, initialTab }: GetAdviceDialogProp
     const [tab, setTab] = useState<'login'|'signup'>(initialTab || 'signup');
     const closeRef = useRef<HTMLButtonElement>(null);
 
-    const onClose = () => {
-        if (closeRef.current) closeRef.current.click();
-    }
-
-    const onSigninWithOAuth = async (provider: "github"|"google") => {
-        await signIn(provider);
-        // close dialog and reset form
-        onClose();
+    const onSignin = async (provider: "credentials"|"github"|"google", values?: any) => {
+        if (provider === "credentials") {
+            await signIn("credentials", {
+                ...values,
+                redirect: false,
+            });
+        } else {
+            await signIn(provider);
+        }
+        // refresh page
+        window.location.reload();
     }
 
     return (
@@ -51,12 +54,12 @@ export default function AuthDialog({ children, initialTab }: GetAdviceDialogProp
                 <div className='w-full flex flex-col gap-5 p-x-5'>
                     {tab === 'signup'? (
                     <SignupForm
-                        onSuccess={onClose}
+                        onSuccess={onSignin}
                         onNavigateLogin={() => setTab('login')}
                     />
                     ) : (
                     <LoginForm
-                        onSuccess={onClose}
+                        onSuccess={onSignin}
                         onNavigateSignup={() => setTab('signup')}
                     />
                     )}
@@ -64,7 +67,7 @@ export default function AuthDialog({ children, initialTab }: GetAdviceDialogProp
                     <Button
                         type='button'
                         variant='outline'
-                        onClick={() => onSigninWithOAuth("github")}
+                        onClick={() => onSignin("github")}
                         className='h-10 flex flex-row items-center gap-2'
                     >
                         <Image
@@ -80,7 +83,7 @@ export default function AuthDialog({ children, initialTab }: GetAdviceDialogProp
                     <Button
                         type='button'
                         variant='outline'
-                        onClick={() => onSigninWithOAuth("google")}
+                        onClick={() => onSignin("google")}
                         className='h-10 flex flex-row items-center gap-2'
                     >
                         <Image

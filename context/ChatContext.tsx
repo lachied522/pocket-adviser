@@ -92,8 +92,11 @@ export function ChatProvider({
         }
 
         async function sayHello() {
-            setSaidHello(true); // prevent effect from running more than once
-            const content = `Hello!${state? ' My name is ' + state.name: ' '}Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market.`;
+            setSaidHello(true); // prevent effect from running more than once            
+            const content = (
+                `Hello!${state && state.name? ' My name is ' + state.name + '.': ''} ` +
+                `Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market.`
+            );
             await sendMessage({
                 content,
                 addUserMessage: false,

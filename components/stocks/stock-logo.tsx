@@ -1,4 +1,8 @@
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 const BASE_URL = "https://financialmodelingprep.com/image-stock/";
 
@@ -8,25 +12,56 @@ interface StockLogoProps {
     width?: number
 }
 
+async function getImageBlur(symbol: string) {
+    let url = BASE_URL + symbol + ".png";
+
+    const res = await fetch(url);
+    
+    if (!res.ok) {
+        // sometimes '.AX' suffix must be removed for ASX stocks
+        if (symbol.endsWith('.AX')) {
+            // try again with suffix removed
+            symbol = symbol.split('.')[0];
+            return getImageBlur(symbol);
+        }
+    }
+
+    return {
+        url,
+        buffer: Buffer.from(await res.arrayBuffer()).toString("base64"),
+    }
+}
+
 export default function StockLogo({
     symbol,
     height = 110,
     width = 110,
 }: StockLogoProps) {
+    const [src, setSrc] = useState<string|null>(null);
+    const [imageBlur, setImageBlur] = useState<string|null>(null);
+    
+    useEffect(() => {
+        getImageBlur(symbol)
+        .then(({ url, buffer }) => {
+            setSrc(url);
+            setImageBlur(buffer);
+        });
+    }, []);
 
     return (
         <>
-            {symbol ? (
+            {src ? (
             <Image
-                src={BASE_URL + symbol + ".png"}
+                src={src || ''}
                 alt={symbol + " logo"}
                 height={height}
                 width={width}
+                sizes="110px"
+                // blurDataURL={`data:image/png;base64,${imageBlur}`}
+                // placeholder="blur"
             />
             ) : (
-            <div className='h-full w-full flex items-center justify-center text-sm'>
-                Logo not found
-            </div>
+            <Skeleton className='bg-slate-200' style={{ height, width }} />
             )}
         </>
     )

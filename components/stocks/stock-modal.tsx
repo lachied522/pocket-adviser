@@ -94,7 +94,7 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
                             </div>
 
                             <div className='h-36 px-3.5 opacity-90'>
-                                <StockChart symbol={stockData.symbol} />
+                                <StockChart stockData={stockData} />
                             </div>
                         </div>
                     </div>
