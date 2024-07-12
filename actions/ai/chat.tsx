@@ -41,21 +41,21 @@ async function getSystemMessage() {
     let message = (
         `You are an enthusiastic investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
         `Where you cannot answer the user's query, you can recommend the user contact a financial adviser to assist them. ` +
-        `Feel free to use emojis in your messages. ` +
+        `Feel free to use emojis. ` +
         `Today's date is ${today}. `
     );
     
     try {
-        let message = await kv.get("MESSAGES_SYSTEM");
-        if (!message) {
+        let context = await kv.get("GENERAL_MARKET_UPDATE");
+        if (!context) {
             // create a new system message
             const res = await searchWeb("What's happening in the stock market today?", today);
-            const context = res["answer"];
-            message += context;
-
+            context = res["answer"];
             // update kv
-            kv.set("MESSAGES_SYSTEM", message, { ex: 24 * 60 * 60 });
+            kv.set("GENERAL_MARKET_UPDATE", message, { ex: 24 * 60 * 60 });
         }
+
+        message += context;
     } catch (e) {
         console.error("Error fetching system message: ", e);
     }

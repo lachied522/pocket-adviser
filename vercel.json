@@ -1,12 +1,12 @@
 {
     "crons": [
       {
-        "path": "/api/refresh-all-stock-data/ASX",
-        "schedule": "0 5 * * *"
+        "path": "/api/cron/refresh-data",
+        "schedule": "0 22 * * 1-5"
       },
       {
-        "path": "/api/refresh-all-stock-data/NASDAQ",
-        "schedule": "0 8 * * *"
+        "path": "/api/cron/send-emails",
+        "schedule": "30 22 * * 1-5"
       }
     ]
-  }
+}
