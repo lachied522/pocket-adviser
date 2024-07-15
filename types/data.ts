@@ -120,3 +120,25 @@ export type FXQuote = {
     changes: number
     date: string // isostring
 }
+
+export type EarningsEvent = {
+    date: string
+    symbol: string
+    eps: number
+    epsEstimated: number
+    revenue: number|null
+    revenueEstimated: number|null
+    updatedFromDate: string
+    fiscalDateEnding: string
+}
+
+export type EconomicsEvent = {
+    date: string
+    country: string
+    event: string // name of event
+    currency: string
+    previous: number|null // previous value of figure
+    estimate: number|null // estimated value of figure
+    impact: string // Low, Medium, High
+    unit: string // e.g. %
+}

@@ -1,11 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import { motion, AnimatePresence } from "framer-motion";
-
-import { LoaderCircle } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { getNewsAction } from "@/actions/data/news";
@@ -14,12 +11,11 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import NewsArticle from "./news-article";
 
-import type { StockNews } from "@/types/api";
+import type { StockNews } from "@/types/data";
 
 export default function NewsCarousel() {
     const { state, getStockData } = useGlobalContext() as GlobalState;
     const [data, setData] = useState<StockNews[]|null>(null);
-    const [isOpen, setIsOpen] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(0);
 
@@ -52,72 +48,57 @@ export default function NewsCarousel() {
     }, [page, getStockData]);
 
     return (
-        <div className='flex flex-col items-stretch'>
-            <div className='flex xl:justify-end xl:mb-3'>
-                <Button
-                    variant='ghost'
-                    onClick={() => setIsOpen(!isOpen)}
-                    className='flex flex-row xl:flex-col items-center xl:items-end gap-2 xl:gap-0 hover:bg-transparent p-0'
-                >
-                    <h4 className='text-lg'>News</h4>
-                    <span className='text-sm text-slate-600'>{isOpen? "Hide": "Show"}</span>
-                </Button>
+        <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
+            <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
+                <h4 className='text-lg font-medium text-slate-600'>News</h4>
+
+                {data && data.length > 0 && <div className='text-xs text-slate-600'>Tip: drag an article into the chat</div>}
             </div>
 
-            <AnimatePresence>
-                {isOpen && (
-                <motion.div
-                    key='news-carousel'
-                    // initial={{ opacity: 0, x: 300 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: '-100%' }}
-                    transition={{
-                        ease: "easeOut",
-                        duration: 0.32,
-                    }}
-                >
-                    {data && data.length > 0 ? (
+            <ScrollArea className='xl:h-[660px]'>
+                <div className='flex flex-row xl:flex-col items-center py-3 xl:px-3 xl:py-0 gap-3.5'>
                     <>
-                        <div className='text-sm text-slate-600 xl:ml-4 xl:mb-3'>Tip: try dragging an article into the chat</div>
-                        <ScrollArea className=''>
-                            <div className='z-[-1] xl:h-[640px] flex flex-row xl:flex-col items-center py-3 xl:px-3 xl:py-0'>
-                                {data.map((article) => (
-                                <NewsArticle
-                                    key={`article-${article.title}`}
-                                    article={article}
-                                    draggable
-                                    animateOnHover
+                        {data && data.length > 0 ? (
+                        <>
+                            {data.map((article) => (
+                            <NewsArticle
+                                key={`article-${article.title}`}
+                                article={article}
+                                draggable
+                                animateOnHover
+                            />
+                            ))}
+                            <Button
+                                variant='ghost'
+                                disabled={isLoading || page >= 2}
+                                onClick={() => setPage((curr) => curr + 1)}
+                                className='text-sm mt-3.5'
+                            >
+                                Get more
+                            </Button>
+                        </>
+                        ) : (
+                        <>
+                            {isLoading ? (
+                            <>
+                                {Array.from({length: 5}).map((_, index) => (
+                                <Skeleton
+                                    key={`news-skelton-${index}`}
+                                    className='h-24 md:h-36 w-36 md:w-48 shrink-0 grow-0'
                                 />
                                 ))}
-
-                                <Button
-                                    variant='ghost'
-                                    disabled={isLoading || page >= 2}
-                                    onClick={() => setPage((curr) => curr + 1)}
-                                    className='text-sm mt-3.5'
-                                >
-                                    Get more
-                                </Button>
+                            </>
+                            ) : (
+                            <div>
+                                No articles were found
                             </div>
-                            <ScrollBar orientation="horizontal" />
-                        </ScrollArea>
-                    </>
-                    ) : (
-                    <>
-                        {isLoading ? (
-                        <div className='w-full flex items-center justify-center p-6'>
-                            <LoaderCircle className='animate-spin text-slate-200' />
-                        </div>
-                        ) : (
-                        <div>
-                            No articles were found.
-                        </div>
+                            )}
+                        </>
                         )}
                     </>
-                    )}
-                </motion.div>
-                )}
-            </AnimatePresence>
+                </div>
+                <ScrollBar orientation="horizontal" />
+            </ScrollArea>
         </div>
     )
 }

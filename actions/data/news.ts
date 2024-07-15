@@ -2,7 +2,7 @@
 
 import StockDataClient from "@/utils/data/client";
 
-import type { StockNews } from "@/types/api";
+import type { StockNews } from "@/types/data";
 
 const client = new StockDataClient();
 

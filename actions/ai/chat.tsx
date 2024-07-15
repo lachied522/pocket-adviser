@@ -5,12 +5,12 @@ import { openai } from '@ai-sdk/openai';
 
 import { kv } from '@vercel/kv';
 
-import { format } from "date-fns";
+import { format } from 'date-fns';
 
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
 import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
-import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from "./tools/get-portfolio";
-import { description as getStockDescription, parameters as getStockParams, getStockInfo } from "./tools/get-stock-info";
+import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from './tools/get-portfolio';
+import { description as getStockDescription, parameters as getStockParams, getStockInfo } from './tools/get-stock-info';
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
@@ -18,8 +18,8 @@ import { checkRateLimits } from './ratelimit';
 
 import { ChatMessage, LoadingMessage, MessageWithStockAdvice, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
-import type { StockNews } from '@/types/api';
 import type { UserData } from '@/types/helpers';
+import type { StockNews } from '@/types/data';
 
 export interface ServerMessage {
     role: 'user'|'assistant'|'tool'
@@ -84,10 +84,12 @@ export async function clearConversation() {
 
 export async function continueConversation({
     input,
+    toolName,
     article,
     user
 } : {
     input: string
+    toolName?: "getRecommendations"|"shouldBuyOrSellStock"|"getPortfolio"|"getStockInfo"|"searchWeb"|"readUrl" // specify tool to call
     article?: StockNews|null
     user: UserData|null
 }): Promise<ClientMessage> {
@@ -179,6 +181,7 @@ export async function continueConversation({
         system: systemMessage,
         messages: conversationHistory,
         initial: <LoadingMessage />,
+        toolChoice: toolName? { type: 'tool', toolName }: 'auto',
         text: ({ content, done }) => {
             if (done) {
                 appendAssistantMessageToHistory(content);
@@ -198,7 +201,7 @@ export async function continueConversation({
                     let content = "";
                     if (res) {
                         if (res["transactions"] && res["transactions"].length === 0) {
-                            content = "It looks like you have no recommendations at this time."
+                            content = "It looks like you have no recommendations at this time.";
                         } else {
                             content = "Please note that these are not formal recommendations. Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
                         }
@@ -306,7 +309,7 @@ export async function continueConversation({
                 description: readUrlDescription,
                 parameters: readUrlParams,
                 generate: async function* (args) {
-                    yield <LoadingMessage msg="Reading web page" />;
+                    yield <LoadingMessage msg="Reading url" />;
                     const res = await readUrl(args.url);
                     // update history
                     appendToolCallToHistory("readUrl", args, JSON.stringify(res), !!res);
@@ -319,7 +322,7 @@ export async function continueConversation({
                             yield <ChatMessage content={content} />;
                         }
                     } else {
-                        content = "I'm sorry, I couldn't access that article.";
+                        content = "I'm sorry, I had trouble accessing that url.";
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
@@ -338,7 +341,7 @@ export async function continueConversation({
     }
 }
 
-export const AIProvider = createAI<ServerMessage[], ClientMessage[]>({
+export const AI = createAI<ServerMessage[], ClientMessage[]>({
     actions: {
       continueConversation,
       clearConversation,

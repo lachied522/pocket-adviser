@@ -14,7 +14,7 @@ import { generateId } from 'ai';
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import type { ClientMessage } from "@/actions/ai/chat";
-import type { StockNews } from "@/types/api";
+import type { StockNews } from "@/types/data";
 
 export type ChatState = {
     input: string
@@ -23,7 +23,7 @@ export type ChatState = {
     isLoading: boolean
     setInput: React.Dispatch<React.SetStateAction<string>>
     setArticle: React.Dispatch<React.SetStateAction<StockNews|null>>
-    onSubmit: (content: string) => void
+    onSubmit: (content: string, tool?: string) => void
     onReset: () => void
 }
 
@@ -52,10 +52,12 @@ export function ChatProvider({
     const sendMessage = useCallback(
         async ({
             content,
+            tool,
             addUserMessage = true,
             addAssistantMessage = true,
         } : {
             content: string,
+            tool?: string,
             addUserMessage?: boolean,
             addAssistantMessage?: boolean,
         }) => {
@@ -69,6 +71,7 @@ export function ChatProvider({
 
             const response = await continueConversation({
                 user: state,
+                toolName: tool,
                 input: content,
                 article,
             });
@@ -87,7 +90,7 @@ export function ChatProvider({
 
     useEffect(() => {
         // ask AI to introduce itself on first load
-        if (!saidHello && process.env.ENVIRONMENT !== "development") {
+        if (!(saidHello || conversation.length > 0)) {
             sayHello();
         }
 
@@ -128,14 +131,14 @@ export function ChatProvider({
     }, [conversation, setIsLoading]);
 
     const onSubmit = useCallback(
-        async (content: string) => {
+        async (content: string, tool?: string) => {
             if (isLoading) return;
             // clear input
             setInput('');
             // clear article
             setArticle(null);
             // send message
-            await sendMessage({ content });
+            await sendMessage({ content, tool });
         },
         [isLoading, setInput, setArticle, sendMessage]
     );

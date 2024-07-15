@@ -4,7 +4,7 @@ import { kv } from "@vercel/kv";
 
 import StockDataClient from "@/utils/data/client";
 
-import type { FXQuote } from "@/types/api";
+import type { FXQuote } from "@/types/data";
 
 export async function getForexPriceAction(symbol: "AUDUSD"|"USDAUD") {
     let res: FXQuote|null = await kv.get(`DATA_FX_${symbol}`);

@@ -13,17 +13,17 @@ datasource db {
 }
 
 model User {
-  id               String      @id @default(cuid())
+  id               String         @id @default(cuid())
   name             String?
-  email            String?     @unique
+  email            String?        @unique
   hashedPassword   String?
   emailVerified    DateTime?
   image            String?
-  guest            Boolean     @default(false)
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  guest            Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   stripeCustomerId String?
-  accountType      AccountType @default(FREE)
+  accountType      AccountType    @default(FREE)
   mailFrequency    MailFrequency?
   accounts         Account[]
   sessions         Session[]
@@ -118,12 +118,14 @@ model Holding {
 }
 
 model Advice {
-  id           Int      @id @default(autoincrement())
-  action       Action
-  amount       Float?
-  transactions Json[]
-  createdAt    DateTime @default(now())
-  userId       String
+  id                Int      @id @default(autoincrement())
+  action            Action
+  amount            Float?
+  transactions      Json[]
+  initialAdjUtility Float?
+  finalAdjUtility   Float?
+  createdAt         DateTime @default(now())
+  userId            String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

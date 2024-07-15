@@ -25,8 +25,8 @@ import type { Recommendation } from "@/types/helpers";
 interface RecommendationsTableProps {
     data: {
         transactions: Recommendation[]
-        initial_adj_utility: number
-        final_adj_utility: number
+        initialAdjUtility?: number|null
+        finalAdjUtility?: number|null
     }
 }
 
@@ -35,7 +35,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
 
     const total = useMemo(() => {
         return data.transactions.reduce((acc, obj) => acc + (obj.units * obj.price), 0);
-    }, [data]);
+    }, [data.transactions]);
 
     return (
         <>
@@ -64,7 +64,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data && data.transactions.length > 0? (
+                        {data.transactions.length > 0? (
                         <>
                             {data.transactions.map((obj) => (
                             <StockModal key={`recommendation-${obj.stockId}`} stockId={obj.stockId}>
@@ -124,21 +124,21 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                         </UtilityDialog>
                         <span>Utility before</span>
                     </div>
-                    <div>
-                        {data.initial_adj_utility.toFixed(2)}
+                    <div className='justify-self-start'>
+                        {data.initialAdjUtility?.toFixed(2) || 'N/A'}
                     </div>
                     <div>
                         Utility after
                     </div>
-                    <div>
-                        {data.final_adj_utility.toFixed(2)}
+                    <div className='justify-self-start'>
+                        {data.finalAdjUtility?.toFixed(2) || 'N/A'}
                     </div>
                 </div>
 
                 <div className='w-full flex flex-row justify-end'>
                     <Button
                         variant='default'
-                        onClick={() => onSubmit("Can you give me some more ideas?")}
+                        onClick={() => onSubmit("Can you give me some more ideas?", "getRecommendations")}
                         className='flex flex-row items-center gap-2 shadow-none'
                     >
                         <RefreshCw size={16} />

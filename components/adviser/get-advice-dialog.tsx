@@ -63,7 +63,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
         const content = `I would like to ${values.action} ${formatDollar(values.amount)}. Can you give me some ideas?`;
         // call onSubmit
-        onSubmit(content);
+        onSubmit(content, 'getRecommendations');
         // close dialog and reset form
         if (closeRef.current) closeRef.current.click();
     }

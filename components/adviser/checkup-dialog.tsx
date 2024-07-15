@@ -23,7 +23,7 @@ export default function CheckupDialog({ children }: CheckupDialogProps) {
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const handleSubmit = () => {
-        onSubmit("Can you give me some trade ideas for my portfolio?");
+        onSubmit("Can you give me some trade ideas for my portfolio?", "getRecommendations");
         // close dialog
         if (closeRef.current) closeRef.current.click();
     }

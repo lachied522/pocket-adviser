@@ -46,7 +46,7 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
             const _data = await getStockData(stockId);
             if (_data) setStockData(_data);
         })();
-    }, [stockId, getStockData]);
+    }, [getStockData]);
 
     const onButtonPress = (content: string) => {
         onSubmit(content);
@@ -93,7 +93,7 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
                                 <ChangeIndicator change={stockData.changesPercentage} withIcon={false} />
                             </div>
 
-                            <div className='h-36 px-3.5 opacity-90'>
+                            <div className='h-48 px-3.5 opacity-90'>
                                 <StockChart stockData={stockData} />
                             </div>
                         </div>

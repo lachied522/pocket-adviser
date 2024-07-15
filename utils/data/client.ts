@@ -1,4 +1,6 @@
-import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote } from "@/types/api";
+import { format } from "date-fns";
+
+import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote, EconomicsEvent, EarningsEvent } from "@/types/data";
 
 export default class StockDataClient {
     API_KEY = process.env.FMP_API_KEY;
@@ -106,5 +108,41 @@ export default class StockDataClient {
         const data = await this.makeAuthenticatedAPIRequest(`fx/${symbol}`) as FXQuote[]|null;
         if (!(data && data.length)) return null;
         return data[0];
+    }
+
+    async getEarningsCalendar(from?: Date, to?: Date): Promise<EarningsEvent[]> {
+        // see https://site.financialmodelingprep.com/developer/docs#economics-calendar-economics-data
+        const params = new URLSearchParams();
+        if (from && to) {
+            params.set("from", format(from, 'yyyy-MM-dd'));
+            params.set("to", format(to, 'yyyy-MM-dd'));
+        } 
+        const data = await this.makeAuthenticatedAPIRequest('earning_calendar', params) as EarningsEvent[]|null;
+        if (!(data && data.length)) return [];
+        return data;
+    }
+
+    async getDividendsCalendar(from?: Date, to?: Date): Promise<EconomicsEvent[]> {
+        // see https://site.financialmodelingprep.com/developer/docs#economics-calendar-economics-data
+        const params = new URLSearchParams();
+        if (from && to) {
+            params.set("from", format(from, 'yyyy-MM-dd'));
+            params.set("to", format(to, 'yyyy-MM-dd'));
+        } 
+        const data = await this.makeAuthenticatedAPIRequest('stock_dividend_calendar', params) as EconomicsEvent[]|null;
+        if (!(data && data.length)) return [];
+        return data;
+    }
+
+    async getEconomicsCalendar(from?: Date, to?: Date): Promise<EconomicsEvent[]> {
+        // see https://site.financialmodelingprep.com/developer/docs#economics-calendar-economics-data
+        const params = new URLSearchParams();
+        if (from && to) {
+            params.set("from", format(from, 'yyyy-MM-dd'));
+            params.set("to", format(to, 'yyyy-MM-dd'));
+        } 
+        const data = await this.makeAuthenticatedAPIRequest('economic_calendar', params) as EconomicsEvent[]|null;
+        if (!(data && data.length)) return [];
+        return data;
     }
 }

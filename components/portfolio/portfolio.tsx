@@ -19,7 +19,7 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import { columns } from "./columns";
-import StockTable from "./stock-table";
+import StockTable from "./table";
 import EditPortfolioDialog from "./edit-portfolio-dialog";
 
 import type { PopulatedHolding } from "@/types/helpers";
@@ -40,7 +40,13 @@ export default function Portfolio() {
             const _holdings = await Promise.all(
                 state.holdings.map(async (holding) => {
                     const data = await getStockData(holding.stockId);
-                    return { ...data, ...holding };
+                    // add value column
+                    const value = holding.units * (data.previousClose || 0);
+                    return {
+                        ...data,
+                        ...holding,
+                        value,
+                    };
                 })
             );
 

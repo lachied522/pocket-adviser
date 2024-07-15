@@ -6,7 +6,7 @@ interface TextProps extends React.HTMLProps<HTMLParagraphElement>{};
 const H1 = ({ className, ...props }: HeadingProps) => {
     return (
         <h1
-            className={cn('text-3xl font-semibold', className)}
+            className={cn('text-xl md:text-3xl font-semibold', className)}
             {...props}
         />
     )
@@ -17,7 +17,7 @@ H1.displayName = 'H1';
 const H3 = ({ className, ...props }: HeadingProps) => {
     return (
         <h3
-            className={cn('text-xl font-semibold', className)}
+            className={cn('text-lg md:text-xl font-semibold', className)}
             {...props}
         />
     )

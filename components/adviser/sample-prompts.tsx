@@ -31,7 +31,7 @@ export default function SamplePrompts({ setInput }: SamplePromptsProps) {
 
     useEffect(() => {
         const samples: typeof SAMPLE_PROMPTS[number][] = [];
-        while (samples.length < 4) {
+        while (samples.length < 3) {
             const sample = SAMPLE_PROMPTS[Math.round(Math.random() * (SAMPLE_PROMPTS.length - 1))];
             if (!samples.includes(sample)) {
                 samples.push(sample);
@@ -41,7 +41,7 @@ export default function SamplePrompts({ setInput }: SamplePromptsProps) {
     }, []);
 
     return (
-        <div className="w-full flex flex-wrap justify-start gap-2 md:px-3.5">
+        <div className="w-full flex flex-wrap justify-center gap-2 md:px-3.5 overflow-hidden">
             {samplePrompts.map((prompt) => (
             <Button
                 key={`sample-prompt-${prompt}`}

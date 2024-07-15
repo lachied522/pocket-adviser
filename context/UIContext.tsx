@@ -12,6 +12,7 @@ import { useCookies } from "@/hooks/useCookies";
 import WelcomeDialog from "@/components/modals/welcome-dialog";
 
 export type UIState = {
+    isMobile: boolean
     signupRef: React.RefObject<HTMLButtonElement>
     pricingRef: React.RefObject<HTMLButtonElement>
     openSignup: () => void
@@ -31,10 +32,26 @@ interface UIProviderProps {
 export function UIProvider({
   children,
 }: UIProviderProps) {
+    const [isMobile, setIsMobile] = useState<boolean>(false);
     const { getUserIdFromCookies } = useCookies();
     const welcomeDialogRef = useRef<HTMLButtonElement>(null);
     const signupRef = useRef<HTMLButtonElement>(null);
     const pricingRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        // add event listener for obtaining screen width
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        };
+    }, []);
 
     useEffect(() => {
         if (!getUserIdFromCookies()) {
@@ -56,6 +73,7 @@ export function UIProvider({
     return (
         <UIContext.Provider
             value={{
+                isMobile,
                 signupRef,
                 pricingRef,
                 openSignup,

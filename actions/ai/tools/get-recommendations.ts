@@ -37,7 +37,8 @@ async function fetchData(amount: number, action: string, userId?: string|null) {
 function formatResults(res: any) {
     // format results for interpretation by AI
     return {
-        ...res,
+        initialAdjUtility: res.initial_adj_utility,
+        finalAdjUtility: res.final_adj_utility,
         total: res.transactions.reduce((acc: number, obj: any) => acc + (obj.units * obj.price), 0),
         transactions: res.transactions.map((obj: any) => ({
             ...obj,
