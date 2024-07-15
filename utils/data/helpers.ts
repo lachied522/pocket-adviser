@@ -1,7 +1,7 @@
 import StockDataClient from "./client";
 
 import type { Stock } from "@prisma/client";
-import type { StockQuote, CompanyProfile, PriceTargetConsesus, IncomeGrowth, Ratios } from "@/types/api";
+import type { StockQuote, CompanyProfile, PriceTargetConsesus, IncomeGrowth, Ratios } from "@/types/data";
 
 type Exchange = 'NASDAQ'|'ASX';
 
