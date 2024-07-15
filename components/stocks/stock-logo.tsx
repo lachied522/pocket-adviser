@@ -46,7 +46,7 @@ export default function StockLogo({
             setSrc(url);
             setImageBlur(buffer);
         });
-    }, []);
+    }, [symbol]);
 
     return (
         <>

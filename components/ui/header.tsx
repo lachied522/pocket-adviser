@@ -38,7 +38,7 @@ export default function Header() {
         if (state) {
             setIsGuest(getIsGuestFromCookies());
         }
-    }, [state]);
+    }, [state, getIsGuestFromCookies]);
 
     const onSignOut = async () => {
         // must remove cookies before calling signout

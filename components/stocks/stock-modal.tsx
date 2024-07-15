@@ -46,7 +46,7 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
             const _data = await getStockData(stockId);
             if (_data) setStockData(_data);
         })();
-    }, [getStockData]);
+    }, [initialStockData, stockId, getStockData]);
 
     const onButtonPress = (content: string) => {
         onSubmit(content);

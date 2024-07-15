@@ -45,7 +45,7 @@ export default function NewsCarousel() {
             });
             setIsLoading(false);
         })();
-    }, [page, getStockData]);
+    }, [state, page, getStockData]);
 
     return (
         <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>

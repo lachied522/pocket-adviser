@@ -31,7 +31,7 @@ export default function UpcomingEvents() {
             setData(_data.slice(0, 12));
             setIsLoading(false);
         })();
-    }, [getStockData]);
+    }, [state, getStockData]);
 
     const onDragStart = (e: React.DragEvent<HTMLElement>, obj: Calendar[number]) => {
         const input = (
