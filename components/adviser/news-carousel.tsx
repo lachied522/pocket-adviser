@@ -7,28 +7,24 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { getNewsAction } from "@/actions/data/news";
 
-import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-
 import NewsArticle from "./news-article";
 
 import type { StockNews } from "@/types/data";
 
-export default function NewsCarousel() {
-    const { state, getStockData } = useGlobalContext() as GlobalState;
-    const [data, setData] = useState<StockNews[]|null>(null);
+const MAX_PAGES = 3;
+
+interface NewsCarouselProps {
+    symbols: string[]
+}
+
+export default function NewsCarousel({ symbols }: NewsCarouselProps) {
+    const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(0);
 
     useEffect(() => {
         (async function getNews() {
             setIsLoading(true);
-            const symbols = [];
-            if (state && state.holdings) {
-                for (const holding of state.holdings) {
-                    const { symbol } = await getStockData(holding.stockId);
-                    symbols.push(symbol);
-                }
-            }
             const _data = await getNewsAction(symbols, page);
             // update state, ensuring only unique articles are returned
             setData((curr) => {
@@ -45,57 +41,52 @@ export default function NewsCarousel() {
             });
             setIsLoading(false);
         })();
-    }, [state, page, getStockData]);
+    }, [page]);
 
     return (
         <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
             <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
                 <h4 className='text-lg font-medium text-slate-600'>News</h4>
 
-                {data && data.length > 0 && <div className='text-xs text-slate-600'>Tip: drag an article into the chat</div>}
+                {data.length > 0 && <div className='text-xs text-slate-600'>Tip: drag an article into the chat</div>}
             </div>
 
             <ScrollArea className='xl:h-[660px]'>
                 <div className='flex flex-row xl:flex-col items-center py-3 xl:px-3 xl:py-0 gap-3.5'>
+                    {data.map((article) => (
+                    <NewsArticle
+                        key={`article-${article.title}`}
+                        article={article}
+                        draggable
+                        animateOnHover
+                    />
+                    ))}
+                    
+                    {isLoading && (
                     <>
-                        {data && data.length > 0 ? (
-                        <>
-                            {data.map((article) => (
-                            <NewsArticle
-                                key={`article-${article.title}`}
-                                article={article}
-                                draggable
-                                animateOnHover
-                            />
-                            ))}
-                            <Button
-                                variant='ghost'
-                                disabled={isLoading || page >= 2}
-                                onClick={() => setPage((curr) => curr + 1)}
-                                className='text-sm mt-3.5'
-                            >
-                                Get more
-                            </Button>
-                        </>
-                        ) : (
-                        <>
-                            {isLoading ? (
-                            <>
-                                {Array.from({length: 5}).map((_, index) => (
-                                <Skeleton
-                                    key={`news-skelton-${index}`}
-                                    className='h-24 md:h-36 w-36 md:w-48 shrink-0 grow-0'
-                                />
-                                ))}
-                            </>
-                            ) : (
-                            <div>
-                                No articles were found
-                            </div>
-                            )}
-                        </>
-                        )}
+                        {Array.from({length: 5}).map((_, index) => (
+                        <Skeleton
+                            key={`news-skelton-${index}`}
+                            className='h-24 md:h-36 w-36 md:w-48 shrink-0 grow-0'
+                        />
+                        ))}
                     </>
+                    )}
+
+                    {!isLoading && data.length === 0 && (
+                    <div>
+                        No articles were found
+                    </div>
+                    )}
+
+                    <Button
+                        variant='ghost'
+                        disabled={isLoading || page >= MAX_PAGES - 1}
+                        onClick={() => setPage((curr) => curr + 1)}
+                        className='text-sm mt-3.5'
+                    >
+                        Get more
+                    </Button>
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
