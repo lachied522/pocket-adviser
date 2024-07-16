@@ -9,7 +9,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-import { formatDollar, formatPercent } from "@/utils/formatting";
+import { formatDollar, formatPercent, formatMarketCap } from "@/utils/formatting";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
@@ -78,7 +78,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Name"} />
     ),
     cell: ({ row }) => (
-      <div className='md:text-lg font-medium line-clamp-1 py-5'>
+      <div className='max-w-[240px] md:text-lg font-medium truncate py-5'>
         {(row.getValue('name') as string).toUpperCase()}
       </div>
     )
@@ -90,7 +90,18 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
     ),
     cell: ({ row }) => (
       <div className='md:text-lg font-medium capitalize line-clamp-1 py-5'>
-        {(row.getValue('sector') as string)}
+        {row.getValue('sector')}
+      </div>
+    )
+  },
+  {
+    accessorKey: "marketCap",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"Market Cap"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium capitalize line-clamp-1 py-5'>
+        {formatMarketCap(row.getValue('marketCap'))}
       </div>
     )
   },
@@ -118,7 +129,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
   {
     accessorKey: "changesPercentage",
     header: ({ column }) => (
-      <HeaderCell column={column} title={"Change (%)"} />
+      <HeaderCell column={column} title={"Change"} />
     ),
     cell: ({ row }) => (
       <div className='md:text-lg font-medium py-5'>{formatPercent(row.getValue('changesPercentage'))}</div>
@@ -133,8 +144,71 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <div className='md:text-lg font-medium py-5'>{formatDollar(row.getValue('value'))}</div>
     )
   },
-  // {
-  //   accessorKey: "cost",
-  //   header: "Cost",
-  // },
+  {
+    accessorKey: "eps",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"EPS"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium py-5'>
+        {row.getValue('eps')}
+        <span className='text-sm'>{` ${row.original['currency']}`}</span>
+      </div>
+      
+    )
+  },
+  {
+    accessorKey: "pe",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"PE"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium py-5'>{row.getValue('pe')}</div>
+    )
+  },
+  {
+    accessorKey: "epsGrowth",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"EPS Growth"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium py-5'>
+        {formatPercent(Number(row.getValue('epsGrowth')) * 100)}
+      </div>
+    )
+  },
+  {
+    accessorKey: "dividendAmount",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"Dividend"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium py-5'>
+        {formatDollar(row.getValue('dividendAmount'))}
+        <span className='text-sm'>{` ${row.original['currency']}`}</span>
+      </div>
+    )
+  },
+  {
+    accessorKey: "dividendYield",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"Yield"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium py-5'>
+        {formatPercent(Number(row.getValue('dividendYield')) * 100)}
+      </div>
+    )
+  },
+  {
+    accessorKey: "dividendTotal",
+    header: ({ column }) => (
+      <HeaderCell column={column} title={"Total"} />
+    ),
+    cell: ({ row }) => (
+      <div className='md:text-lg font-medium py-5'>
+        {formatDollar(row.getValue('dividendTotal'))}
+      </div>
+    )
+  },
 ]

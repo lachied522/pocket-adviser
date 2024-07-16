@@ -11,7 +11,7 @@ export default function QuickActions() {
 
     return (
         <div className='flex flex-wrap lg:flex-row xl:flex-col items-center xl:items-start gap-3.5'>
-            <span className='w-full lg:w-auto text-lg font-medium text-slate-600'>Quick actions</span>
+            <span className='w-full lg:w-auto md:text-lg font-medium text-slate-600'>Quick actions</span>
             <Button
                 variant='ghost'
                 onClick={onReset}

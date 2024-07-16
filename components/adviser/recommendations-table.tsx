@@ -18,6 +18,8 @@ import UtilityDialog from "@/components/modals/utility-dialog";
 
 import { formatDollar } from "@/utils/formatting";
 
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+import { type UIState, useUIContext } from "@/context/UIContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import type { Recommendation } from "@/types/helpers";
@@ -31,6 +33,8 @@ interface RecommendationsTableProps {
 }
 
 export default function RecommendationsTable({ data }: RecommendationsTableProps) {
+    const { state } = useGlobalContext() as GlobalState;
+    const { openSignup } = useUIContext() as UIState;
     const { onSubmit } = useChatContext() as ChatState;
 
     const total = useMemo(() => {
@@ -138,7 +142,11 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                 <div className='w-full flex flex-row justify-end'>
                     <Button
                         variant='default'
-                        onClick={() => onSubmit("Can you give me some more ideas?", "getRecommendations")}
+                        onClick={() => {
+                            // regenerating transactions will have no effect if not signed in
+                            // we will prompt user to signup
+                            state? onSubmit("Can you give me some more ideas?", "getRecommendations"): openSignup();
+                        }}
                         className='flex flex-row items-center gap-2 shadow-none'
                     >
                         <RefreshCw size={16} />

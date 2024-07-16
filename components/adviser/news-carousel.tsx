@@ -25,7 +25,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     useEffect(() => {
         (async function getNews() {
             setIsLoading(true);
-            const _data = await getNewsAction(symbols, page);
+            const _data = await getNewsAction(symbols, page, 20);
             // update state, ensuring only unique articles are returned
             setData((curr) => {
                 if (curr) {
@@ -46,9 +46,9 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     return (
         <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
             <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
-                <h4 className='text-lg font-medium text-slate-600'>News</h4>
+                <h4 className='md:text-lg font-medium text-slate-600'>News</h4>
 
-                {data.length > 0 && <div className='text-xs text-slate-600'>Tip: drag an article into the chat</div>}
+                {data.length > 0 && <div className='hidden md:block text-xs text-slate-600'>Tip: drag an article into the chat</div>}
             </div>
 
             <ScrollArea className='xl:h-[660px]'>
@@ -64,7 +64,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
                     
                     {isLoading && (
                     <>
-                        {Array.from({length: 5}).map((_, index) => (
+                        {Array.from({length: 12}).map((_, index) => (
                         <Skeleton
                             key={`news-skelton-${index}`}
                             className='h-24 md:h-36 w-36 md:w-48 shrink-0 grow-0'

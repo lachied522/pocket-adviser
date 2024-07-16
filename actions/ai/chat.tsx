@@ -46,13 +46,13 @@ async function getSystemMessage() {
     );
     
     try {
-        let context = await kv.get("GENERAL_MARKET_UPDATE");
+        let context = await kv.get("SYSTEM_CONTEXT");
         if (!context) {
             // create a new system message
             const res = await searchWeb("What's happening in the stock market today?", today);
             context = res["answer"];
             // update kv
-            kv.set("GENERAL_MARKET_UPDATE", message, { ex: 24 * 60 * 60 });
+            kv.set("SYSTEM_CONTEXT", message, { ex: 24 * 60 * 60 });
         }
 
         message += context;

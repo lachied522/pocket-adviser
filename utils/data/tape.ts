@@ -38,13 +38,16 @@ export async function getStockTape(): Promise<TAPE> {
     if (res) return res;
 
     // kv miss, fetch new data
-    const [index, stocks] = await Promise.all([
+    const [spxQuote, stocks] = await Promise.all([
         client.getQuote("^SPX"),
         getTrendingStocks(),
     ]);
 
     res = {
-        indeces: [index!],
+        indeces: [{
+            ...spxQuote!,
+            symbol: 'SPY', // override '^SPX'
+        }],
         stocks,
     }
 

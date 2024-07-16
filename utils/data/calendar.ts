@@ -57,12 +57,14 @@ export async function getCalendar(symbols: string[]) {
         kv.set(KEY, allEvents, { ex: 31 * 24 * 60 * 60 });
     }
 
-    // return calendar, filtered for symbols and current date
+    // filter for symbols and current date, and limit to 24
     const today = new Date();
     return allEvents.filter((obj) => {
         if ('symbol' in obj) {
             return symbols.includes(obj.symbol);
         }
         return true;
-    }).filter((obj) => new Date(obj.date).getTime() > today.getTime());
+    })
+    .filter((obj) => new Date(obj.date).getTime() > today.getTime())
+    .slice(0, 24);
 }

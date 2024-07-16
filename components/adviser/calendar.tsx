@@ -31,8 +31,8 @@ async function CalendarBody({ symbols }: CalendarProps) {
     return (
         <div className='h-full flex flex-col items-stretch gap-2 xl:gap-3.5'>
             <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
-                <h4 className='text-lg font-medium text-slate-600'>Upcoming</h4>
-                {data && data.length > 0 && <div className='text-xs text-slate-600'>Tip: drag an event into the chat</div>}
+                <h4 className='md:text-lg font-medium text-slate-600'>Upcoming</h4>
+                {data && data.length > 0 && <div className='hidden md:block text-xs text-slate-600'>Tip: drag an event into the chat</div>}
             </div>
 
             <ScrollArea className=''>
@@ -40,7 +40,7 @@ async function CalendarBody({ symbols }: CalendarProps) {
                     {data && data.length > 0? (
                     <>
                         {data.map((item, index) => (
-                            <CalendarItem key={`calendar-item-${index}`} item={item} />
+                        <CalendarItem key={`calendar-item-${index}`} item={item} />
                         ))}
                     </>
                     ) : (

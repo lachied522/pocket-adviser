@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/components/utils";
 
 import { formatDollar } from "@/utils/formatting";
 
@@ -24,10 +25,44 @@ import EditPortfolioDialog from "./edit-portfolio-dialog";
 
 import type { PopulatedHolding } from "@/types/helpers";
 
+const TABS = {
+    overview: [
+        "symbol",
+        "name",
+        "sector",
+        "marketCap",
+        "units",
+        "previousClose",
+        "changesPercentage",
+        "value",
+    ],
+    earnings: [
+        "symbol",
+        "name",
+        "marketCap",
+        "units",
+        "sector",
+        "eps",
+        "pe",
+        "epsGrowth",
+    ],
+    dividends: [
+        "symbol",
+        "name",
+        "marketCap",
+        "sector",
+        "units",
+        "dividendAmount",
+        "dividendYield",
+        "dividendTotal"
+    ]
+}
+
 export default function Portfolio() {
     const { state, portfolioValue, currency, setCurrency, getStockData } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as ChatState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
+    const [tab, setTab] = useState<keyof typeof TABS>("overview");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -42,10 +77,18 @@ export default function Portfolio() {
                     const data = await getStockData(holding.stockId);
                     // add value column
                     const value = holding.units * (data.previousClose || 0);
+                    // add total income
+                    const dividendTotal = holding.units * (data.dividendAmount || 0);
+                    // add EPS column
+                    // NOTE: only pe ratio is stored in DB
+                    // TODO: store eps in db instead of pe
+                    const eps = (data.pe && data.previousClose)? Math.round(100 * data.previousClose / data.pe) / 100: NaN;
                     return {
                         ...data,
                         ...holding,
                         value,
+                        dividendTotal,
+                        eps,
                     };
                 })
             );
@@ -56,22 +99,46 @@ export default function Portfolio() {
     }, [state, getStockData]);
 
     return (
-        <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-3.5 md:gap-6'>
             <H3 className=''>My Portfolio</H3>
-            <div className='w-full flex flex-col md:flex-row items-start justify-between gap-3.5'>
-                <div className='flex flex-row items-center gap-3.5'>
-                    <div className=''>
-                        Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>
-                    </div>
-                    <Select onValueChange={(value: "USD"|"AUD") => setCurrency(value)} defaultValue={currency}>
-                        <SelectTrigger className='w-[80px]'>
-                            <SelectValue placeholder="USD" />
-                        </SelectTrigger>
-                        <SelectContent className='w-[80px]'>
-                            <SelectItem value="USD">USD</SelectItem>
-                            <SelectItem value="AUD">AUD</SelectItem>
-                        </SelectContent>
-                    </Select>
+            <div className='flex flex-row items-center gap-3.5'>
+                <div className=''>
+                    Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>
+                </div>
+                <Select onValueChange={(value: "USD"|"AUD") => setCurrency(value)} defaultValue={currency}>
+                    <SelectTrigger className='w-[80px]'>
+                        <SelectValue placeholder="USD" />
+                    </SelectTrigger>
+                    <SelectContent className='w-[80px]'>
+                        <SelectItem value="USD">USD</SelectItem>
+                        <SelectItem value="AUD">AUD</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className='w-full flex flex-row items-start justify-between gap-3.5'>
+                <div className='hidden md:flex flex-wrap items-center gap-2'>
+                    <Button
+                        onClick={() => setTab("overview")}
+                        variant='outline'
+                        className={cn(tab === 'overview' && 'border border-sky-600')}
+                    >
+                        Overview
+                    </Button>
+                    <Button
+                        onClick={() => setTab("earnings")}
+                        variant='outline'
+                        className={cn(tab === 'earnings' && 'border border-sky-600')}
+                    >
+                        Earnings
+                    </Button>
+                    <Button
+                        onClick={() => setTab("dividends")}
+                        variant='outline'
+                        className={cn(tab === 'dividends' && 'border border-sky-600')}
+                    >
+                        Dividends
+                    </Button>
                 </div>
 
                 <EditPortfolioDialog>
@@ -86,14 +153,15 @@ export default function Portfolio() {
             </div>
 
             <StockTable
-                columns={columns}
+                // @ts-ignore: issue with ColumnDef type https://github.com/TanStack/table/issues/4241
+                columns={columns.filter((column) => TABS[tab].includes(column.accessorKey))}
                 data={populatedHoldings}
                 emptyComponent={(
                     <div className='flex flex-col items-center gap-6 p-24'>
                         <span className='font-medium text-lg'>Portfolio empty</span>
                         <Button
                             onClick={() => {
-                                onSubmit("Can you give me some ideas for my portfolio?");
+                                onSubmit("Can you give me some ideas for my portfolio?", "getRecommendations");
                                 window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
                             }}
                         >

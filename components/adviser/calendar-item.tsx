@@ -25,7 +25,7 @@ export default function CalendarItem({ item }: CalendarItemProps) {
         <div
             onDragStart={(e: React.DragEvent<HTMLElement>) => onDragStart(e, item)}
             draggable
-            className='w-full flex flex-col gap-2 p-2 border border-slate-50 cursor-pointer hover:scale-[1.05]'
+            className='xl:w-full flex flex-col gap-2 p-2 border border-slate-50 cursor-pointer shrink-0 hover:scale-[1.05]'
         >
             <div className='flex flex-row items-center gap-1'>
                 <Image
