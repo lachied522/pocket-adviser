@@ -1,7 +1,4 @@
-"use server";
-
 import { kv } from "@vercel/kv";
-
 import { PrismaClient } from '@prisma/client';
 
 import StockDataClient from "@/utils/data/client";
@@ -36,7 +33,7 @@ async function fetchEcononmicsData(from: Date, to: Date, countryCodes = ["AU", "
 
 export type Calendar = (EarningsEvent|EconomicsEvent)[];
 
-export async function getCalendarAction(symbols: string[]) {
+export async function getCalendar(symbols: string[]) {
     // check kv
     let allEvents: Calendar|null = await kv.get(KEY);
 
@@ -60,11 +57,12 @@ export async function getCalendarAction(symbols: string[]) {
         kv.set(KEY, allEvents, { ex: 31 * 24 * 60 * 60 });
     }
 
-    // return calendar, filtered for symbols
+    // return calendar, filtered for symbols and current date
+    const today = new Date();
     return allEvents.filter((obj) => {
         if ('symbol' in obj) {
             return symbols.includes(obj.symbol);
         }
         return true;
-    });
+    }).filter((obj) => new Date(obj.date).getTime() > today.getTime());
 }

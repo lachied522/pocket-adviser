@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Advice" ALTER COLUMN "action" SET DEFAULT 'REVIEW',
+ALTER COLUMN "amount" SET DEFAULT 0;

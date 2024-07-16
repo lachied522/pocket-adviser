@@ -14,7 +14,6 @@ import { updateUserAction } from "@/actions/crud/user";
 import { updateProfileAction } from "@/actions/crud/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { getStockByIdAction } from "@/actions/data/stocks";
-import { getForexPriceAction } from "@/actions/data/forex";
 
 import { useCookies } from "@/hooks/useCookies";
 

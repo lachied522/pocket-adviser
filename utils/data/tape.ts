@@ -1,5 +1,3 @@
-"use server";
-
 import { kv } from "@vercel/kv";
 
 import StockDataClient from "@/utils/data/client";
@@ -34,7 +32,7 @@ type TAPE = {
     stocks: Stock[]
 }
 
-export async function getStockTapeAction(): Promise<TAPE> {
+export async function getStockTape(): Promise<TAPE> {
     let res: TAPE|null = await kv.get(KEY);
 
     if (res) return res;
@@ -52,6 +50,5 @@ export async function getStockTapeAction(): Promise<TAPE> {
 
     // update kv
     kv.set(KEY, res, { ex: 24 * 60 * 60 });
-
     return res;
 }

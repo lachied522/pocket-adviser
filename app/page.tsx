@@ -5,7 +5,7 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 import { getUserById } from "@/utils/crud/user";
 import { getStockById } from "@/utils/crud/stocks";
-import { getForexRate } from "@/utils/data/helpers";
+import { getForexRate } from "@/utils/data/forex";
 
 import { GlobalProvider } from "@/context/GlobalContext";
 import { UIProvider } from "@/context/UIContext";
@@ -14,10 +14,10 @@ import { AIProvider } from "@/context/AIContext";
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
 import ProfileTabs from "@/components/profile/profile-tabs";
-import StockTape from "@/components/tape/stock-tape";
 import Chat from "@/components/adviser/chat";
 import Portfolio from "@/components/portfolio/portfolio";
 import Footer from "@/components/ui/footer";
+import StockTape from "@/components/tape/stock-tape";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -58,10 +58,11 @@ export default async function Page({
       userData = await getUserById(userId.value);
     }
 
-    const stockData = await getStockData(userData);
-
-    // get forex rate
-    const forexRate = await getForexRate("USDAUD");
+    // get stock data and forex rate simultaneously
+    const [stockData, forexRate] = await Promise.all([
+        getStockData(userData),
+        getForexRate("USDAUD"),
+    ]);
 
     return (
       <GlobalProvider
@@ -101,7 +102,7 @@ export default async function Page({
                 <div className='flex flex-col gap-5 xl:gap-10 py-5 xl:py-10'>
                   <div className='px-3 sm:px-6'>
                     <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                      <Chat />
+                      <Chat initialUserData={userData} initialStockData={stockData} />
                     </Container>
                   </div>
 

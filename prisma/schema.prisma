@@ -119,8 +119,8 @@ model Holding {
 
 model Advice {
   id                Int      @id @default(autoincrement())
-  action            Action
-  amount            Float?
+  action            Action   @default(REVIEW)
+  amount            Float?   @default(0)
   transactions      Json[]
   initialAdjUtility Float?
   finalAdjUtility   Float?
