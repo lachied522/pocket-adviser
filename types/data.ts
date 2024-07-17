@@ -104,7 +104,7 @@ export type StockNews = {
     symbol: string,
     publishedDate: string, // datestring
     title: string,
-    image: string,
+    image: string|null,
     site: string,
     text: string,
     url: string

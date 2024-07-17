@@ -31,7 +31,7 @@ export default function ProfileTabs() {
 
     return (
         <div className='flex flex-col gap-6'>
-            <div className='lg:h-16 flex flex-col lg:grid lg:grid-cols-[0.25fr_0.5fr_0.25fr] lg:items-center gap-2 py-2 lg:py-0'>
+            <div className='lg:h-16 grid grid-cols-1 lg:grid-cols-3 items-center md:gap-2 py-2 lg:py-0'>
                 <div className='flex flex-row items-center gap-3.5 order-first shrink-0'>
                     <Button
                         variant='ghost'
@@ -90,7 +90,7 @@ export default function ProfileTabs() {
                     </AnimatePresence>
                 </div>
                 
-                <div className='w-full lg:w-[160px] flex flex-row justify-end xl:order-last justify-self-end'>
+                <div className='w-full flex flex-row justify-end xl:order-last justify-self-end'>
                     <AnimatePresence>
                         {isOpen && isApplyButtonVisible && (
                         <motion.div

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,10 +22,17 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(0);
 
+    const getNews = useCallback(
+        async (nextPage: number) => {
+            return await getNewsAction(symbols, nextPage, 20);
+        },
+        [symbols]
+    );
+
     useEffect(() => {
-        (async function getNews() {
+        (async function populatePage() {
             setIsLoading(true);
-            const _data = await getNewsAction(symbols, page, 20);
+            const _data = await getNews(page);
             // update state, ensuring only unique articles are returned
             setData((curr) => {
                 if (curr) {
@@ -41,7 +48,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
             });
             setIsLoading(false);
         })();
-    }, [page]);
+    }, [page, getNews]);
 
     return (
         <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>

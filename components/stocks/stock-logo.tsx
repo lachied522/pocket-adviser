@@ -52,7 +52,7 @@ export default function StockLogo({
         <>
             {src ? (
             <Image
-                src={src || ''}
+                src={src}
                 alt={symbol + " logo"}
                 height={height}
                 width={width}

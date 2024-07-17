@@ -64,7 +64,7 @@ export default function Header() {
     }
 
     return (
-        <Container className='grid grid-cols-2 md:grid-cols-[60px_1fr_1fr] lg:grid-cols-3 items-center pt-3.5 gap-3.5'>
+        <Container className='container grid grid-cols-2 md:grid-cols-[60px_1fr_1fr] lg:grid-cols-3 items-center pt-3.5 gap-3.5'>
             <Logo />
 
             {isMobile? (
