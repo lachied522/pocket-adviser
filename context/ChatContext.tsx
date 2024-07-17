@@ -42,47 +42,43 @@ export function ChatProvider({
 }: ChatProviderProps) {
     const { state } = useGlobalContext() as GlobalState;
     const [conversation, setConversation] = useUIState();
-    const { continueConversation, clearConversation } = useActions();
+    const { greetUser, continueConversation, clearConversation } = useActions();
     const [input, setInput] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [article, setArticle] = useState<StockNews|null>(null);
     const [saidHello, setSaidHello] = useState<boolean>(false);
     const cooldownRef = useRef<ReturnType<typeof setTimeout>|null>(null);
 
+    const appendMessage = useCallback(
+        (message : ClientMessage) => {
+            setConversation((currentConversation: ClientMessage[]) => [
+                ...currentConversation,
+                message,
+            ]);
+        },
+        [setConversation]
+    );
+
     const sendMessage = useCallback(
         async ({
-            content,
+            input,
             tool,
-            addUserMessage = true,
-            addAssistantMessage = true,
         } : {
-            content: string,
+            input: string,
             tool?: string,
-            addUserMessage?: boolean,
-            addAssistantMessage?: boolean,
         }) => {
-            if (addUserMessage) {
-                // add user message to conversation
-                setConversation((currentConversation: ClientMessage[]) => [
-                    ...currentConversation,
-                    { id: generateId(), role: 'user', display: content, article },
-                ]);
-            }
+            // add user message to conversation
+            appendMessage({ id: generateId(), role: 'user', display: input, article });
 
             const response = await continueConversation({
                 user: state,
                 toolName: tool,
-                input: content,
+                input,
                 article,
             });
 
-            if (addAssistantMessage) {
-                setConversation((currentConversation: ClientMessage[]) => [
-                    ...currentConversation,
-                    response,
-                ]);
-            }
-
+            // append response to conversation
+            appendMessage(response);
             return response;
         },
         [state, continueConversation, article]
@@ -95,15 +91,10 @@ export function ChatProvider({
         }
 
         async function sayHello() {
-            setSaidHello(true); // prevent effect from running more than once            
-            const content = (
-                `Hello!${state && state.name? ' My name is ' + state.name + '.': ''} ` +
-                `Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market.`
-            );
-            await sendMessage({
-                content,
-                addUserMessage: false,
-            });
+            setSaidHello(true); // prevent effect from running more than once
+            const response = await greetUser({ user: state });
+            // append response to conversation
+            appendMessage(response);
         };
     }, []);
 
@@ -131,14 +122,14 @@ export function ChatProvider({
     }, [conversation, setIsLoading]);
 
     const onSubmit = useCallback(
-        async (content: string, tool?: string) => {
+        async (input: string, tool?: string) => {
             if (isLoading) return;
             // clear input
             setInput('');
             // clear article
             setArticle(null);
             // send message
-            await sendMessage({ content, tool });
+            await sendMessage({ input, tool });
         },
         [isLoading, setInput, setArticle, sendMessage]
     );

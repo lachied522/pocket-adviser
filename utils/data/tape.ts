@@ -18,11 +18,14 @@ async function getTrendingStocks() {
     const quotes = [...nasdaq, ...asx]
     .filter((quote) => quote.marketCap > 50_000_000_000)
     .sort((a, b) => Math.abs(b.changesPercentage) - Math.abs(a.changesPercentage))
-    .slice(0, 20);
+    .slice(0, 24);
 
-    return await Promise.all(
+    const data = await Promise.all(
         quotes.map((quote) => getAggregatedStockData(quote.symbol, quote.exchange as "NASDAQ"|"ASX", quote))
     ) as Stock[];
+
+    // filter further by removing etfs and indeces
+    return data.filter((obj) => !obj.isEtf && !obj.name.toLowerCase().includes('index'));
 }
 
 const KEY = "DATA_STOCK_TAPE";

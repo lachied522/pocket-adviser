@@ -3,10 +3,6 @@ import { generateId, streamText, type TextPart, type ToolResultPart, type ToolCa
 import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
 import { openai } from '@ai-sdk/openai';
 
-import { kv } from '@vercel/kv';
-
-import { format } from 'date-fns';
-
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
 import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
 import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from './tools/get-portfolio';
@@ -15,6 +11,8 @@ import { description as searchWebDescription, parameters as searchWebParams, sea
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
 import { checkRateLimits } from './ratelimit';
+import { getSystemMessage } from './system';
+import { getGreeting } from './greeting';
 
 import { ChatMessage, LoadingMessage, MessageWithStockAdvice, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
 
@@ -35,34 +33,6 @@ export interface ClientMessage {
 
 const MODEL = openai('gpt-4o');
 
-async function getSystemMessage() {
-    const today = format(new Date(), "PPPP");
-
-    let message = (
-        `You are an enthusiastic investment advisor working for Pocket Adviser. You are assiting the user with their investments in the stock market. ` +
-        `Where you cannot answer the user's query, you can recommend the user contact a financial adviser to assist them. ` +
-        `Feel free to use emojis. ` +
-        `Today's date is ${today}. `
-    );
-    
-    try {
-        let context = await kv.get("SYSTEM_CONTEXT");
-        if (!context) {
-            // create a new system message
-            const res = await searchWeb("What's happening in the stock market today?", today);
-            context = res["answer"];
-            // update kv
-            kv.set("SYSTEM_CONTEXT", message, { ex: 24 * 60 * 60 });
-        }
-
-        message += context;
-    } catch (e) {
-        console.error("Error fetching system message: ", e);
-    }
-
-    return message.trim();
-}
-
 async function* streamAI(messages: CoreMessage[]) {
     const systemMessage = await getSystemMessage();
 
@@ -75,6 +45,29 @@ async function* streamAI(messages: CoreMessage[]) {
     for await (const text of textStream) {
         yield text;
     }
+}
+
+function AIMessage(display: React.ReactNode) {
+    return {
+        id: generateId(),
+        role: 'assistant' as const,
+        display,
+    }
+}
+
+export async function greetUser({
+    user
+}: {
+    user: UserData|null
+}) {
+    // greet the user when the page initially loads
+    const history = getMutableAIState();
+    const greeting = await getGreeting(user);
+    // append greeting to history
+    history.done([
+        { role: 'assistant', content: [{ type: 'text', text: greeting }] },
+    ]);
+    return AIMessage(<ChatMessage content={greeting} />);
 }
 
 export async function clearConversation() {
@@ -96,26 +89,14 @@ export async function continueConversation({
     "use server";
     // check rate limit
     const [isWithinSlidingLimit, isWithinFixedLimit] = await checkRateLimits(user);
-
     if (!isWithinSlidingLimit) {
-        return {
-            id: generateId(),
-            role: 'assistant',
-            display: <ChatMessage content="Slow down there! You have submitted too many requests, please try again in a couple of seconds. 🏁" />
-        }
+        return AIMessage(<ChatMessage content="Slow down there! You have submitted too many requests, please try again in a couple of seconds. 🏁" />);
     }
-
     if (!isWithinFixedLimit) {
-        return {
-            id: generateId(),
-            role: 'assistant',
-            display: <ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to a paid plan. 🙂" />
-        }
+        return AIMessage(<ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to a paid plan. 🙂" />);
     }
-
     // see https://sdk.vercel.ai/examples/next-app/interface/route-components
     const history = getMutableAIState();
-    const systemMessage = await getSystemMessage();
 
     // create copy of conversation history
     let conversationHistory = [
@@ -175,7 +156,8 @@ export async function continueConversation({
         // push user input to conversation history
         conversationHistory.push({ role: 'user', content: input });
     }
-
+    
+    const systemMessage = await getSystemMessage();
     const result = await streamUI({
         model: MODEL,
         system: systemMessage,
@@ -334,17 +316,14 @@ export async function continueConversation({
         },
     });
 
-    return {
-        id: generateId(),
-        role: 'assistant',
-        display: result.value,
-    }
+    return AIMessage(result.value);
 }
 
 export const AI = createAI<ServerMessage[], ClientMessage[]>({
     actions: {
       continueConversation,
       clearConversation,
+      greetUser,
     },
     initialAIState: [],
     initialUIState: [],
