@@ -89,7 +89,7 @@ export default function ChatArea() {
                     {article && (
                     <div className="h-16 w-32 relative group">
                         <Image
-                            src={article.image}
+                            src={article.image || ''}
                             alt={article.title}
                             fill
                             style={{
