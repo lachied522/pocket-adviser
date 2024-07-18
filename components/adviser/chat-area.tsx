@@ -49,10 +49,10 @@ export default function ChatArea() {
                     setIsDragging(true);
                 }}
                 onDrop={onDrop}
-                className={cn('max-w-[960px] flex flex-col gap-3 mx-auto rounded-lg border border-white shadow-inner shadow-slate-50', isDragging && 'border-slate-200')}
+                className={cn('max-w-[960px] flex flex-col gap-3 mx-auto rounded-lg md:border md:border-white md:shadow-inner md:shadow-slate-50', isDragging && 'border-slate-200')}
             >
                 <ScrollArea ref={scrollAreaRef} className='h-[640px] 2xl:h-[720px]'>
-                    <div ref={messagesRef} className='flex flex-col justify-start gap-3 px-3 py-3'>
+                    <div ref={messagesRef} className='flex flex-col justify-start gap-3 md:px-3 py-3'>
                         {conversation.map((message: ClientMessage) => (
                         <div
                             key={message.id}

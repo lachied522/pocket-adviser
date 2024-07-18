@@ -102,6 +102,7 @@ model Stock {
   sector            String?
   pe                Float?
   epsGrowth         Float?
+  tags              String[]
   Holdings          Holding[]
 
   @@index([name, symbol])

@@ -74,7 +74,7 @@ function EditHolding({ holding, onUpdate, onRemove }: EditHoldingProps) {
                     placeholder='100'
                     value={holding.units}
                     onChange={onChangeUnits}
-                    className='w-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                    className='w-[60px] sm:w-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                 />
             </TableCell>
             <TableCell>
@@ -84,7 +84,7 @@ function EditHolding({ holding, onUpdate, onRemove }: EditHoldingProps) {
                     min={1}
                     placeholder='100'
                     value={((stockData?.previousClose || 0) * (holding.units || 0)).toFixed(2)}
-                    className='w-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                    className='w-[60px] sm:w-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
                 />
             </TableCell>
             <TableCell>
@@ -231,147 +231,150 @@ export default function EditPortfolioDialog({
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='min-h-[540px] flex flex-col gap-6'>
+            <DialogContent className='flex flex-col gap-6'>
                 <DialogHeader>
                     <DialogTitle>
                         Edit Your Portfolio
                     </DialogTitle>
                 </DialogHeader>
+                <ScrollArea className='max-h-[80vh]'>
+                    <div className='flex flex-col gap-6'>
+                        <p className='font-medium'>Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.</p>
 
-                <p className='font-medium'>Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.</p>
+                        <div className='flex flex-col gap-2'>
+                            <span className='text-lg font-medium'>Add a stock</span>
+                            <div className='h-full w-full flex flex-row items-center border border-neutral-200 rounded-lg overflow-hidden'>
+                                <Input
+                                    type='text'
+                                    value={searchString}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                        setSearchString(e.target.value);
+                                        setIsSearchEmpty(false);
+                                    }}
+                                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                        if (e.key === 'Enter') onSearch();
+                                    }}
+                                    placeholder='e.g. AAPL, BHP'
+                                    className='h-full border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                                />
+                                <Button
+                                    variant='secondary'
+                                    onClick={onSearch}
+                                    className='h-full aspect-square p-3'
+                                >
+                                    <Search size={22} color='black' />
+                                </Button>
+                            </div>
+                        </div>
 
-                <div className='flex flex-col gap-2'>
-                    <span className='text-lg font-medium'>Add a stock</span>
-                    <div className='h-full w-full flex flex-row items-center border border-neutral-200 rounded-lg overflow-hidden'>
-                        <Input
-                            type='text'
-                            value={searchString}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                setSearchString(e.target.value);
-                                setIsSearchEmpty(false);
-                            }}
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                if (e.key === 'Enter') onSearch();
-                            }}
-                            placeholder='e.g. AAPL, BHP'
-                            className='h-full border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
-                        />
-                        <Button
-                            variant='secondary'
-                            onClick={onSearch}
-                            className='h-full aspect-square p-3'
-                        >
-                            <Search size={22} color='black' />
-                        </Button>
-                    </div>
-                </div>
+                        <div className='relative'>
+                            <div className='text-lg font-medium mb-2'>Edit or remove stocks</div>
+                            <div className='h-[380px] grid grid-cols-1 items-start gap-2'>
+                                <div className='rounded-md border'>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Symbol</TableHead>
+                                                <TableHead>Units</TableHead>
+                                                <TableHead>Value ($)</TableHead>
+                                                <TableHead>Remove</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            <>
+                                                {modifiedHoldings.length > 0? (
+                                                <>
+                                                    {currentPage.map((holding) => (
+                                                    <EditHolding
+                                                        key={`edit-holding-${holding.id}`}
+                                                        holding={holding}
+                                                        onUpdate={onUpdateHolding}
+                                                        onRemove={() => onRemoveHolding(holding)}
+                                                    />
+                                                    ))}
+                                                </>
+                                                ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className='p-6'>
+                                                        <div className='w-full flex items-center justify-center text-center'>
+                                                            Use the search bar above to add stocks to your portfolio.
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                                )}
+                                            </>
+                                        </TableBody>
+                                    </Table>
+                                </div>
 
-                <div className='relative'>
-                    <div className='text-lg font-medium mb-2'>Edit or remove stocks</div>
-                    <div className='h-[380px] grid grid-cols-1 items-start gap-2'>
-                        <div className='rounded-md border'>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Symbol</TableHead>
-                                        <TableHead>Units</TableHead>
-                                        <TableHead>Value ($)</TableHead>
-                                        <TableHead>Remove</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
+                                <div className="flex items-center justify-end space-x-2 py-4 place-self-end">
+                                    <div className='text-xs'>
+                                        Showing {currentPage.length} of {modifiedHoldings.filter((holding) => !holding.deleted).length}
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setPage((curr) => curr - 1)}
+                                        disabled={page === 0}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setPage((curr) => curr + 1)}
+                                        disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / 5)}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {searchString.length > 0 && (
+                            <div className='bg-white inset-0 absolute'>
+                                {isSearchLoading ? (
+                                <div className='h-[240px] w-full flex flex-col gap-3 py-3'>
+                                    <Skeleton className='h-12 w-full bg-slate-100' />
+                                    <Skeleton className='h-12 w-full bg-slate-100' />
+                                    <Skeleton className='h-12 w-full bg-slate-100' />
+                                </div>
+                                ) : (
+                                <>
+                                    {searchResults.length > 0? (
+                                    <ScrollArea className='h-[240px] py-3'>
+                                        {searchResults.map((stock) => (
+                                        <Button
+                                            key={`search-result-${stock.symbol}`}
+                                            variant='ghost'
+                                            onClick={() => {
+                                                onAddHolding(stock);
+                                                setSearchResults([]);
+                                            }}
+                                            className='h-12 w-full grid grid-cols-[100px_1fr] place-items-start gap-2 p-3 mb-3'
+                                        >
+                                            <div className='text-lg font-medium'>{stock.symbol.toUpperCase()}</div>
+                                            <div className='text-lg truncate'>
+                                                {stock.name}
+                                            </div>
+                                        </Button>
+                                        ))}
+                                    </ScrollArea>
+                                    ) : (
                                     <>
-                                        {modifiedHoldings.length > 0? (
-                                        <>
-                                            {currentPage.map((holding) => (
-                                            <EditHolding
-                                                key={`edit-holding-${holding.id}`}
-                                                holding={holding}
-                                                onUpdate={onUpdateHolding}
-                                                onRemove={() => onRemoveHolding(holding)}
-                                            />
-                                            ))}
-                                        </>
-                                        ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={4} className='p-6'>
-                                                <div className='w-full flex items-center justify-center text-center'>
-                                                    Use the search bar above to add stocks to your portfolio.
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
+                                        {isSearchEmpty && (
+                                        <div className='w-full text-center p-12'>
+                                            Pocket Adviser only covers a limited number of stocks, and it looks like we don&apos;t cover this one!
+                                        </div>
                                         )}
                                     </>
-                                </TableBody>
-                            </Table>
-                        </div>
-
-                        <div className="flex items-center justify-end space-x-2 py-4 place-self-end">
-                            <div className='text-xs'>
-                                Showing {currentPage.length} of {modifiedHoldings.filter((holding) => !holding.deleted).length}
-                            </div>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setPage((curr) => curr - 1)}
-                                disabled={page === 0}
-                            >
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setPage((curr) => curr + 1)}
-                                disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / 5)}
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    </div>
-
-                    {searchString.length > 0 && (
-                    <div className='bg-white inset-0 absolute'>
-                        {isSearchLoading ? (
-                        <div className='h-[240px] w-full flex flex-col gap-3 py-3'>
-                            <Skeleton className='h-12 w-full bg-slate-100' />
-                            <Skeleton className='h-12 w-full bg-slate-100' />
-                            <Skeleton className='h-12 w-full bg-slate-100' />
-                        </div>
-                        ) : (
-                        <>
-                            {searchResults.length > 0? (
-                            <ScrollArea className='h-[240px] py-3'>
-                                {searchResults.map((stock) => (
-                                <Button
-                                    key={`search-result-${stock.symbol}`}
-                                    variant='ghost'
-                                    onClick={() => {
-                                        onAddHolding(stock);
-                                        setSearchResults([]);
-                                    }}
-                                    className='h-12 w-full grid grid-cols-[100px_1fr] place-items-start gap-2 p-3 mb-3'
-                                >
-                                    <div className='text-lg font-medium'>{stock.symbol.toUpperCase()}</div>
-                                    <div className='text-lg truncate'>
-                                        {stock.name}
-                                    </div>
-                                </Button>
-                                ))}
-                            </ScrollArea>
-                            ) : (
-                            <>
-                                {isSearchEmpty && (
-                                <div className='w-full text-center p-12'>
-                                    Pocket Adviser only covers a limited number of stocks, and it looks like we don&apos;t cover this one!
-                                </div>
+                                    )}
+                                </>
                                 )}
-                            </>
+                            </div>
                             )}
-                        </>
-                        )}
+                        </div>
                     </div>
-                    )}
-                </div>
+                </ScrollArea>
 
                 <DialogFooter>
                     <div  className='w-full flex flex-row items-end justify-between'>

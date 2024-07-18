@@ -15,7 +15,7 @@ export default function QuickActions() {
             <Button
                 variant='ghost'
                 onClick={onReset}
-                className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
+                className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-50'
             >
                 <span className='text-lg mr-1 lg:mr-2'>🌱</span>
                 New chat
@@ -24,7 +24,7 @@ export default function QuickActions() {
             <CheckupDialog>
                 <Button
                     variant='ghost'
-                    className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
+                    className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-50'
                 >
                     <span className='text-lg mr-1 lg:mr-2'>📝</span>
                     Portfolio review
@@ -34,7 +34,7 @@ export default function QuickActions() {
             <GetAdviceDialog>
                 <Button
                     variant='ghost'
-                    className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3'
+                    className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-50'
                 >
                     <span className='text-lg mr-1 lg:mr-2'>📈</span>
                     Deposit/withdraw

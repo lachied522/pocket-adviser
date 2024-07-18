@@ -5,19 +5,21 @@ import ChangeIndicator from "@/components/stocks/change-indicator";
 
 function TapeItemLessModal({ data }: { data: any }) {
     return (
-        <div className='md:w-[180px] flex flex-row items-center justify-center gap-2 bg-slate-50/20 rounded-lg px-1.5 md:px-0 py-1.5'>
-            <span className='text-sm md:text-base'>
+        <div className='md:w-[180px] flex flex-row items-center justify-center gap-1 md:gap-2 bg-slate-50/20 rounded-lg px-1.5 md:px-0 py-1.5'>
+            <span className='text-xs md:text-base'>
                 {data.symbol.endsWith('.AX')? data.symbol.split('.')[0]: data.symbol}
             </span>
-            <Image
-                src={data.exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
-                alt='flag'
-                height={16}
-                width={16}
-            />
-            <div className=''>
-                <ChangeIndicator change={data.changesPercentage} size='sm' />
+            
+            <div className='h-3 md:h-4 w-3 md:w-4 relative'>
+                <Image
+                    src={data.exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+                    alt='flag'
+                    sizes='16px'
+                    fill
+                />
             </div>
+
+            <ChangeIndicator change={data.changesPercentage} size='sm' />
         </div>
     )
 }

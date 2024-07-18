@@ -19,8 +19,8 @@ export default function Chat({ initialUserData, initialStockData }: ChatProps) {
         (holding) => initialStockData[holding.stockId].symbol
     ) || [];
     return (
-        <div className='grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] justify-start gap-3 xl:gap-6'>
-            <div className='grid grid-cols-1 auto-rows-min gap-3 xl:gap-6 order-first'>
+        <div className='grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] justify-start gap-2 xl:gap-6'>
+            <div className='grid grid-cols-1 auto-rows-min gap-2 xl:gap-6 order-first'>
                 <H3 className=''>My Adviser</H3>
 
                 <QuickActions />

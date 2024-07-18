@@ -3,6 +3,8 @@ import { openai } from '@ai-sdk/openai';
 
 import { kv } from '@vercel/kv';
 
+import { format } from 'date-fns';
+
 import { getSystemMessage } from './system';
 
 import type { UserData } from '@/types/helpers';
@@ -14,11 +16,15 @@ async function* asyncTextGenerator(text: string, pieceLength: number, interval: 
         yield text.slice(i, i + pieceLength);
     }
 }
+
+function todayDate() {
+    return format(new Date(), 'd_MM_yyyy');
+}
   
 export async function getGreeting(user: UserData|null) {
-    let greeting = await kv.get("DEFAULT_GREETING");
+    const key = `DEFAULT_GREETING_${todayDate()}`
+    let greeting = await kv.get(key);
     if (greeting) {
-        console.log('cache hit')
         // const textStream = asyncTextGenerator(greeting as string, 5);
         // for await (const text of textStream) {
         //     yield text;
@@ -38,6 +44,6 @@ export async function getGreeting(user: UserData|null) {
         greeting += text;
     }
     // update kv
-    kv.set("DEFAULT_GREETING", greeting, { ex: 24 * 60 * 60 });
+    kv.set(key, greeting, { ex: 24 * 60 * 60 });
     return greeting;
 }

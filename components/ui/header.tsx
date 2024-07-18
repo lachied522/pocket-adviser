@@ -64,193 +64,186 @@ export default function Header() {
     }
 
     return (
-        <Container className='container grid grid-cols-2 md:grid-cols-[60px_1fr_1fr] lg:grid-cols-3 items-center pt-3.5 gap-3.5'>
+        <Container className='grid grid-cols-[45px_1fr] md:grid-cols-3 items-center px-2 pt-3.5 md:gap-3.5'>
             <Logo />
 
-            {isMobile? (
-            <div className='place-self-end'>
+            <div className='hidden md:flex flex-row items-center justify-center gap-3.5'>
+                <AboutDialog>
+                    <Button
+                        variant='ghost'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
+                    >
+                        About
+                    </Button>
+                </AboutDialog>
+
+                <PremiumDialog>
+                    <Button
+                        variant='ghost'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
+                    >
+                        Premium
+                    </Button>
+                </PremiumDialog>
+
+                <a href="mailto:lachie@pocketadviser.com.au">
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
+                    >
+                        Contact
+                    </Button>
+                </a>
+            </div>
+
+            <div className='place-self-end flex flex-row items-center gap-2 md:gap-3.5'>
+                {state && !isGuest? (
+                <span className='text-sm sm:text-base text-white text-right font-medium'>Welcome {state.name}</span>
+                ) : (
+                <div className='flex flex-row items-center gap-3.5'>
+                    <AuthDialog initialTab="login">
+                        <Button
+                            variant='outline'
+                            className='h-7 md:h-9 px-2 py-1 md:px-4 md:py-2 font-medium bg-transparent text-white'
+                        >
+                            <span className='text-xs md:text-base'>Login</span>
+                        </Button>
+                    </AuthDialog>
+                    <AuthDialog initialTab="signup">
+                        <Button
+                            ref={signupRef}
+                            variant='secondary'
+                            className='h-7 md:h-9 px-2 py-1 md:px-4 md:py-2 font-medium'
+                        >
+                            <span className='text-xs md:text-base'>Signup</span>
+                        </Button>
+                    </AuthDialog>
+                </div>
+                )}
+
+                {(isMobile || (state && !isGuest)) &&(
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button
-                            title='Menu'
-                            aria-label='menu'
+                            title='Settings'
+                            aria-label='settings'
                             variant='ghost'
                             className='h-8 w-8 p-0 hover:bg-slate-100/10'
                         >
-                            <Menu size={24} strokeWidth={2} color='white' />
+                            {isMobile ? (
+                            <Menu size={18} strokeWidth={2} color='white' />
+                            ) : (
+                            <Settings size={18} strokeWidth={2} color='white' />
+                            )}
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-fit flex flex-col p-2 bg-white mx-3'>
-                        <AboutDialog>
+                    <PopoverContent className='w-fit flex flex-col justify-center p-2 bg-slate-100'>
+                        {state && !isGuest && (
+                        <>
                             <Button
-                                variant='ghost'
-                                className='h-[42px] w-full flex font-medium justify-start gap-2'
-                            >
-                                <BookA size={18} strokeWidth={2} />
-                                <span className='text-xs'>About</span>
-                            </Button>
-                        </AboutDialog>
-
-                        <Separator className='my-1' />
-
-                        <PremiumDialog>
-                            <Button
-                                variant='ghost'
-                                className='h-[42px] w-full flex font-medium justify-start gap-2'
-                            >
-                                <Sparkles size={18} strokeWidth={2} />
-                                <span className='text-xs'>Premium</span>
-                            </Button>
-                        </PremiumDialog>
-
-                        <Separator className='my-1' />
-
-                        <Button
-                            aria-label='billing'
-                            variant='ghost'
-                            size='sm'
-                            onClick={onBillingButtonClick}
-                            className='h-[42px] w-full flex font-medium justify-start gap-2'
-                        >
-                            <ScrollText size={18} strokeWidth={2} />
-                            <span className='text-xs'>Billing</span>
-                        </Button>
-
-                        <Separator className='my-1' />
-
-                        <EmailsDialog>
-                            <Button
-                                aria-label='email-preferences'
+                                aria-label='billing'
                                 variant='ghost'
                                 size='sm'
-                                className='h-[42px] flex font-medium justify-start gap-2'
+                                onClick={onBillingButtonClick}
+                                className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
                             >
-                                <Settings size={16} strokeWidth={2} />
-                                <span className='text-xs'>Settings</span>
+                                <ScrollText size={18} strokeWidth={2} />
+                                <span className='text-xs'>Billing</span>
                             </Button>
-                        </EmailsDialog>
 
-                        <Separator className='my-1' />
+                            <Separator className='my-1' />
 
-                        <a href="mailto:lachie@pocketadviser.com.au">
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                size='sm'
-                                className='h-[42px] flex font-medium justify-start gap-2'
-                            >
-                                <Mail size={16} strokeWidth={2} />
-                                <span className='text-xs'>Contact</span>
-                            </Button>
-                        </a>
-                    </PopoverContent>
-                </Popover>
-            </div>
-            ) :(
-            <>
-                <div className="flex flex-row items-center justify-center gap-3.5">
-                    <AboutDialog>
-                        <Button
-                            variant='ghost'
-                            className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
-                        >
-                            About
-                        </Button>
-                    </AboutDialog>
-
-                    <PremiumDialog>
-                        <Button
-                            variant='ghost'
-                            className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
-                        >
-                            Premium
-                        </Button>
-                    </PremiumDialog>
-
-                    <a href="mailto:lachie@pocketadviser.com.au">
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
-                        >
-                            Contact
-                        </Button>
-                    </a>
-                </div>
-                
-                <div className='place-self-end'>
-                    {state && !isGuest ? (
-                    <div className="flex flex-row items-center gap-1 md:gap-3.5">
-                        <span className="text-xs md:text-base text-white text-right font-medium">Welcome {state.name}</span>
-                        <Popover>
-                            <PopoverTrigger asChild>
+                            <EmailsDialog>
                                 <Button
-                                    title='Settings'
-                                    aria-label='settings'
-                                    variant='ghost'
-                                    className='h-8 w-8 p-0 hover:bg-slate-100/10'
-                                >
-                                    <Settings size={18} strokeWidth={2} color='white' />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-fit flex flex-col p-2 bg-slate-100'>
-                                <Button
-                                    aria-label='billing'
+                                    aria-label='email-preferences'
                                     variant='ghost'
                                     size='sm'
-                                    onClick={onBillingButtonClick}
-                                    className='h-[42px] w-full flex font-medium justify-start gap-2'
+                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
                                 >
-                                    <ScrollText size={18} strokeWidth={2} />
-                                    <span className='text-xs'>Billing</span>
+                                    <Mail size={18} strokeWidth={2} />
+                                    <span className='text-xs'>Email</span>
                                 </Button>
+                            </EmailsDialog>
+                        </>
+                        )}
+
+                        {isMobile && state && !isGuest && (
+                        <Separator className='my-1' />
+                        )}
+
+                        {isMobile && (
+                        <>
+                            <AboutDialog>
+                                <Button
+                                    variant='ghost'
+                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+                                >
+                                    <BookA size={18} strokeWidth={2} />
+                                    <span className='text-xs'>About</span>
+                                </Button>
+                            </AboutDialog>
+
+                            <Separator className='my-1' />
+
+                            <PremiumDialog>
+                                <Button
+                                    variant='ghost'
+                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+                                >
+                                    <Sparkles size={18} strokeWidth={2} />
+                                    <span className='text-xs'>Premium</span>
+                                </Button>
+                            </PremiumDialog>
+
+                            <Separator className='my-1' />
+                            
+                            <a href="mailto:lachie@pocketadviser.com.au">
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    size='sm'
+                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+                                >
+                                    <Mail size={18} strokeWidth={2} />
+                                    <span className='text-xs'>Contact</span>
+                                </Button>
+                            </a>
+                            
+                            {state && !isGuest && (
+                            <>
                                 <Separator className='my-1' />
-                                <EmailsDialog>
-                                    <Button
-                                        aria-label='email-preferences'
-                                        variant='ghost'
-                                        size='sm'
-                                        className='h-[42px] flex font-medium justify-start gap-2'
-                                    >
-                                        <Mail size={16} strokeWidth={2} />
-                                        <span className='text-xs'>Email</span>
-                                    </Button>
-                                </EmailsDialog>
-                            </PopoverContent>
-                        </Popover>
-                        <Button
-                            title='Logout'
-                            aria-label='logout'
-                            variant='ghost'
-                            onClick={onSignOut}
-                            className="h-8 w-8 p-0 hover:bg-slate-100/10"
-                        >
-                            <LogOut size={16} strokeWidth={2.5} color='white' />
-                        </Button>
-                    </div>
-                    ) : (
-                    <div className="flex flex-row items-center gap-3.5">
-                        <AuthDialog initialTab="login">
-                            <Button
-                                variant='outline'
-                                className='font-medium bg-transparent text-white'
-                            >
-                                Login
-                            </Button>
-                        </AuthDialog>
-                        <AuthDialog initialTab="signup">
-                            <Button
-                                ref={signupRef}
-                                variant='secondary'
-                                className='font-medium'
-                            >
-                                Signup
-                            </Button>
-                        </AuthDialog>
-                    </div>
-                    )}
-                </div>
-            </>)}
+
+                                <Button
+                                    title='Logout'
+                                    aria-label='logout'
+                                    variant='ghost'
+                                    size='sm'
+                                    onClick={onSignOut}
+                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+                                >
+                                    <LogOut size={18} strokeWidth={2.5} />
+                                    <span className='text-xs'>Logout</span>
+                                </Button>
+                            </>
+                            )}
+                        </>
+                        )}
+                    </PopoverContent>
+                </Popover>)}
+
+                {state && !isGuest && (
+                <Button
+                    title='Logout'
+                    aria-label='logout'
+                    variant='ghost'
+                    onClick={onSignOut}
+                    className='hidden md:flex h-8 w-8 p-0 hover:bg-slate-100/10'
+                >
+                    <LogOut size={16} strokeWidth={2.5} color='white' />
+                </Button>
+                )}
+            </div>            
         </Container>
     )
 }

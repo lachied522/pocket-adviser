@@ -17,6 +17,7 @@ import { cn } from "@/components/utils";
 import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+import {type  UIState, useUIContext } from "@/context/UIContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import { columns } from "./columns";
@@ -60,6 +61,7 @@ const TABS = {
 
 export default function Portfolio() {
     const { state, portfolioValue, currency, setCurrency, getStockData } = useGlobalContext() as GlobalState;
+    const { isMobile } = useUIContext() as UIState;
     const { onSubmit } = useChatContext() as ChatState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [tab, setTab] = useState<keyof typeof TABS>("overview");
@@ -101,7 +103,7 @@ export default function Portfolio() {
     return (
         <div className='flex flex-col gap-3.5 md:gap-6'>
             <H3 className=''>My Portfolio</H3>
-            <div className='flex flex-row items-center gap-3.5'>
+            <div className='hidden md:flex flex-row items-center gap-3.5'>
                 <div className=''>
                     Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>
                 </div>
@@ -153,11 +155,16 @@ export default function Portfolio() {
             </div>
 
             <StockTable
-                // @ts-ignore: issue with ColumnDef type https://github.com/TanStack/table/issues/4241
-                columns={columns.filter((column) => TABS[tab].includes(column.accessorKey))}
+                columns={
+                    columns.filter((column) => {
+                        const cols = isMobile? ['symbol', 'units', 'value']: TABS[tab];
+                        // @ts-ignore: issue with ColumnDef type https://github.com/TanStack/table/issues/4241
+                        return cols.includes(column.accessorKey)
+                    })
+                }
                 data={populatedHoldings}
                 emptyComponent={(
-                    <div className='flex flex-col items-center gap-6 p-24'>
+                    <div className='flex flex-col items-center gap-3 md:gap-6 p-3 md:p-24'>
                         <span className='font-medium text-lg'>Portfolio empty</span>
                         <Button
                             onClick={() => {

@@ -36,7 +36,7 @@ async function CalendarBody({ symbols }: CalendarProps) {
             </div>
 
             <ScrollArea className=''>
-                <div className='xl:h-[380px] flex flex-row xl:flex-col items-center py-3 xl:px-3 xl:py-0 gap-3.5'>
+                <div className='xl:h-[380px] flex flex-row xl:flex-col items-center pb-3 xl:px-3 xl:py-0 gap-2'>
                     {data && data.length > 0? (
                     <>
                         {data.map((item, index) => (

@@ -47,7 +47,7 @@ async function StockTapeBody() {
 export default function StockTape() {
     return (
         <Container>
-            <div className='w-full flex flex-row items-center py-2 gap-3.5 justify-evenly overflow-hidden'>
+            <div className='w-full flex flex-row items-center px-1 py-2 gap-3.5 justify-evenly overflow-hidden'>
                 <Suspense fallback={<StockTapeSkeleton />}>
                     <StockTapeBody />
                 </Suspense>

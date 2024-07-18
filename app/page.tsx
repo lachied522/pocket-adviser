@@ -81,7 +81,9 @@ export default async function Page({
                       <Image
                         src='/background-image-main.jpg'
                         alt='background-image'
+                        sizes='100vw'
                         fill
+                        priority
                         style={{
                           objectFit: 'cover',
                         }}
@@ -93,24 +95,20 @@ export default async function Page({
                   <StockTape />
                 </div>
 
-                <div className='bg-slate-50/80 px-6 shadow-sm'>
+                <div className='bg-slate-50/80 shadow-sm'>
                   <Container className='p-3.5'>
                     <ProfileTabs />
                   </Container>
                 </div>
 
-                <div className='flex flex-col gap-5 xl:gap-10 py-5 xl:py-10'>
-                  <div className='px-3 sm:px-6'>
-                    <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                      <Chat initialUserData={userData} initialStockData={stockData} />
-                    </Container>
-                  </div>
+                <div className='flex flex-col px-1 sm:px-6 py-2 sm:py-5 xl:py-10 gap-2 sm:gap-5 xl:gap-10'>
+                  <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
+                    <Chat initialUserData={userData} initialStockData={stockData} />
+                  </Container>
 
-                  <div className='px-3 sm:px-6'>
-                    <Container className='flex flex-col gap-6 p-7 bg-white border border-slate-200 rounded-xl'>
-                      <Portfolio />
-                    </Container>
-                  </div>
+                  <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
+                    <Portfolio />
+                  </Container>
                 </div>
 
                 <Footer />

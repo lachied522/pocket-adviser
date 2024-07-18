@@ -59,7 +59,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
             </div>
 
             <ScrollArea className='xl:h-[660px]'>
-                <div className='flex flex-row xl:flex-col items-center py-3 xl:px-3 xl:py-0 gap-3.5'>
+                <div className='flex flex-row xl:flex-col items-center pb-2 xl:px-2 xl:py-0 gap-2'>
                     {data.map((article) => (
                     <NewsArticle
                         key={`article-${article.title}`}

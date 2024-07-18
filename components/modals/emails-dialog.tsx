@@ -74,7 +74,7 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
 
     return (
         <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger className='p-0' asChild>
                 {children}
             </DialogTrigger>
             <DialogContent>
