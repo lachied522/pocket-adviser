@@ -56,6 +56,7 @@ export async function getAggregatedStockData(
         epsGrowth: growth?.growthEps || null,
         dividendAmount: profile.lastDiv || null,
         dividendYield: ratios?.dividendYield || null,
+        tags: [],
     }
 }
 
