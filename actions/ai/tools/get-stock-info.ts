@@ -61,6 +61,7 @@ export async function getStockInfo(symbol: string, exchange: "ASX"|"NASDAQ", inc
                 dividendYield: null,
                 pe: null,
                 epsGrowth: null,
+                tags: [],
             }            
         }
 

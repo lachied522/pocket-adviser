@@ -34,7 +34,6 @@ export default function ProfileTabs() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isApplyButtonVisible, setIsApplyButtonVisible] = useState<boolean>(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
-
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -53,7 +52,7 @@ export default function ProfileTabs() {
             // reset form state to new values
             form.reset(data);
         },
-        [form.reset, setIsSubmitLoading, updateProfileAndUpdateState]
+        [form, setIsSubmitLoading, updateProfileAndUpdateState]
     );
 
     return (
