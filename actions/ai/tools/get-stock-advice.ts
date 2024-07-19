@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-export const description = "Returns whether the user should buy or sell a stock based on their current portfolio and investment profile";
+export const description = "Display whether a user should buy or sell a stock based on their portfolio and investment profile";
 
 export const parameters = z.object({
     symbol: z.string().describe("The ticker symbol of the stock, e.g. BHP or AAPL"),
     exchange: z.enum(["ASX", "NASDAQ"]).describe("The exchange that the stock trades on").default("NASDAQ"),
-    amount: z.number().describe("The proposed amount to be bought (positive) or sold (negative) in dollars. You should ask the user how much they intend to buy or sell."),
+    amount: z.number().describe("The proposed amount to be bought (positive) or sold (negative) in dollars. You should ask the user how much they intend to buy or sell.").default(1000),
 });
 
 async function fetchData(symbol: string, amount: number, userId?: string|null) {

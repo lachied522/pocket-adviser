@@ -69,7 +69,7 @@ export default function Header() {
         <Container className='grid grid-cols-[45px_1fr] md:grid-cols-3 items-center px-2 pt-3.5 md:gap-3.5'>
             <Logo />
 
-            <div className='hidden md:flex flex-row items-center justify-center gap-3.5'>
+            <div className='hidden w-[360px] md:grid grid-cols-3 items-center justify-center gap-2 mx-auto'>
                 <AboutDialog>
                     <Button
                         variant='ghost'
@@ -88,7 +88,7 @@ export default function Header() {
                     </Button>
                 </PremiumDialog>
 
-                <a href="mailto:lachie@pocketadviser.com.au">
+                <a href="mailto:lachie@pocketadviser.com.au" className='flex items-center justify-center p-0'>
                     <Button
                         type='button'
                         variant='ghost'

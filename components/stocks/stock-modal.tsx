@@ -27,6 +27,29 @@ import StockChart from "./stock-chart";
 
 import type { Stock } from "@prisma/client";
 
+const prompts = (symbol: string) => [
+    {
+        display: `What's new with ${symbol}?`, // displayed on the button
+        input: `What's new with ${symbol}?`, // input passed to chat endpoint
+        tool: "searchWeb", // tool AI is required to use
+    },
+    {
+        display: 'What are analysts saying?',
+        input: `What are analysts saying about ${symbol}?`,
+        tool: "getStockInfo",
+    },
+    {
+        display: 'What are some similar stocks?',
+        input: `What are some similar stocks to ${symbol}?`,
+        tool: "searchWeb",
+    },
+    {
+        display: `Should I buy ${symbol}?`,
+        input: `Should I buy ${symbol}?`,
+        tool: "shouldBuyOrSellStock",
+    },
+]
+
 type StockWithoutId = Omit<Stock, 'id'> & { id?: number }
 
 interface StockModalProps {
@@ -51,8 +74,8 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
         })();
     }, [initialStockData, stockId, getStockData]);
 
-    const onButtonPress = (content: string) => {
-        onSubmit(content);
+    const onButtonPress = (input: string, tool?: string) => {
+        onSubmit(input, tool);
         if (closeRef.current) closeRef.current.click();
     }
 
@@ -134,30 +157,15 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
 
                         <DialogFooter>
                             <div className='w-full flex flex-wrap justify-center gap-1 md:gap-2'>
+                                {prompts(stockData.symbol).map((obj, index) => (
                                 <Button
-                                    onClick={() => onButtonPress(`What's new with ${stockData.symbol}?`)}
-                                    className='px-2 py-1 md:px-4 md:py-2'
+                                    key={`prompt-${stockData.symbol}-${index}`}
+                                    size='sm'
+                                    onClick={() => onButtonPress(obj.input, obj.tool)}
                                 >
-                                    <span className='text-xs md:text-base'>What&apos;s new with {stockData.symbol}?</span>
+                                    <span className='text-xs md:text-sm'>{obj.display}</span>
                                 </Button>
-                                <Button
-                                    onClick={() => onButtonPress(`What are analysts saying about ${stockData.symbol}?`)}
-                                    className='px-2 py-1 md:px-4 md:py-2'
-                                >
-                                    <span className='text-xs md:text-base'>What are analysts saying?</span>
-                                </Button>
-                                <Button
-                                    onClick={() => onButtonPress(`What are some similar stocks to ${stockData.symbol}?`)}
-                                    className='px-2 py-1 md:px-4 md:py-2'
-                                >
-                                    <span className='text-xs md:text-base'>What are some similar stocks?</span>
-                                </Button>
-                                <Button
-                                    onClick={() => onButtonPress(`Should I buy ${stockData.symbol}?`)}
-                                    className='px-2 py-1 md:px-4 md:py-2'
-                                >
-                                    <span className='text-xs md:text-base'>Should I buy {stockData.symbol}?</span>
-                                </Button>
+                                ))}
                             </div>
                         </DialogFooter>
                     </ScrollArea>

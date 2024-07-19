@@ -56,7 +56,7 @@ export default function StockAdvice({ data }: StockAdviceProps) {
                     {data.stockData.priceTarget && data.stockData.previousClose && (
                     <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
                         <span className='md:text-lg font-medium'>Analyst Research</span>
-                        <span>{`Analyst's have a price target of $${data.stockData.priceTarget.toFixed(2)}, which implies a ${(100 * data.stockData.priceTarget / data.stockData.previousClose).toFixed(2)}% return.`}</span>
+                        <span>{`Analyst's have a price target of $${data.stockData.priceTarget.toFixed(2)}, which implies a ${(100 * ((data.stockData.priceTarget / data.stockData.previousClose) - 1)).toFixed(2)}% return.`}</span>
                     </div>
                     )}
 
