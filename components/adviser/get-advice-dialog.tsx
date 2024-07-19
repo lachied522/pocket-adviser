@@ -88,7 +88,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className='min-h-[360px] flex flex-col gap-6'>
                         <p>I would like to...</p>
-                        <div className="flex flex-row items-center justify-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-center gap-3">
                             <Button
                                 type="button"
                                 variant={action==='deposit' ? 'default': 'secondary'}
@@ -150,7 +150,10 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                                 </Button>
                             </DialogClose>
 
-                            <Button type='submit'>
+                            <Button
+                                type='submit'
+                                disabled={proposedValue === 0}
+                            >
                                 Submit
                             </Button>
                         </div>

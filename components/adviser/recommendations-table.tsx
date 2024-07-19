@@ -42,27 +42,24 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
     }, [data.transactions]);
 
     return (
-        <>
-            <div className='w-full shrink-0 rounded-md border'>
+        <div className='max-w-[calc(90vw-10px)] sm:max-w-none w-full'>
+            <div className='w-full rounded-md border'>
                 <Table className=''>
                     <TableHeader>
                         <TableRow className='bg-slate-50'>
-                            <TableHead className='p-3.5 font-medium'>
+                            <TableHead className='text-xs md:text-base sm:pl-3.5 py-3.5 font-medium'>
                                 Transaction
                             </TableHead>
-                            <TableHead className='py-3.5 font-medium'>
+                            <TableHead className='text-xs md:text-base py-3.5 font-medium'>
                                 Symbol
                             </TableHead>
-                            {/* <TableHead className='py-3.5 font-medium'>
-                                Name
-                            </TableHead> */}
-                            <TableHead className='py-3.5 font-medium'>
+                            <TableHead className='text-xs md:text-base py-3.5 font-medium'>
                                 Units
                             </TableHead>
-                            <TableHead className='py-3.5 font-medium'>
+                            <TableHead className='text-xs md:text-base py-3.5 font-medium'>
                                 Price
                             </TableHead>
-                            <TableHead className='py-3.5 font-medium'>
+                            <TableHead className='text-xs md:text-base py-3.5 font-medium'>
                                 Value
                             </TableHead>
                         </TableRow>
@@ -73,35 +70,32 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                             {data.transactions.map((obj) => (
                             <StockModal key={`recommendation-${obj.stockId}`} stockId={obj.stockId}>
                                 <TableRow className='cursor-pointer'>
-                                    <TableCell className='text-lg font-semibold p-3.5'>
+                                    <TableCell className='text-sm md:text-lg font-semibold sm:pl-3.5 py-3.5'>
                                         {obj.units > 0? "📈  Buy": "📉  Sell"}
                                     </TableCell>
-                                    <TableCell className='text-lg font-medium py-3.5'>
+                                    <TableCell className='text-sm md:text-lg font-medium py-3.5'>
                                         {obj.symbol}
                                     </TableCell>
-                                    {/* <TableCell className='text-lg font-medium py-3.5'>
-                                        {obj.name}
-                                    </TableCell> */}
-                                    <TableCell className='text-lg font-medium py-3.5'>
+                                    <TableCell className='text-sm md:text-lg font-medium py-3.5'>
                                         {obj.units}
                                     </TableCell>
-                                    <TableCell className='text-lg font-medium py-3.5'>
+                                    <TableCell className='text-sm md:text-lg font-medium py-3.5'>
                                         {formatDollar(obj.price)}
                                     </TableCell>
-                                    <TableCell className='text-lg font-medium py-3.5'>
+                                    <TableCell className='text-sm md:text-lg font-medium py-3.5'>
                                         {formatDollar(obj.price * obj.units)}
                                     </TableCell>
                                 </TableRow>
                             </StockModal>
                             ))}
                             <TableRow>
-                                <TableCell colSpan={4} className='p-3.5'>
-                                    <div className='text-lg font-medium ml-6'>
+                                <TableCell colSpan={4} className='sm:pl-3.5 py-3.5'>
+                                    <div className='text-sm md:text-lg font-medium ml-5'>
                                         Total
                                     </div>
                                 </TableCell>
-                                <TableCell colSpan={1} className='p-y-3.5'>
-                                    <div className='text-lg font-medium'>
+                                <TableCell colSpan={1} className='py-3.5'>
+                                    <div className='text-sm md:text-lg font-medium'>
                                         {formatDollar(total)}
                                     </div>
                                 </TableCell>
@@ -120,21 +114,21 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                 </Table>
             </div>
             {data && data.transactions.length > 0 && (
-            <div className='w-full flex flex-row items-center justify-between p-3.5 pr-0'>
-                <div className='grid grid-cols-2 place-items-end gap-x-2 gap-y-1 shrink-0'>
+            <div className='w-full flex flex-col sm:flex-row items-end sm:items-center justify-between p-3.5 pr-0 gap-2'>
+                <div className='grid grid-cols-[1fr_60px] place-items-end gap-x-2 gap-y-1 shrink-0'>
                     <div className='flex flex-row items-center gap-2'>
                         <UtilityDialog>
                             <CircleHelp size={18} color='black' />
                         </UtilityDialog>
-                        <span>Utility before</span>
+                        <span className='text-sm md:text-base'>Utility before</span>
                     </div>
-                    <div className='justify-self-start'>
+                    <div className='text-sm md:text-base'>
                         {data.initialAdjUtility?.toFixed(2) || 'N/A'}
                     </div>
-                    <div>
+                    <div className='text-sm md:text-base'>
                         Utility after
                     </div>
-                    <div className='justify-self-start'>
+                    <div className='text-sm md:text-base'>
                         {data.finalAdjUtility?.toFixed(2) || 'N/A'}
                     </div>
                 </div>
@@ -147,7 +141,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                             // we will prompt user to signup
                             state? onSubmit("Can you give me some more ideas?", "getRecommendations"): openSignup();
                         }}
-                        className='flex flex-row items-center gap-2 shadow-none'
+                        className='flex flex-row items-center gap-2 text-xs px-2 py-3 md:px-4 md:text-base shadow-none'
                     >
                         <RefreshCw size={16} />
                         Regenerate
@@ -155,6 +149,6 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                 </div>
             </div>
             )}
-        </>
+        </div>
     )
 }

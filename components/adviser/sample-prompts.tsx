@@ -1,32 +1,73 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
+import { type ChatState, useChatContext } from "@/context/ChatContext";
+
 const SAMPLE_PROMPTS = [
-    "Should I buy shares in AAPL?",
-    "Should I invest in NVDA?",
-    "What can I invest in with $100?",
-    "What are the best dividend stocks?",
-    "Should I invest more in ETFs?",
-    "Why is the market up/down today?",
-    "What does 'EPS' mean?",
-    "What's happening in the market?",
-    "What is value investing?",
-    "What is the PE ratio?",
-    "What stocks are on the move?",
-    "How does inflation impact my portfolio?",
-    "What is diversification?",
-    "Should I diversify my portfolio?",
-    "What does Beta mean?",
-    "What is BHP's dividend yield?"
+    {
+        input: "Should I buy shares in AAPL?",
+        tool: "shouldBuyOrSellStock",
+    },
+    {
+        input: "Should I invest in NVDA?",
+        tool: "shouldBuyOrSellStock",
+    },
+    {
+        input: "What can I invest in with $100?",
+        tool: "getRecommendations",
+    },
+    {
+        input: "What are the best dividend stocks?",
+        tool: "searchWeb",
+    },
+    {
+        input: "Should I invest more in ETFs?",
+    },
+    {
+        input: "Why is the market up/down today?",
+        tool: "searchWeb",
+    },
+    {
+        input: "What does 'EPS' mean?",
+    },
+    {
+        input: "What's happening in the market?",
+        tool: "searchWeb",
+    },
+    {
+        input: "What is value investing?",
+    },
+    {
+        input: "What is the PE ratio?",
+    },
+    {
+        input: "What stocks are on the move?",
+        tool: "searchWeb",
+    },
+    {
+        input: "How does inflation impact my portfolio?",
+        tool: "getPortfolio",
+    },
+    {
+        input: "What is diversification?",
+    },
+    {
+        input: "Should I diversify my portfolio?",
+        tool: "getPortfolio",
+    },
+    {
+        input: "What does Beta mean?",
+    },
+    {
+        input: "What is BHP's dividend yield?",
+        tool: "getStockInfo"
+    },
 ] as const;
 
-interface SamplePromptsProps {
-    setInput: (prompt: string) => void
-}
-
-export default function SamplePrompts({ setInput }: SamplePromptsProps) {
+export default function SamplePrompts() {
+    const { onSubmit } = useChatContext() as ChatState;
     const [samplePrompts, setSamplePrompts] = useState<typeof SAMPLE_PROMPTS[number][]>([]);
 
     useEffect(() => {
@@ -41,15 +82,15 @@ export default function SamplePrompts({ setInput }: SamplePromptsProps) {
     }, []);
 
     return (
-        <div className="w-full flex flex-wrap justify-center gap-2 md:px-3.5 overflow-hidden">
+        <div className="w-full flex flex-row sm:flex-wrap sm:justify-center gap-2 pb-1 sm:pb-0 overflow-x-scroll sm:overflow-hidden">
             {samplePrompts.map((prompt) => (
             <Button
-                key={`sample-prompt-${prompt}`}
+                key={`sample-prompt-${prompt.input}`}
                 variant='secondary'
-                onClick={() => setInput(prompt)}
+                onClick={() => onSubmit(prompt.input, 'tool' in prompt? prompt.tool: undefined)}
                 className='text-xs px-2 py-3 md:px-4 md:text-base bg-sky-600 hover:bg-sky-600 text-white hover:scale-[1.02] transition-transform duration-150'
             >
-                {prompt}
+                {prompt.input}
             </Button>
             ))}
         </div>

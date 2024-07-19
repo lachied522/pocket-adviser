@@ -14,6 +14,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
@@ -38,6 +40,7 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
     const { onSubmit } = useChatContext() as ChatState;
     const [stockData, setStockData] = useState<StockWithoutId|null|undefined>(initialStockData);
     const closeRef = useRef<HTMLButtonElement>(null);
+    const isMobile = useMediaQuery();
 
     useEffect(() => {
         if (initialStockData) return; // data already populated
@@ -67,7 +70,7 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
                         </DialogTitle>
                     </DialogHeader>
 
-                    <ScrollArea className='max-h-[80vh]'>
+                    <ScrollArea className='max-h-[75vh] sm:max-h-[80vh]'>
                         <div className='grid grid-cols-[60px_1fr] md:grid-cols-[120px_1fr] items-start gap-x-2 sm:gap-x-6 gap-y-2'>
                             <div className='h-14 w-14 md:h-auto md:w-auto flex items-center justify-center bg-slate-100 rounded-xl aspect-square md:row-span-2'>
                                 <div className='h-10 w-10 md:h-24 md:w-24 relative'>
@@ -90,10 +93,14 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
                                 </div>
                                 <div className='flex flex-row items-center gap-2'>
                                     <div className='inline'>
-                                        <span className='font-medium text-lg mr-0.5'>{stockData.previousClose? formatDollar(stockData.previousClose): 'N/A'}</span>
+                                        <span className='font-medium text-base md:text-lg mr-0.5'>{stockData.previousClose? formatDollar(stockData.previousClose): 'N/A'}</span>
                                         <span className='font-medium text-sm'>{stockData.previousClose? stockData.currency: ''}</span>
                                     </div>
-                                    <ChangeIndicator change={stockData.changesPercentage} withIcon={false} />
+                                    <ChangeIndicator
+                                        change={stockData.changesPercentage}
+                                        withIcon={false}
+                                        size={isMobile? 'sm': 'lg'}
+                                    />
                                 </div>
                             </div>
 

@@ -57,8 +57,8 @@ export default function ChatArea() {
                         <div
                             key={message.id}
                             className={cn(
-                                'flex flex-col items-start md:pr-24 gap-2',
-                                message.role === 'user' && 'items-end md:pr-0 md:pl-24'
+                                'flex flex-col items-start lg:pr-24 gap-2',
+                                message.role === 'user' && 'items-end lg:pr-0 lg:pl-24'
                             )}
                         >
                             <div className='text-sm font-medium text-slate-600'>
@@ -80,7 +80,7 @@ export default function ChatArea() {
 
                 <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
 
-                <SamplePrompts setInput={setInput} />
+                <SamplePrompts />
 
                 <div className={cn(
                     "h-12 xl:h-14 flex flex-row border border-neutral-100 rounded-b-lg overflow-hidden",

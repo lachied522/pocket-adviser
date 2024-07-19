@@ -16,8 +16,9 @@ import { cn } from "@/components/utils";
 
 import { formatDollar } from "@/utils/formatting";
 
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import {type  UIState, useUIContext } from "@/context/UIContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import { columns } from "./columns";
@@ -61,11 +62,11 @@ const TABS = {
 
 export default function Portfolio() {
     const { state, portfolioValue, currency, setCurrency, getStockData } = useGlobalContext() as GlobalState;
-    const { isMobile } = useUIContext() as UIState;
     const { onSubmit } = useChatContext() as ChatState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [tab, setTab] = useState<keyof typeof TABS>("overview");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const isMobile = useMediaQuery();
 
     useEffect(() => {
         // fetch stock data for each holding and update populated holdings
