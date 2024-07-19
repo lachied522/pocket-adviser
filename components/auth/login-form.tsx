@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,6 +30,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onSuccess, onNavigateSignup }: LoginFormProps) {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -37,7 +40,8 @@ export default function LoginForm({ onSuccess, onNavigateSignup }: LoginFormProp
     });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        onSuccess("credentials", values);
+        setIsLoading(true);
+        await onSuccess("credentials", values);
     }
 
     return (
@@ -87,6 +91,7 @@ export default function LoginForm({ onSuccess, onNavigateSignup }: LoginFormProp
 
                 <Button
                     type='submit'
+                    disabled={isLoading}
                     className='h-10'
                 >
                     Login

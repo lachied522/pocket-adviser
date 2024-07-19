@@ -1,18 +1,19 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import NextAuth from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 
-import type { AuthOptions, DefaultSession } from "next-auth";
-
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 
 import bcrypt from "bcrypt";
 
 import { COOKIE_NAME_FOR_IS_GUEST, COOKIE_NAME_FOR_USER_ID } from '@/constants/cookies';
+
+import type { DefaultSession } from "@auth/core/types"
 
 const prisma = new PrismaClient();
 
@@ -27,7 +28,7 @@ declare module "next-auth" {
 const adapter = PrismaAdapter(prisma);
 
 // see https://next-auth.js.org/getting-started/example
-export const authOptions: AuthOptions = {
+export const { auth, handlers, signIn, signOut } = NextAuth({
     providers: [
       Credentials({
         // You can specify which fields should be submitted, by adding keys to the `credentials` object.
@@ -44,7 +45,7 @@ export const authOptions: AuthOptions = {
 
           // logic to verify if user exists
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email }
+            where: { email: credentials.email as string }
           });
 
           if (!user) {
@@ -53,7 +54,7 @@ export const authOptions: AuthOptions = {
             throw new Error("User not found.");
           }
 
-          const passwordsMatch = await bcrypt.compare(credentials.password, user.hashedPassword!);
+          const passwordsMatch = await bcrypt.compare(credentials.password as string, user.hashedPassword!);
 
           if (!passwordsMatch) {
               throw new Error("Passwords do not match.");
@@ -64,13 +65,9 @@ export const authOptions: AuthOptions = {
         },
       }),
       GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         allowDangerousEmailAccountLinking: true,
       }),
       GitHubProvider({
-        clientId: process.env.GITHUB_CLIENT_ID!,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         allowDangerousEmailAccountLinking: true,
       }),
     ],
@@ -79,8 +76,10 @@ export const authOptions: AuthOptions = {
         // update cookies
         const cookieStore = cookies();
         const defaultExpiry = 7 * 24 * 60 * 60 * 1000; // one week
-        cookieStore.set({ name: COOKIE_NAME_FOR_USER_ID, value: user.id, maxAge: defaultExpiry });
-        cookieStore.set({ name: COOKIE_NAME_FOR_IS_GUEST, value: "false", maxAge: defaultExpiry });
+        if (user.id) {
+            cookieStore.set({ name: COOKIE_NAME_FOR_USER_ID, value: user.id, maxAge: defaultExpiry });
+            cookieStore.set({ name: COOKIE_NAME_FOR_IS_GUEST, value: "false", maxAge: defaultExpiry });
+        }
         // revalidate path
         revalidatePath('/', 'layout');
         return true;
@@ -101,4 +100,4 @@ export const authOptions: AuthOptions = {
       maxAge: 7 * 24 * 60 * 60 // 7 days
     },
     secret: process.env.AUTH_SECRET
-}
+});

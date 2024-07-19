@@ -107,18 +107,19 @@ export default function Header() {
                     <AuthDialog initialTab="login">
                         <Button
                             variant='outline'
-                            className='h-7 md:h-9 px-2 py-1 md:px-4 md:py-2 font-medium bg-transparent text-white'
+                            size='sm'
+                            className='bg-transparent text-white'
                         >
-                            <span className='text-xs md:text-base'>Login</span>
+                            <span className='text-xs md:text-sm'>Login</span>
                         </Button>
                     </AuthDialog>
                     <AuthDialog initialTab="signup">
                         <Button
                             ref={signupRef}
                             variant='secondary'
-                            className='h-7 md:h-9 px-2 py-1 md:px-4 md:py-2 font-medium'
+                            size='sm'
                         >
-                            <span className='text-xs md:text-base'>Signup</span>
+                            <span className='text-xs md:text-sm'>Signup</span>
                         </Button>
                     </AuthDialog>
                 </div>

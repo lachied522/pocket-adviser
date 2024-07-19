@@ -32,11 +32,11 @@ export default function AuthDialog({ children, initialTab }: GetAdviceDialogProp
                 ...values,
                 redirect: false,
             });
+            // refresh page
+            window.location.reload();
         } else {
             await signIn(provider);
         }
-        // refresh page
-        window.location.reload();
     }
 
     return (

@@ -255,7 +255,7 @@ export default function EditPortfolioDialog({
                                         if (e.key === 'Enter') onSearch();
                                     }}
                                     placeholder='e.g. AAPL, BHP'
-                                    className='h-full border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                                    className='h-full py-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
                                 />
                                 <Button
                                     variant='secondary'
