@@ -66,14 +66,14 @@ export default function Header() {
     }
 
     return (
-        <Container className='grid grid-cols-[45px_1fr] md:grid-cols-3 items-center px-2 pt-3.5 md:gap-3.5'>
+        <Container className='grid grid-cols-[45px_1fr] md:grid-cols-[1fr_minmax(320px,_1fr)_1fr] items-center px-2 pt-3.5'>
             <Logo />
 
-            <div className='hidden w-[360px] md:grid grid-cols-3 items-center justify-center gap-2 mx-auto'>
+            <div className='hidden w-[300px] md:grid grid-cols-3 items-center justify-center mx-auto'>
                 <AboutDialog>
                     <Button
                         variant='ghost'
-                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 p-0'
                     >
                         About
                     </Button>
@@ -82,7 +82,7 @@ export default function Header() {
                 <PremiumDialog>
                     <Button
                         variant='ghost'
-                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 p-0'
                     >
                         Premium
                     </Button>
@@ -92,23 +92,23 @@ export default function Header() {
                     <Button
                         type='button'
                         variant='ghost'
-                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 py-0'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 p-0'
                     >
                         Contact
                     </Button>
                 </a>
             </div>
 
-            <div className='place-self-end flex flex-row items-center gap-2 md:gap-3.5'>
+            <div className='place-self-end flex flex-row items-center gap-2'>
                 {state && !isGuest? (
-                <span className='text-sm sm:text-base text-white text-right font-medium'>Welcome {state.name}</span>
+                <div className='text-sm sm:text-base text-white text-right font-medium shrink-0'>Welcome {state.name}</div>
                 ) : (
                 <div className='flex flex-row items-center gap-3.5'>
                     <AuthDialog initialTab="login">
                         <Button
                             variant='outline'
                             size='sm'
-                            className='bg-transparent text-white'
+                            className='h-7 md:h-9 bg-transparent text-white'
                         >
                             <span className='text-xs md:text-sm'>Login</span>
                         </Button>
@@ -118,6 +118,7 @@ export default function Header() {
                             ref={signupRef}
                             variant='secondary'
                             size='sm'
+                            className='h-7 md:h-9'
                         >
                             <span className='text-xs md:text-sm'>Signup</span>
                         </Button>
@@ -213,7 +214,7 @@ export default function Header() {
                                 </Button>
                             </a>
                             
-                            {state && !isGuest && (
+                            {/* {state && !isGuest && (
                             <>
                                 <Separator className='my-1' />
 
@@ -229,7 +230,7 @@ export default function Header() {
                                     <span className='text-xs'>Logout</span>
                                 </Button>
                             </>
-                            )}
+                            )} */}
                         </>
                         )}
                     </PopoverContent>
@@ -241,7 +242,7 @@ export default function Header() {
                     aria-label='logout'
                     variant='ghost'
                     onClick={onSignOut}
-                    className='hidden md:flex h-8 w-8 p-0 hover:bg-slate-100/10'
+                    className='flex h-8 w-8 p-0 hover:bg-slate-100/10'
                 >
                     <LogOut size={16} strokeWidth={2.5} color='white' />
                 </Button>

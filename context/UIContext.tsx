@@ -41,7 +41,7 @@ export function UIProvider({
             // open welcome dialog after three seconds
             setTimeout(() => {
                 if (welcomeDialogRef.current) welcomeDialogRef.current.click();
-            }, 3000);
+            }, 2000);
         }
     }, []);
 

@@ -125,6 +125,7 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
                                 </div>
                             </div>
                             )}
+
                             <FormField
                                 control={form.control}
                                 name="mailFrequency"
@@ -151,21 +152,6 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
                                     </FormItem>
                                 )}
                             />
-
-                            <div className='w-full'>
-                                <FormLabel>Email Includes</FormLabel>
-                                <FormDescription>
-                                    Your email from Pocket Adviser will include:
-                                </FormDescription>
-                                <div className='w-full flex flex-col items-center px-2 mt-3'>
-                                    <ul className='flex flex-col gap-2 list-disc pl-3'>
-                                        <li className=''>General Market Update</li>
-                                        <li className=''>Portfolio Update</li>
-                                        <li className=''>Trending Stocks</li>
-                                        <li className=''>Trade Ideas</li>
-                                    </ul>
-                                </div>
-                            </div>
                         </div>
                         
                         <div className='h-full flex flex-row items-end justify-between'>

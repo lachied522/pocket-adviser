@@ -15,7 +15,7 @@ export const OBJECTIVE_MAP = {
     },
     PRESERVATION: {
         name: "🏦 Capital Preservation",
-        text: "Protect your hard-earned capital in a safe investments",
+        text: "Protect your hard-earned capital in safer investments",
         timeHorizon: "1-3 years",
         Icon: Vault
     },

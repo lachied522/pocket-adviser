@@ -15,22 +15,33 @@ async function fetchData(symbol: string, amount: number, userId?: string|null) {
         params.set("userId", userId);
     }
     url.search = params.toString();
-    const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-            amount,
-            symbol,
-        }),
-        headers: {
-            "Content-Type": "application/json",
-        }
-    })
-    .then((res) => {
-        if (!res.ok) throw new Error(`Error calling function.`)
-        return res.json();
-    });
 
-    return response;
+    // use an abort controller to impose a 58s limit (slightly less than 60s max streaming time)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 58000);
+    const response = await fetch(
+        url,
+        {
+            method: "POST",
+            signal: controller.signal,
+            body: JSON.stringify({
+                amount,
+                symbol,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+    );
+
+    // Clear the timeout if the request completes in time
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+        throw new Error(await response.json());
+    }
+
+    return await response.json();
 }
 
 function formatResults(result: any) {

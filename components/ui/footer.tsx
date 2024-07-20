@@ -5,11 +5,11 @@ export default function Footer() {
         <div className='w-full flex items-center justify-center px-6 py-6 md:py-12 md:mt-12 bg-sky-800 opacity-90'>
             <div className='max-w-md md:max-w-lg flex flex-col items-stretch gap-3.5'>
                 <p className='text-sm text-white'>
-                    <span id='disclaimer' className='font-medium'>Disclaimer:</span>
+                    <span id='disclaimer' className='text-lg font-medium'>Disclaimer</span>
                     <br /><br />
                     Pocket Adviser is for educational purposes only.
-                    Any information or ideas presented by Pocket Adviser are not intended to be formal financial advice,
-                    and the decision to buy or sell securities lies with you.
+                    Any information or ideas presented by Pocket Adviser are not intended to be formal financial advice.
+                    The decision to buy or sell securities lies with you, and we do not take responsibility for the outcome of such decisions.
                     Please consult a certified financial advisor if you require advice.
                 </p>
                 {/* <p className='text-white'>

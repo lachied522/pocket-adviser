@@ -28,8 +28,8 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                     <div className='flex flex-col gap-6'>
                         <H3>Pocket Adviser Premium</H3>
 
-                        <div className='max-w-[400px] flex flex-col gap-2 p-5 bg-sky-50 border-2 border-sky-600 rounded-lg'>
-                            <div className='flex flex-row items-end justify-between gap-10'>
+                        <div className='max-w-[calc(90vw-30px)] overflow-x-auto md:w-[400px] flex flex-col gap-2 p-2 sm:p-5 bg-sky-50 border-2 border-sky-600 rounded-lg'>
+                            <div className='flex flex-col items-start md:flex-row md:items-end justify-between gap-2 md:gap-10'>
                                 <div className=''>
                                     <div>Price <span className='text-sm'>(USD)</span></div>
                                     <div className='inline-flex items-end'>
@@ -37,24 +37,24 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                                         <span className='text-lg text-slate-600 ml-1 mb-0.5'>/month</span>
                                     </div>
                                 </div>
-                                <div className='w-full flex justify-end'>
+                                <div className='w-full flex md:justify-end'>
                                     <SubscribeButton />
                                 </div>
                             </div>
 
                             <span>Includes:</span>
-                            <ul className='list-disc list-inside pl-3'>
+                            <ul className='list-disc list-inside sm:pl-3 *:text-sm *:sm:text-base'>
                                 <li><b>Unlimited</b> chat requests</li>
                                 <li><b>Unlimited</b> portfolio reviews</li>
                                 <li><b>New!</b> Personalised newsletter</li>
                             </ul>
                         </div>
 
-                        <H3>Personal Newsletter</H3>
+                        <H3>Newsletter</H3>
                         <p>
                             Premium subscribers can opt-in to receive a personalised newsletter on a daily, weekly, or monthly basis! The newsletter includes:
                         </p>
-                        <div className='grid grid-cols-[24px_1fr] items-start gap-x-2 pl-3 *:font-medium'>
+                        <div className='grid grid-cols-[24px_1fr] items-start gap-x-2 sm:pl-3 *:font-medium'>
                             <div className=''>💡</div>
                             <div className=''>Trade Ideas</div>
                             <div className=''>📈</div>
@@ -66,8 +66,8 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                         </div>
                         
                         <span className='text-lg font-medium'>Preview</span>
-                        <div className='border border-slate-50 rounded-lg relative p-5'>
-                            {/* <div className='z-10 absolute inset-0 bg-gradient-to-b from-transparent to-white/80 from-30%'/> */}
+
+                        <div className='border border-slate-50 rounded-lg relative p-2 sm:p-5'>
                             <p>
                                 <span>Good morning Lachie,</span>
                                 <br /><br />
@@ -75,61 +75,63 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                                 <br /><br />
                             </p>
                             <h3 className='text-lg font-bold'>Trade Ideas</h3>
-                            <table className='w-full border-collapse font-medium text-sm mt-3.5'>
-                                <thead className='bg-slate-100 border border-slate-100 text-left'>
-                                    <tr className='*:p-2'>
-                                        <td>Transaction</td>
-                                        <td>Symbol</td>
-                                        <td>Name</td>
-                                        <td>Units</td>
-                                        <td>Price</td>
-                                        <td>Value</td>
-                                    </tr>
-                                </thead>
+                            <div className='max-w-[calc(90vw-30px)] overflow-x-auto'>
+                                <table className='w-full border-collapse font-medium text-sm mt-3.5'>
+                                    <thead className='bg-slate-100 border border-slate-100 text-left'>
+                                        <tr className='*:p-2'>
+                                            <td>Transaction</td>
+                                            <td>Symbol</td>
+                                            <td>Name</td>
+                                            <td>Units</td>
+                                            <td>Price</td>
+                                            <td>Value</td>
+                                        </tr>
+                                    </thead>
 
-                                <tbody className='bg-white border border-slate-100 text-left'>
-                                    <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                        <td>📈 <b>Buy</b></td>
-                                        <td>SMCI</td>
-                                        <td>Super Micro Computer, Inc.</td>
-                                        <td>2</td>
-                                        <td>$899.98</td>
-                                        <td>$1,799.96</td>
-                                    </tr>
-                                    <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                        <td>📈 <b>Buy</b></td>
-                                        <td>CVX</td>
-                                        <td>Chevron Corporation</td>
-                                        <td>9</td>
-                                        <td>$155.13</td>
-                                        <td>$1,396.17</td>
-                                    </tr>
-                                    <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                        <td>📈 <b>Buy</b></td>
-                                        <td>SQ2.AX</td>
-                                        <td>Block, Inc.</td>
-                                        <td>15</td>
-                                        <td>$95.70</td>
-                                        <td>$1,435.50</td>
-                                    </tr>
-                                    <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                        <td>📈 <b>Buy</b></td>
-                                        <td>CRM</td>
-                                        <td>Salesforce, Inc.</td>
-                                        <td>6</td>
-                                        <td>$252.59</td>
-                                        <td>$1,515.54</td>
-                                    </tr>
-                                    <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                        <td>📉 <b>Sell</b></td>
-                                        <td>Meta</td>
-                                        <td>Meta Platforms, Inc.</td>
-                                        <td>11</td>
-                                        <td>$534.69</td>
-                                        <td>$5,881.59</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    <tbody className='bg-white border border-slate-100 text-left'>
+                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
+                                            <td>📈 <b>Buy</b></td>
+                                            <td>SMCI</td>
+                                            <td>Super Micro Computer, Inc.</td>
+                                            <td>2</td>
+                                            <td>$899.98</td>
+                                            <td>$1,799.96</td>
+                                        </tr>
+                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
+                                            <td>📈 <b>Buy</b></td>
+                                            <td>CVX</td>
+                                            <td>Chevron Corporation</td>
+                                            <td>9</td>
+                                            <td>$155.13</td>
+                                            <td>$1,396.17</td>
+                                        </tr>
+                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
+                                            <td>📈 <b>Buy</b></td>
+                                            <td>SQ2.AX</td>
+                                            <td>Block, Inc.</td>
+                                            <td>15</td>
+                                            <td>$95.70</td>
+                                            <td>$1,435.50</td>
+                                        </tr>
+                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
+                                            <td>📈 <b>Buy</b></td>
+                                            <td>CRM</td>
+                                            <td>Salesforce, Inc.</td>
+                                            <td>6</td>
+                                            <td>$252.59</td>
+                                            <td>$1,515.54</td>
+                                        </tr>
+                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
+                                            <td>📉 <b>Sell</b></td>
+                                            <td>Meta</td>
+                                            <td>Meta Platforms, Inc.</td>
+                                            <td>11</td>
+                                            <td>$534.69</td>
+                                            <td>$5,881.59</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             <p className='whitespace-pre-wrap mt-6'>
                                 <h3 className='text-lg font-bold'>Stock Market Update: Navigating Uncertainty and Opportunities 🌐📊</h3>
                                 <br />

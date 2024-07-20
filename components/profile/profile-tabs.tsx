@@ -61,8 +61,8 @@ export default function ProfileTabs() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className='flex flex-col gap-6'
             >
-                <div className='lg:h-16 grid grid-cols-2 sm:grid-cols-3 items-center md:gap-2 py-2 lg:py-0'>
-                    <div className='flex flex-row items-center gap-2 md:gap-3.5 order-first shrink-0'>
+                <div className='lg:h-16 grid grid-cols-2 lg:grid-cols-3 items-center py-2 lg:py-0'>
+                    <div className='flex flex-row items-center gap-2 order-first shrink-0 sm:shrink'>
                         <Button
                             type='button'
                             variant='ghost'
@@ -74,7 +74,7 @@ export default function ProfileTabs() {
                         <H3 className=''>My Profile</H3>
                     </div>
                     
-                    <div className='hidden md:block'>
+                    <div className='hidden lg:block'>
                         <AnimatePresence>
                             {!isOpen && (
                             <motion.div
@@ -85,11 +85,11 @@ export default function ProfileTabs() {
                                     ease: "easeOut",
                                     duration: 0.32,
                                 }}
-                                className='flex flex-row items-center justify-center gap-3 xl:gap-6 order-last xl:order-2'
+                                className='flex flex-row items-center justify-center gap-3 order-last xl:order-2'
                             >
                                 <div className='min-w-[180px] flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>
                                     <span className='text-sm xl:text-base font-medium'>Objective</span>
-                                    <span className='text-sm'>{OBJECTIVE_MAP[state?.profile?.objective || "RETIREMENT"].name}</span>
+                                    <span className='text-sm truncate'>{OBJECTIVE_MAP[state?.profile?.objective || "RETIREMENT"].name}</span>
                                 </div>
 
                                 <div className='min-w-[180px] flex flex-col shrink-0 bg-white px-3.5 py-2 border border-slate-100 rounded-xl'>

@@ -93,7 +93,7 @@ export async function continueConversation({
         return AIMessage(<ChatMessage content="Slow down there! You have submitted too many requests, please try again in a couple of seconds. 🏁" />);
     }
     if (!isWithinFixedLimit) {
-        return AIMessage(<ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to a paid plan. 🙂" />);
+        return AIMessage(<ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to Premium. 🙂" />);
     }
     // see https://sdk.vercel.ai/examples/next-app/interface/route-components
     const history = getMutableAIState();
@@ -111,23 +111,23 @@ export async function continueConversation({
     }
 
     function appendToolCallToHistory(
-        name: string,
+        toolName: string,
         args: object,
         result: string,
         isError: boolean = false
     ) {
-        const id = generateId();
+        const toolCallId = generateId();
         conversationHistory = [
             ...conversationHistory,
             // append assistant message first
             {
                 role: 'assistant',
-                content: [{ type: 'tool-call', toolCallId: id, toolName: name, args }]
+                content: [{ type: 'tool-call', toolCallId, toolName, args }]
             },
             // append tool result
             {
                 role: 'tool',
-                content: [{ type: 'tool-result', toolCallId: id, toolName: name, args, result, isError }]
+                content: [{ type: 'tool-result', toolCallId, toolName, args, result, isError }]
             },
         ];
     }
@@ -152,6 +152,12 @@ export async function continueConversation({
             title: article.title,
         }
         appendToolCallToHistory("readUrl", args, JSON.stringify(res), !!text);
+        // prompt AI to get the user's portfolio if portfolio is not already in history
+        if (!conversationHistory.find((obj) => (
+            obj.role === 'tool' && obj.content[0].toolName === 'getPortfolio'
+        ))) {
+            toolName = "getPortfolio";
+        }
     } else {
         // push user input to conversation history
         conversationHistory.push({ role: 'user', content: input });

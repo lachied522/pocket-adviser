@@ -16,19 +16,29 @@ async function fetchData(amount: number, action: string, userId?: string|null) {
     }
     url.search = params.toString();
 
-    const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-            amount,
-            action,
-        }),
-        headers: {
-            "Content-Type": "application/json",
+    // use an abort controller to impose a 58s limit (slightly less than 60s max streaming time)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 58000);
+    const response = await fetch(
+        url,
+        {
+            method: "POST",
+            signal: controller.signal,
+            body: JSON.stringify({
+                amount,
+                action,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            }
         }
-    });
+    );
+
+    // Clear the timeout if the request completes in time
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
-        throw new Error(`Error getting recommendations.`)
+        throw new Error(await response.json());
     }
 
     return await response.json();
@@ -53,7 +63,7 @@ export async function getRecommendations(amount: number, action: string, userId?
         const res = await fetchData(amount, action, userId);
         return formatResults(res);
     } catch (e) {
-        console.log(e);
+        console.error("Error getting recommendations: ", e);
         return null;
     }
 }

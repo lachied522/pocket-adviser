@@ -11,12 +11,12 @@ export function useScrollAnchor() {
 
     const scrollToBottom = useCallback(
         () => {
-            if (messagesRef.current) {
-                messagesRef.current.scrollIntoView({
-                    block: 'end',
-                    behavior: 'smooth'
-                });
-            }
+            // if (anchorRef.current) {
+            //     anchorRef.current.scrollIntoView({
+            //         block: 'center',
+            //         behavior: 'smooth'
+            //     });
+            // }
         },
         []
     );

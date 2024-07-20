@@ -18,13 +18,14 @@ import Chat from "@/components/adviser/chat";
 import Portfolio from "@/components/portfolio/portfolio";
 import Footer from "@/components/ui/footer";
 import StockTape from "@/components/tape/stock-tape";
+import ProductHunt from "./ProductHunt";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
 
 // Force the page to be dynamic and allow streaming responses up to 30 seconds
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 async function getStockData(userData: UserData|null) {
   if (!userData) return {};
@@ -113,6 +114,9 @@ export default async function Page({
 
                 <Footer />
               </main>
+              <div className='fixed bottom-0 sm:left-0 p-6'>
+                <ProductHunt />
+              </div>
           </AIProvider>
         </UIProvider>
       </GlobalProvider>

@@ -26,7 +26,10 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
                     Welcome
                 </Button>
             </DialogTrigger>
-            <DialogContent className='max-w-lg'>
+            <DialogContent
+                onInteractOutside={(e) => e.preventDefault()} // prevent closing dialog on outside click
+                className='max-w-lg'
+            >
                 <DialogHeader>
                     <DialogTitle className='flex flex-row items-center gap-1'>
                         Welcome
@@ -34,11 +37,11 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
                 </DialogHeader>
 
                 <p>Hello! 👋</p>
-                <p>Welcome to Pocket Adviser! Pocket Adviser is your personal stock market guide to assist you on your investing journey.</p>
-                <p>Pocket Adviser can help you find investments that fit your objectives and preferences, explain financial concepts, and navigate market events.</p>
+                <p>Welcome to Pocket Adviser! I am your AI stock market copilot, here to assist you on your investing journey.</p>
+                <p>I can help you find investments that fit your objectives and preferences, explain financial concepts, and navigate market events.</p>
                 <p>Get started in <b>three easy steps</b>.</p>
 
-                <div className='grid grid-cols-1 sm:grid-cols-3 place-items-center gap-2 mt-3'>
+                <div className='grid grid-cols-1 sm:grid-cols-3 place-items-center gap-2 my-3'>
                     <div className='w-[280px] sm:w-auto flex flex-row sm:flex-col items-center gap-3.5 md:gap-2 px-2 py-3 border-2 border-slate-200 rounded-xl'>
                         <ClipboardList size={48} strokeWidth={1.5} />
                         <span className='font-medium text-left sm:text-center'>1. Adjust your profile</span>
@@ -51,9 +54,15 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
 
                     <div className='w-[280px] sm:w-auto flex flex-row sm:flex-col items-center gap-3.5 md:gap-2 px-2 py-3 border-2 border-slate-200 rounded-xl'>
                         <MessageCircleMore size={48} strokeWidth={1.5} />
-                        <span className='font-medium text-left sm:text-center'>3. Chat with your adviser</span>
+                        <span className='font-medium text-left sm:text-center'>3. Start a discussion!</span>
                     </div>
                 </div>
+
+                <DialogClose asChild>
+                    <Button>
+                        Get Started
+                    </Button>
+                </DialogClose>
             </DialogContent>
         </Dialog>
     )

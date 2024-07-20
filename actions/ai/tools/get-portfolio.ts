@@ -1,6 +1,7 @@
-import { getHoldingsWithStocks } from "@/utils/crud/holding";
-
 import { z } from "zod";
+
+import { getHoldingsWithStocks } from "@/utils/crud/holding";
+import { formatDollar } from "@/utils/formatting";
 
 export const description = "Get information about the user's portfolio and their current investments";
 
@@ -40,18 +41,20 @@ export async function getPortfolio(userId?: string|null): Promise<any> {
         }, {});
 
         return {
-            portfolioValue,
-            totalIncome,
+            portfolioValue: formatDollar(portfolioValue),
+            totalIncome: formatDollar(totalIncome),
             incomeYield: (100 * totalIncome / portfolioValue).toFixed(2) + '%',
             sectorAllocations,
-            holdings: data.map((obj) => ({
-                symbol: obj.stock.symbol,
-                name: obj.stock.name,
-                sector: obj.stock.sector,
-                previousClose: obj.stock.previousClose,
-                units: obj.units,
-                value: (obj.stock.previousClose || 0) * obj.units,
-            }))
+            holdings: data.map(
+                (obj) => ({
+                    symbol: obj.stock.symbol,
+                    name: obj.stock.name,
+                    sector: obj.stock.sector,
+                    previousClose: obj.stock.previousClose,
+                    units: obj.units,
+                    value: formatDollar((obj.stock.previousClose || 0) * obj.units),
+                })
+            ),
         }
     } catch (e) {
         console.log(e);
