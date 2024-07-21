@@ -18,7 +18,6 @@ import Chat from "@/components/adviser/chat";
 import Portfolio from "@/components/portfolio/portfolio";
 import Footer from "@/components/ui/footer";
 import StockTape from "@/components/tape/stock-tape";
-import ProductHunt from "./ProductHunt";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -114,9 +113,6 @@ export default async function Page({
 
                 <Footer />
               </main>
-              <div className='fixed bottom-0 sm:left-0 p-6'>
-                <ProductHunt />
-              </div>
           </AIProvider>
         </UIProvider>
       </GlobalProvider>
