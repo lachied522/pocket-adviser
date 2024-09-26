@@ -29,9 +29,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
@@ -63,12 +61,18 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
         setIsLoading(true);
         await updateUserAndUpdateState({
             email: values.email,
-            ...(values.mailFrequency === "NEVER"? {}: { mailFrequency: values.mailFrequency })
+            ...(
+                values.mailFrequency === "NEVER"? {
+                    mailFrequency: null
+                } : {
+                    mailFrequency: values.mailFrequency
+                }
+            )
         });
         // close modal
         if (closeRef.current) closeRef.current.click();
         // reset form
-        form.reset();
+        form.reset(values);
         setIsLoading(false);
     }
 
