@@ -214,8 +214,6 @@ export async function continueConversation({
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
                     finishStreaming();
-                    // update loading state
-                    loadingState.done({ loading: false });
                     return <MessageWithRecommendations content={content} data={res} />;
                 },
             },
