@@ -74,7 +74,7 @@ export default function ChatArea() {
                             )}
                         </div>
                         ))}
-                        <div className="w-full h-px" ref={anchorRef} />
+                        <div className="w-full h-6" ref={anchorRef} />
                     </div>
                 </ScrollArea>
 
@@ -88,10 +88,9 @@ export default function ChatArea() {
                 )}>
                     {article && (
                     <div className="h-16 w-32 relative group">
-                        <Image
+                        <img
                             src={article.image || ''}
                             alt={article.title}
-                            fill
                             style={{
                                 objectFit: "cover"
                             }}

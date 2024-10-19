@@ -13,8 +13,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import StockModal from "@/components/stocks/stock-modal";
-import UtilityDialog from "@/components/modals/utility-dialog";
+import StockDialog from "@/components/stocks/stock-dialog";
+import UtilityDialog from "@/components/dialogs/utility-dialog";
 
 import { formatDollar } from "@/utils/formatting";
 
@@ -68,7 +68,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                         {data.transactions.length > 0? (
                         <>
                             {data.transactions.map((obj) => (
-                            <StockModal key={`recommendation-${obj.stockId}`} stockId={obj.stockId}>
+                            <StockDialog key={`recommendation-${obj.stockId}`} stockId={obj.stockId}>
                                 <TableRow className='cursor-pointer'>
                                     <TableCell className='text-sm md:text-lg font-semibold sm:pl-3.5 py-3.5'>
                                         {obj.units > 0? "📈  Buy": "📉  Sell"}
@@ -86,7 +86,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                                         {formatDollar(obj.price * obj.units)}
                                     </TableCell>
                                 </TableRow>
-                            </StockModal>
+                            </StockDialog>
                             ))}
                             <TableRow>
                                 <TableCell colSpan={4} className='sm:pl-3.5 py-3.5'>

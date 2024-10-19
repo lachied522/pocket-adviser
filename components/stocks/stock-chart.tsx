@@ -34,22 +34,24 @@ function StockChart({ stockData }: { stockData: Omit<Stock, 'id'> }) {
     useEffect(
         () => {
             const script = document.createElement("script");
-            script.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+            script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
             script.type = "text/javascript";
             script.async = true;
             script.innerHTML = `
                 {
-                    "symbol": "${formatSymbol(stockData.symbol, stockData.exchange as 'ASX'|'NASDAQ'|'NYSE')}",
-                    "width": "100%",
-                    "height": "100%",
-                    "locale": "en",
-                    "dateRange": "12M",
-                    "colorTheme": "light",
-                    "trendLineColor": "rgba(71, 85, 105, 1)",
-                    "isTransparent": false,
                     "autosize": true,
-                    "largeChartUrl": "",
-                    "chartOnly": true
+                    "symbol": "NASDAQ:AAPL",
+                    "interval": "D",
+                    "timezone": "Etc/UTC",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "en",
+                    "hide_top_toolbar": true,
+                    "hide_legend": true,
+                    "allow_symbol_change": false,
+                    "save_image": false,
+                    "calendar": false,
+                    "support_host": "https://www.tradingview.com"
                 }
             `;
             if (!mountedRef.current && containerRef.current) containerRef.current.appendChild(script);

@@ -104,6 +104,7 @@ export default function Portfolio() {
     return (
         <div className='flex flex-col gap-3.5 md:gap-6'>
             <H3 className=''>My Portfolio</H3>
+
             <div className='hidden md:flex flex-row items-center gap-3.5'>
                 <div className=''>
                     Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>
@@ -166,14 +167,14 @@ export default function Portfolio() {
                 data={populatedHoldings}
                 emptyComponent={(
                     <div className='flex flex-col items-center gap-3 md:gap-6 p-3 md:p-24'>
-                        <span className='font-medium text-lg'>Portfolio empty</span>
+                        <span className='font-medium text-lg'>Portfolio empty. Need ideas?</span>
                         <Button
                             onClick={() => {
                                 onSubmit("Can you give me some ideas for my portfolio?", "getRecommendations");
                                 window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
                             }}
                         >
-                            Need ideas?
+                            Get started
                         </Button>
                     </div>
                 )}

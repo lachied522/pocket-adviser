@@ -9,7 +9,7 @@ import {
 
 import { useCookies } from "@/hooks/useCookies";
 
-import WelcomeDialog from "@/components/modals/welcome-dialog";
+import WelcomeDialog from "@/components/dialogs/welcome-dialog";
 
 export type UIState = {
     signupRef: React.RefObject<HTMLButtonElement>

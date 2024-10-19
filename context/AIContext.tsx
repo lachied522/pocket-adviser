@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { AI, type ClientMessage, type ServerMessage } from '@/actions/ai/chat';
 import { ChatProvider } from '@/context/ChatContext';
 
-import { MessageWithRecommendations } from '@/components/adviser/messages';
+import { MessageWithRecommendations } from '@/components/chat/messages';
 
 import type { Recommendation } from "@/types/helpers";
 

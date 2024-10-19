@@ -15,9 +15,9 @@ import { Separator } from "@/components/ui/separator";
 
 import Logo from "@/components/ui/logo";
 import Container from "@/components/ui/container";
-import AboutDialog from "@/components/modals/about-dialog";
-import EmailsDialog from "@/components/modals/emails-dialog";
-import PremiumDialog from "@/components/modals/premium-dialog";
+import AboutDialog from "@/components/dialogs/about-dialog";
+import EmailsDialog from "@/components/dialogs/emails-dialog";
+import PremiumDialog from "@/components/dialogs/premium-dialog";
 import AuthDialog from "@/components/auth/auth-dialog";
 
 import { useCookies } from "@/hooks/useCookies";

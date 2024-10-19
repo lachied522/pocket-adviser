@@ -2,49 +2,34 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 export function useScrollAnchor() {
     // see https://github.com/vercel/ai-chatbot/blob/main/lib/hooks/use-scroll-anchor.tsx
-    const [scrollHeight, setScrollHeight] = useState<number>(0);
+    const [shouldAutoScroll, setShouldAutoScroll] = useState<boolean>(false);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
-    const [isVisible, setIsVisible] = useState(false);
-    const messagesRef = useRef<HTMLDivElement>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
-    const anchorRef = useRef<HTMLDivElement>(null);
+    const messagesRef = useRef<HTMLDivElement>(null);
+    const anchorRef = useRef<HTMLDivElement>(null); // placeholder element at bottom of scroll area
 
     const scrollToBottom = useCallback(
         () => {
-            // if (anchorRef.current) {
-            //     anchorRef.current.scrollIntoView({
-            //         block: 'center',
-            //         behavior: 'smooth'
-            //     });
-            // }
+            if (anchorRef.current) {
+                anchorRef.current.scrollIntoView({
+                    block: 'nearest',
+                    behavior: 'smooth'
+                });
+            }
         },
         []
     );
 
-    const hasHeightChanged = useCallback(
-        () => {
-            // scroll only if the scrollHeight of the messages has increased
-            // inidicates a new message has been added
-            return (messagesRef.current?.scrollHeight || 0) !== scrollHeight;
-        },
-        [scrollHeight]
-    )
-
     useEffect(() => {
-        if (hasHeightChanged()) {
-            if (isAtBottom && !isVisible) {
-                scrollToBottom();
-            }
-            setScrollHeight(messagesRef.current?.scrollHeight || 0);
-        }
-    }, [isAtBottom, isVisible, hasHeightChanged, setScrollHeight]);
+        scrollToBottom();
+    }, [isAtBottom, shouldAutoScroll]);
 
     useEffect(() => {
         if (scrollAreaRef.current) {
             const handleScroll = (event: Event) => {
                 const target = event.target as HTMLDivElement;
                 const offset = 50;
-                setIsAtBottom(target.scrollTop + target.clientHeight >= target.scrollHeight - offset);
+                setShouldAutoScroll(target.scrollTop + target.clientHeight >= target.scrollHeight - offset);
             }
             
             scrollAreaRef.current.addEventListener('scroll', handleScroll);
@@ -57,10 +42,11 @@ export function useScrollAnchor() {
 
     useEffect(() => {
         if (anchorRef.current) {
+            // set shouldAutoScroll if anchor is not in view
             let observer = new IntersectionObserver(
                 entries => {
                     entries.forEach(entry => {
-                        setIsVisible(entry.isIntersecting);
+                        setIsAtBottom(entry.isIntersecting);
                     })
                 },
                 {
@@ -74,7 +60,7 @@ export function useScrollAnchor() {
                 observer.disconnect();
             }
         }
-    });
+    }, []);
 
     return {
         scrollAreaRef,

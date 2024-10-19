@@ -13,8 +13,7 @@ import { AIProvider } from "@/context/AIContext";
 
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
-import ProfileTabs from "@/components/profile/profile-tabs";
-import Chat from "@/components/adviser/chat";
+import Chat from "@/components/chat/chat-container";
 import Portfolio from "@/components/portfolio/portfolio";
 import Footer from "@/components/ui/footer";
 import StockTape from "@/components/tape/stock-tape";
@@ -93,12 +92,6 @@ export default async function Page({
                 <div className='bg-sky-600/80'>
                   <Header />
                   <StockTape />
-                </div>
-
-                <div className='bg-slate-50/80 shadow-sm'>
-                  <Container className='p-3.5'>
-                    <ProfileTabs />
-                  </Container>
                 </div>
 
                 <div className='flex flex-col px-1 sm:px-6 py-2 sm:py-5 xl:py-10 gap-2 sm:gap-5 xl:gap-10'>

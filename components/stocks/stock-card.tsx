@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
-import StockModal from "@/components/stocks/stock-modal";
+import StockDialog from "@/components/stocks/stock-dialog";
 import StockLogo from "@/components/stocks/stock-logo";
 import ChangeIndicator from "@/components/stocks/change-indicator";
 
@@ -17,7 +17,7 @@ interface StockCardProps {
 
 export default function StockCard({ stockData }: StockCardProps) {
     return (
-        <StockModal initialStockData={stockData}>
+        <StockDialog initialStockData={stockData}>
             <Card className='cursor-pointer shrink-0'>
                 <CardContent className='flex flex-col gap-3.5 p-3'>
                     <div className='grid grid-cols-[60px_1fr] gap-2'>
@@ -66,6 +66,6 @@ export default function StockCard({ stockData }: StockCardProps) {
                     </div>
                 </CardContent>
             </Card>
-        </StockModal>
+        </StockDialog>
     )
 }

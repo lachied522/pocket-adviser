@@ -39,8 +39,11 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
 
                 <ScrollArea className='max-h-[75vh] sm:max-h-[80vh]'>
                     <p>Hello! 👋</p>
+                    <br />
                     <p>Welcome to Pocket Adviser! I am your AI stock market copilot, here to assist you on your investing journey.</p>
+                    <br />
                     <p>I can help you find investments that fit your objectives and preferences, explain financial concepts, and navigate market events.</p>
+                    <br />
                     <p>Get started in <b>three easy steps</b>.</p>
 
                     <div className='grid grid-cols-1 sm:grid-cols-3 place-items-center gap-2 my-3'>

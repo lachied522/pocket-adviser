@@ -1,22 +1,41 @@
 "use client";
-import { motion } from "framer-motion";
+import {  useEffect, useRef } from "react";
+import { motion, animate, useMotionValue } from "framer-motion";
 
-interface AnimationWrapperProps {
-    children: React.ReactNode
-}
+interface AnimationWrapperProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export default function AnimationWrapper({ children }: AnimationWrapperProps) {
+export default function AnimationWrapper({ children, className }: AnimationWrapperProps) {
+    const x = useMotionValue("0%");
+    const animationRef = useRef<ReturnType<typeof animate>>();
+
+    const startAnimation = () => {
+        const animation = animate(
+            x,
+            `${Number(x.get().replace('%', '')) - 100}%`,
+            {
+                ease: "linear",
+                duration: 60,
+                repeat: Infinity,
+            }
+        );
+        animationRef.current = animation;
+    }
+
+    const stopAnimation = () => {
+        if (animationRef.current) animationRef.current.stop();
+    }
+
+    // start animation on component mount
+    useEffect(() => {
+        startAnimation();
+    }, []);
+
     return (
         <motion.div
-            animate={{
-                translateX: '-100%',
-                transition: {
-                    ease: "linear",
-                    repeat: Infinity,
-                    duration: 60,
-                }
-            }}
-            className='flex flex-row items-center gap-3.5'
+            style={{x}}
+            // onHoverStart={stopAnimation}
+            // onHoverEnd={startAnimation}
+            className={className}
         >
             {children}
         </motion.div>

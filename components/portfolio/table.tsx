@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 
-import StockModal from "@/components/stocks/stock-modal";
+import StockDialog from "@/components/stocks/stock-dialog";
 
 import type { PopulatedHolding } from "@/types/helpers";
 
@@ -61,8 +61,8 @@ export default function StockTable<TData, TValue>({
     });
 
     return (
-        <div className='min-h-[560px] flex flex-col justify-between'>
-            <div className="rounded-md border">
+        <div className='min-h-[560px] flex flex-col justify-stretch'>
+            <div className='flex-1 rounded-md border'>
                 <Table>
                     <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -85,7 +85,7 @@ export default function StockTable<TData, TValue>({
                     <TableBody>
                     {table.getRowModel().rows.length ? (
                         table.getRowModel().rows.map((row) => (
-                        <StockModal
+                        <StockDialog
                             key={row.id}
                             stockId={row.original.stockId}
                         >
@@ -96,11 +96,11 @@ export default function StockTable<TData, TValue>({
                                 </TableCell>
                                 ))}
                             </TableRow>
-                        </StockModal>
+                        </StockDialog>
                         ))
                     ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                        <TableRow className="">
+                            <TableCell colSpan={columns.length} className="h-[560px] text-center">
                                 {emptyComponent? emptyComponent: "Portfolio empty."}
                             </TableCell>
                         </TableRow>

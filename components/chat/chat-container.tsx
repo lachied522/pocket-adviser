@@ -1,10 +1,9 @@
 
 import { H3 } from "@/components/ui/typography";
 
-import QuickActions from "./quick-actions";
+import LeftSidebar from "./left-sidebar";
 import ChatArea from "./chat-area";
-import NewsCarousel from "./news-carousel";
-import Calendar from "./calendar";
+import NewsCarousel from "./right-sidebar";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -14,18 +13,17 @@ interface ChatProps {
     initialStockData: { [id: number]: Stock }
 }
 
-export default function Chat({ initialUserData, initialStockData }: ChatProps) {
+export default function ChatContainer({ initialUserData, initialStockData }: ChatProps) {
     const symbols = initialUserData?.holdings.map(
         (holding) => initialStockData[holding.stockId].symbol
     ) || [];
+    
     return (
         <div className='grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] justify-start gap-2 xl:gap-6'>
-            <div className='grid grid-cols-1 auto-rows-min gap-2 xl:gap-6 order-first'>
+            <div className='flex flex-col gap-3.5 md:gap-6 order-first'>
                 <H3 className=''>My Adviser</H3>
 
-                <QuickActions />
-                
-                <Calendar symbols={symbols} />
+                <LeftSidebar />
             </div>
 
             <ChatArea />

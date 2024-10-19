@@ -2,7 +2,7 @@ import { Check, CircleHelp, X } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import StockCard from "@/components/stocks/stock-card";
-import UtilityDialog from "@/components/modals/utility-dialog";
+import UtilityDialog from "@/components/dialogs/utility-dialog";
 
 import type { Stock } from "@prisma/client";
 

@@ -176,7 +176,6 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
                             >
                                 Save
                             </Button>
-
                         </div>
                     </form>
                 </Form>

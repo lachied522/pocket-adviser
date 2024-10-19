@@ -25,20 +25,20 @@ async function StockTapeBody() {
     const data = await getStockTape();
     return (
         <>
+            {/* Indices are not animated */}
             {data.indeces.map((item) => (
             <TapeItem key={`trending-${item.symbol}`} data={item} />
             ))}
-            <div className='flex flex-row items-center gap-3.5 overflow-hidden'>
-                <AnimationWrapper>
+            
+            <div className='flex flex-row items-center overflow-hidden'>
+                {/* Display 2x stock tape */}
+                {Array.from({ length: 2 }).map((_, index) => (
+                <AnimationWrapper key={`stock-tape-${index}`} className='flex flex-row items-center'>
                     {data.stocks.map((stock) => (
-                    <TapeItem key={`stock-tape-1-${stock.symbol}`} data={stock} clickable />
+                    <TapeItem key={`stock-tape-${index}-${stock.symbol}`} data={stock} clickable />
                     ))}
                 </AnimationWrapper>
-                <AnimationWrapper>
-                    {data.stocks.map((stock) => (
-                    <TapeItem key={`stock-tape-2-${stock.symbol}`} data={stock} clickable />
-                    ))}
-                </AnimationWrapper>
+                ))}
             </div>
         </>
     )

@@ -27,7 +27,7 @@ export default function ChangeIndicator({ change, withIcon = true, size = 'md' }
             <span
                 className={cn(
                     'text-black text-lg font-medium',
-                    size === 'sm' && 'text-sm md:text-base',
+                    size === 'sm' && 'text-xs md:text-sm',
                     change && change > 0 && 'text-green-400',
                     change && change < 0 && 'text-red-400'
                 )}

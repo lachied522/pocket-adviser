@@ -58,7 +58,7 @@ interface StockModalProps {
     stockId?: any
 }
 
-export default function StockModal({ children, stockId, initialStockData }: StockModalProps) {
+export default function StockDialog({ children, stockId, initialStockData }: StockModalProps) {
     const { getStockData } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as ChatState;
     const [stockData, setStockData] = useState<StockWithoutId|null|undefined>(initialStockData);
@@ -86,14 +86,14 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
                 <DialogTrigger asChild>
                     {children}
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className='max-w-6xl'>
                     <DialogHeader>
                         <DialogTitle>
                             {stockData.name}
                         </DialogTitle>
                     </DialogHeader>
 
-                    <ScrollArea className='max-h-[75vh] sm:max-h-[80vh]'>
+                    <ScrollArea className='max-h-[75vh] sm:max-h-[80vh] px-3'>
                         <div className='grid grid-cols-[60px_1fr] md:grid-cols-[120px_1fr] items-start gap-x-2 sm:gap-x-6 gap-y-2'>
                             <div className='h-14 w-14 md:h-auto md:w-auto flex items-center justify-center bg-slate-100 rounded-xl aspect-square md:row-span-2'>
                                 <div className='h-10 w-10 md:h-24 md:w-24 relative'>
@@ -144,31 +144,29 @@ export default function StockModal({ children, stockId, initialStockData }: Stoc
                                 </div>
                             </div>
 
-                            <div className='col-span-2 md:px-6 xl:px-12 mt-6'>
-                                <div className='h-48 opacity-90 md:p-0'>
-                                    <StockChart stockData={stockData} />
-                                </div>
+                            <div className='h-[360px] md:h-[520px] col-span-2 mt-6'>
+                                <StockChart stockData={stockData} />
                             </div>
                         </div>
 
                         <ScrollArea className='h-[360px] p-3'>
                             <p className='text-base'>{stockData.description || 'Company information not available'}</p>
                         </ScrollArea>
-
-                        <DialogFooter>
-                            <div className='w-full flex flex-wrap justify-center gap-1 md:gap-2'>
-                                {prompts(stockData.symbol).map((obj, index) => (
-                                <Button
-                                    key={`prompt-${stockData.symbol}-${index}`}
-                                    size='sm'
-                                    onClick={() => onButtonPress(obj.input, obj.tool)}
-                                >
-                                    <span className='text-xs md:text-sm'>{obj.display}</span>
-                                </Button>
-                                ))}
-                            </div>
-                        </DialogFooter>
                     </ScrollArea>
+                    
+                    <DialogFooter>
+                        <div className='w-full flex flex-wrap justify-center gap-1 md:gap-2'>
+                            {prompts(stockData.symbol).map((obj, index) => (
+                            <Button
+                                key={`prompt-${stockData.symbol}-${index}`}
+                                size='sm'
+                                onClick={() => onButtonPress(obj.input, obj.tool)}
+                            >
+                                <span className='text-xs md:text-sm'>{obj.display}</span>
+                            </Button>
+                            ))}
+                        </div>
+                    </DialogFooter>
                     <DialogClose ref={closeRef} className='hidden' />
                 </DialogContent>
             </Dialog>

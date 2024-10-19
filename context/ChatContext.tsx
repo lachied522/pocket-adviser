@@ -8,7 +8,7 @@ import {
   useCallback,
 } from "react";
 
-import { useActions, useUIState } from 'ai/rsc';
+import { useActions, useUIState, readStreamableValue, StreamableValue } from 'ai/rsc';
 import { generateId } from 'ai';
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
@@ -47,7 +47,6 @@ export function ChatProvider({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [article, setArticle] = useState<StockNews|null>(null);
     const [saidHello, setSaidHello] = useState<boolean>(false);
-    const cooldownRef = useRef<ReturnType<typeof setTimeout>|null>(null);
 
     const appendMessage = useCallback(
         (message : ClientMessage) => {
@@ -67,19 +66,32 @@ export function ChatProvider({
             input: string,
             tool?: string,
         }) => {
+            setIsLoading(true);
             // add user message to conversation
             appendMessage({ id: generateId(), role: 'user', display: input, article });
 
-            const response = await continueConversation({
+            const { response, loading } = await continueConversation({
                 user: state,
                 toolName: tool,
                 input,
                 article,
-            });
+            }) as {
+                response: ClientMessage,
+                loading?: StreamableValue<{ loading: boolean }>
+            };
 
             // append response to conversation
             appendMessage(response);
-            return response;
+
+            if (loading) {
+                // update loading state
+                // see https://sdk.vercel.ai/docs/ai-sdk-rsc/loading-state
+                for await (const loadingDelta of readStreamableValue(loading)) {
+                    if (loadingDelta) setIsLoading(loadingDelta.loading);
+                }
+            }
+
+            setIsLoading(false);
         },
         [state, continueConversation, article]
     );
@@ -97,29 +109,6 @@ export function ChatProvider({
             appendMessage(response);
         };
     }, []);
-
-    useEffect(() => {
-        // TO DO: find a better way to handle loading state
-        // whenever an update in conversation is detected, setIsLoading with a 3s cooldown
-        if (conversation.length > 0) {
-            setIsLoading(true);
-            // Clear existing timeout to ensure there's only one
-            if (cooldownRef.current) {
-                clearTimeout(cooldownRef.current);
-            }
-            // add new cooldown
-            cooldownRef.current = setTimeout(() => {
-                setIsLoading(false);
-                cooldownRef.current = null; // Clear the ref when done
-            }, 3000);
-        }
-
-        return () => {
-            if (cooldownRef.current) {
-                clearTimeout(cooldownRef.current);
-            }
-        };
-    }, [conversation, setIsLoading]);
 
     const onSubmit = useCallback(
         async (input: string, tool?: string) => {

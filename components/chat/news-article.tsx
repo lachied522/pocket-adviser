@@ -40,10 +40,13 @@ export default function NewsArticle({
                 className={cn("flex flex-col items-center justify-start", animateOnHover && "p-1")}
             >
                 <div className={cn("h-24 xl:h-36 w-36 xl:w-48 rounded-xl relative overflow-hidden cursor-pointer", animateOnHover && "hover:scale-[1.05]")}>
-                    <Image
+                    {/** 
+                     * Use regular img tag here.
+                     * Next JS Image results in error for source not being configured even though it is??
+                     *  */ }
+                    <img
                         src={article.image}
                         alt="Article Image"
-                        fill
                         sizes="192px"
                         style={{
                             objectFit: "cover"

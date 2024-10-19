@@ -11,6 +11,12 @@ const nextConfig = {
           },
           {
             protocol: 'https',
+            hostname: 'images.financialmodelingprep.com',
+            port: '',
+            pathname: '*',
+          },
+          {
+            protocol: 'https',
             hostname: '*.snapi.dev',
             port: '',
             pathname: '/images/**',

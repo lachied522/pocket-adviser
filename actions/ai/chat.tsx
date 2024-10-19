@@ -1,6 +1,6 @@
 "use server";
 import { generateId, streamText, type TextPart, type ToolResultPart, type ToolCallPart, type CoreMessage } from 'ai';
-import { createAI, getMutableAIState, streamUI } from 'ai/rsc';
+import { createAI, getMutableAIState, streamUI, createStreamableValue, type StreamableValue } from 'ai/rsc';
 import { openai } from '@ai-sdk/openai';
 
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
@@ -14,7 +14,7 @@ import { checkRateLimits } from './ratelimit';
 import { getSystemMessage } from './system';
 import { getGreeting } from './greeting';
 
-import { ChatMessage, LoadingMessage, MessageWithStockAdvice, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/adviser/messages';
+import { ChatMessage, LoadingMessage, MessageWithStockAdvice, MessageWithRecommendations, MessageWithStockCard, MessageWithWebSearch } from '@/components/chat/messages';
 
 import type { UserData } from '@/types/helpers';
 import type { StockNews } from '@/types/data';
@@ -85,23 +85,22 @@ export async function continueConversation({
     toolName?: "getRecommendations"|"shouldBuyOrSellStock"|"getPortfolio"|"getStockInfo"|"searchWeb"|"readUrl" // specify tool to call
     article?: StockNews|null
     user: UserData|null
-}): Promise<ClientMessage> {
-    "use server";
+}): Promise<{
+    response: ClientMessage,
+    loading?: StreamableValue<{ loading: boolean }>
+}> {
     // check rate limit
     const [isWithinSlidingLimit, isWithinFixedLimit] = await checkRateLimits(user);
     if (!isWithinSlidingLimit) {
-        return AIMessage(<ChatMessage content="Slow down there! You have submitted too many requests, please try again in a couple of seconds. 🏁" />);
+        return {
+            response: AIMessage(<ChatMessage content="Slow down there! You have submitted too many requests, please try again in a couple of seconds. 🏁" />),
+        };
     }
     if (!isWithinFixedLimit) {
-        return AIMessage(<ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to Premium. 🙂" />);
+        return {
+            response: AIMessage(<ChatMessage content="You have reached the maximum number of requests for today. Please try again tomorrow or upgrade to Premium. 🙂" />),
+        };
     }
-    // see https://sdk.vercel.ai/examples/next-app/interface/route-components
-    const history = getMutableAIState();
-
-    // create copy of conversation history
-    let conversationHistory = [
-        ...history.get(),
-    ];
 
     function appendAssistantMessageToHistory(text: string) {
         conversationHistory = [
@@ -132,9 +131,23 @@ export async function continueConversation({
         ];
     }
 
-    function commitHistory() {
+    function finishStreaming() {
+        // commit history
         history.done(conversationHistory);
+        // update loading state
+        loadingState.done({ loading: false });
     }
+
+    // see https://sdk.vercel.ai/examples/next-app/interface/route-components
+    const history = getMutableAIState();
+
+    // create copy of conversation history
+    let conversationHistory = [
+        ...history.get(),
+    ];
+
+    // create a loading state to stream alongside response
+    const loadingState = createStreamableValue({ loading: true });
 
     // if article exists, read article before and append to conversation history
     if (article) {
@@ -164,7 +177,8 @@ export async function continueConversation({
     }
     
     const systemMessage = await getSystemMessage();
-    const result = await streamUI({
+
+    const response = await streamUI({
         model: MODEL,
         system: systemMessage,
         messages: conversationHistory,
@@ -172,8 +186,9 @@ export async function continueConversation({
         toolChoice: toolName? { type: 'tool', toolName }: 'auto',
         text: ({ content, done }) => {
             if (done) {
+                // append message to history and commit
                 appendAssistantMessageToHistory(content);
-                commitHistory();
+                finishStreaming();
             }
             return <ChatMessage content={content} />
         },
@@ -198,7 +213,9 @@ export async function continueConversation({
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
-                    commitHistory();
+                    finishStreaming();
+                    // update loading state
+                    loadingState.done({ loading: false });
                     return <MessageWithRecommendations content={content} data={res} />;
                 },
             },
@@ -220,7 +237,7 @@ export async function continueConversation({
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
-                    commitHistory();
+                    finishStreaming();
                     return <MessageWithStockAdvice content={content} data={res} />;
                 },
             },
@@ -242,7 +259,7 @@ export async function continueConversation({
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
                     // commit history
-                    commitHistory();
+                    finishStreaming();
                     return <ChatMessage content={content} />;
                 }
             },
@@ -267,7 +284,7 @@ export async function continueConversation({
                     }
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
-                    commitHistory();
+                    finishStreaming();
                     return <MessageWithStockCard content={content} stockData={stockData} />;
                 },
             },
@@ -289,7 +306,7 @@ export async function continueConversation({
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
                     // commit history
-                    commitHistory();
+                    finishStreaming();
                     return <MessageWithWebSearch content={content} res={res} />;
                 },
             },
@@ -315,14 +332,17 @@ export async function continueConversation({
                     // add assistant response to history
                     appendAssistantMessageToHistory(content);
                     // commit history
-                    commitHistory();
+                    finishStreaming();
                     return <ChatMessage content={content} />;
                 },
             },
         },
     });
 
-    return AIMessage(result.value);
+    return {
+        response: AIMessage(response.value),
+        loading: loadingState.value
+    };
 }
 
 export const AI = createAI<ServerMessage[], ClientMessage[]>({
