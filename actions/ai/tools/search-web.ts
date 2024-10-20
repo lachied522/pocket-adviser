@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { format } from "date-fns";
 
 function getTodayDate() {
     const today = new Date();
@@ -27,10 +28,10 @@ export const description = "Search the internet for market events and stock news
 
 export const parameters = z.object({
     query: z.string().describe("The phrase that will be used to search the internet."),
-    date: z.string().optional().default(getTodayDate()).describe("The date you wish to receive results for in DD/MM/YYYY. Defaults to today."),
+    date: z.string().optional().default(getTodayDate()).describe("The date you wish to receive results for in MM/DD/YYYY. Defaults to today."),
 });
 
-function format(data: WebSearchResponse) {
+function formatResponse(data: WebSearchResponse) {
     return {
         query: data.query,
         answer: data.answer,
@@ -46,10 +47,10 @@ function format(data: WebSearchResponse) {
     };
 }
 
-export async function searchWeb(query: string, date: string): Promise<any> {
+export async function searchWeb(query: string, dateString: string): Promise<any> {
     try {
         // adding date to query helps to get current information
-        query = query + " " + date;
+        query = query + " " + format(new Date(dateString), 'PPP');
 
         const response = await fetch('https://api.tavily.com/search', {
             method: 'POST',
@@ -68,7 +69,7 @@ export async function searchWeb(query: string, date: string): Promise<any> {
             throw new Error("Error searching web");
         }
         const data = await response.json() as WebSearchResponse;
-        return format(data);
+        return formatResponse(data);
     } catch (e) {
         return null;
     }

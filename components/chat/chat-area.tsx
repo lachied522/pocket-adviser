@@ -74,13 +74,16 @@ export default function ChatArea() {
                             )}
                         </div>
                         ))}
+                        {conversation.length === 1 && conversation[0].role === 'assistant' && (
+                            <div className='p-6'>
+                                <SamplePrompts />
+                            </div>
+                        )}
                         <div className="w-full h-6" ref={anchorRef} />
                     </div>
                 </ScrollArea>
 
                 <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
-
-                <SamplePrompts />
 
                 <div className={cn(
                     "h-12 xl:h-14 flex flex-row border border-neutral-100 rounded-b-lg overflow-hidden",
