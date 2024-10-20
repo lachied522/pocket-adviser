@@ -16,7 +16,7 @@ import Header from "@/components/ui/header";
 import Chat from "@/components/chat/chat-container";
 import Portfolio from "@/components/portfolio/portfolio";
 import Footer from "@/components/ui/footer";
-import StockTape from "@/components/tape/stock-tape";
+import TickerTape from "@/components/tape/ticker-tape";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -91,7 +91,7 @@ export default async function Page({
                 
                 <div className='bg-sky-600/80'>
                   <Header />
-                  <StockTape />
+                  <TickerTape />
                 </div>
 
                 <div className='flex flex-col px-1 sm:px-6 py-2 sm:py-5 xl:py-10 gap-2 sm:gap-5 xl:gap-10'>

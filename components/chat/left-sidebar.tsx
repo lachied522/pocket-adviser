@@ -1,4 +1,7 @@
 "use client";
+
+import { ArrowUpDown, MessageCirclePlus, SearchCheck, UserRoundCog } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -17,9 +20,9 @@ export default function LeftSidebar() {
                 <ProfileDialog>
                     <Button
                         variant='ghost'
-                        className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-100'
+                        className='xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                     >
-                        <span className='text-lg mr-1 lg:mr-2'>✏️</span>
+                        <UserRoundCog size={16} />
                         Edit profile
                     </Button>
                 </ProfileDialog>
@@ -31,18 +34,18 @@ export default function LeftSidebar() {
                 <Button
                     variant='ghost'
                     onClick={onReset}
-                    className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-100'
+                    className='xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                 >
-                    <span className='text-lg mr-1 lg:mr-2'>🌱</span>
+                    <MessageCirclePlus size={16} />
                     New chat
                 </Button>
 
                 <CheckupDialog>
                     <Button
                         variant='ghost'
-                        className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-100'
+                        className='xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                     >
-                        <span className='text-lg mr-1 lg:mr-2'>📝</span>
+                        <SearchCheck size={16} />
                         Portfolio review
                     </Button>
                 </CheckupDialog>
@@ -50,9 +53,9 @@ export default function LeftSidebar() {
                 <GetAdviceDialog>
                     <Button
                         variant='ghost'
-                        className='h-[42px] xl:w-[180px] flex font-medium justify-start py-3 border border-slate-100'
+                        className='xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                     >
-                        <span className='text-lg mr-1 lg:mr-2'>📈</span>
+                        <ArrowUpDown size={16} className='rotate-90' />
                         Deposit/withdraw
                     </Button>
                 </GetAdviceDialog>

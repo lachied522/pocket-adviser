@@ -148,10 +148,10 @@ export default function Portfolio() {
                 <EditPortfolioDialog>
                     <Button
                         variant='outline'
-                        className='flex flex-row gap-2'
+                        className='flex flex-row gap-2 justify-start font-medium py-3 border border-neutral-600'
                     >
                         <Pencil size={16} />
-                        Edit Portfolio
+                        Edit portfolio
                     </Button>
                 </EditPortfolioDialog>
             </div>
