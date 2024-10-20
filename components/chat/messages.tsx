@@ -11,6 +11,7 @@ import RecommendationsTable from "./recommendations-table";
 
 import type { Stock } from "@prisma/client";
 
+/** formatting functions for markdown */
 function H3(props: any) {
     return (
         <h3 className="text-xl font-semibold">
@@ -47,6 +48,8 @@ function Link(props: any) {
       </a>
     );
 }
+
+/** end formatting functions */
 
 interface ChatMessageProps {
     content: any

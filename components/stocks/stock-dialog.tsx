@@ -127,20 +127,47 @@ export default function StockDialog({ children, stockId, initialStockData }: Sto
                                 </div>
                             </div>
 
-                            <div className='col-span-2 md:col-span-1 flex flex-row justify-between gap-2'>
-                                <div className='flex flex-col'>
-                                    <span className='font-medium text-base md:text-lg'>{formatMarketCap(stockData.marketCap)}</span>
-                                    <span className='text-slate-600 text-xs md:text-sm'>Market Cap.</span>
+                            <div className='col-span-2 md:col-span-1 grid grid-rows-1 grid-cols-4 sm:grid-cols-6 grid-flow-col-dense divide-x'>
+                                <div className=''>
+                                    <div className='flex flex-col'>
+                                        <span className='font-medium text-base md:text-lg'>{formatMarketCap(stockData.marketCap)}</span>
+                                        <span className='text-slate-600 text-xs md:text-sm'>Market Cap.</span>
+                                    </div>
                                 </div>
 
-                                <div className='flex flex-col'>
-                                    <span className='font-medium text-base md:text-lg'>{stockData.sector}</span>
-                                    <span className='text-slate-600 text-xs md:text-sm'>Sector</span>
+                                <div className='w-full flex items-center justify-center'>
+                                    <div className='flex flex-col'>
+                                        <span className='font-medium text-base md:text-lg line-clamp-1'>{stockData.sector}</span>
+                                        <span className='text-slate-600 text-xs md:text-sm'>Sector</span>
+                                    </div>
                                 </div>
 
-                                <div className='flex flex-col'>
-                                    <span className='font-medium text-base md:text-lg'>{formatDollar(stockData.dividendAmount || 0)}</span>
-                                    <span className='text-slate-600 text-xs md:text-sm'>Div. Amount</span>
+                                <div className='w-full flex items-center justify-center'>
+                                    <div className='flex flex-col'>
+                                        <span className='font-medium text-base md:text-lg'>{formatDollar(stockData.dividendAmount || 0)}</span>
+                                        <span className='text-slate-600 text-xs md:text-sm'>Div. Amount</span>
+                                    </div>
+                                </div>
+
+                                <div className='w-full flex items-center justify-center'>
+                                    <div className='flex flex-col'>
+                                        <span className='font-medium text-base md:text-lg'>{(100 * (stockData.dividendYield || 0)).toFixed(2)}%</span>
+                                        <span className='text-slate-600 text-xs md:text-sm'>Div. Yield</span>
+                                    </div>
+                                </div>
+
+                                <div className='w-full hidden sm:flex items-center justify-center'>
+                                    <div className='flex flex-col'>
+                                        <span className='font-medium text-base md:text-lg'>{stockData.pe ?? 'N/A'}</span>
+                                        <span className='text-slate-600 text-xs md:text-sm'>PE Ratio</span>
+                                    </div>
+                                </div>
+
+                                <div className='w-full hidden sm:flex items-center justify-center'>
+                                    <div className='flex flex-col'>
+                                        <span className='font-medium text-base md:text-lg'>{stockData.epsGrowth? (100 * stockData.epsGrowth).toFixed(2) + '%': 'N/A'}</span>
+                                        <span className='text-slate-600 text-xs md:text-sm'>EPS Growth</span>
+                                    </div>
                                 </div>
                             </div>
 

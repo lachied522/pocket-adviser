@@ -56,9 +56,12 @@ export default function StockLogo({
             <Image
                 src={src}
                 alt={symbol + " logo"}
-                fill={fill}
                 height={!fill? height: undefined}
                 width={!fill? width: undefined}
+                fill={fill}
+                style={{
+                    objectFit: "contain"
+                }}
                 sizes="110px"
                 // blurDataURL={`data:image/png;base64,${imageBlur}`}
                 // placeholder="blur"

@@ -104,9 +104,12 @@ export function ChatProvider({
 
         async function sayHello() {
             setSaidHello(true); // prevent effect from running more than once
+            setIsLoading(true);
             const response = await greetUser({ user: state });
             // append response to conversation
             appendMessage(response);
+            // append sample prompts
+            setIsLoading(false);
         };
     }, []);
 
