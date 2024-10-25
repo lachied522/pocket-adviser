@@ -75,12 +75,21 @@ model VerificationRequest {
 }
 
 model Profile {
-  userId        String     @id
-  objective     Objective? @default(RETIREMENT)
-  passive       Float?
-  international Float?
-  preferences   Json?
-  User          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String     @id
+  dob                   DateTime   @default(now())
+  income                Int        @default(10000)
+  percentIncomeInvested Float      @default(0.10)
+  experience            Int        @default(0)
+  riskToleranceQ1       Int        @default(3)
+  riskToleranceQ2       Int        @default(3)
+  riskToleranceQ3       Int        @default(3)
+  riskToleranceQ4       Int        @default(3)
+  objective             Objective? @default(RETIREMENT)
+  passive               Float?
+  international         Float?
+  preferences           Json?
+  milestones            Json?
+  User                  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Stock {

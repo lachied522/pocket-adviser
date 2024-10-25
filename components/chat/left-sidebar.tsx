@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, MessageCirclePlus, SearchCheck, UserRoundCog } from "lucide-react";
+import { ArrowUpDown, MessageCirclePlus, SearchCheck, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -22,8 +22,8 @@ export default function LeftSidebar() {
                         variant='ghost'
                         className='xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                     >
-                        <UserRoundCog size={16} />
-                        Edit profile
+                        <UserRound size={16} />
+                        My profile
                     </Button>
                 </ProfileDialog>
             </div>

@@ -5,8 +5,8 @@ export function useScrollAnchor() {
     const [shouldAutoScroll, setShouldAutoScroll] = useState<boolean>(false);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
-    const messagesRef = useRef<HTMLDivElement>(null);
     const anchorRef = useRef<HTMLDivElement>(null); // placeholder element at bottom of scroll area
+    const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // timeout for handling scroll delay
 
     const scrollToBottom = useCallback(
         () => {
@@ -21,8 +21,10 @@ export function useScrollAnchor() {
     );
 
     useEffect(() => {
-        scrollToBottom();
-    }, [isAtBottom, shouldAutoScroll]);
+        if (shouldAutoScroll && !isAtBottom) {
+            scrollToBottom();
+        }
+    }, [isAtBottom, shouldAutoScroll, scrollToBottom]);
 
     useEffect(() => {
         if (scrollAreaRef.current) {
@@ -64,8 +66,7 @@ export function useScrollAnchor() {
 
     return {
         scrollAreaRef,
-        messagesRef,
         anchorRef,
-        scrollToBottom,
+        setShouldAutoScroll,
     }
 }

@@ -7,7 +7,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 
-import ProfileForm from "./profile-form";
+import ProfileTabs from "./profile-tabs";
 
 interface ProfileDialogProps {
     children: React.ReactNode
@@ -27,7 +27,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                     </DialogTitle>
                 </DialogHeader>
 
-                <ProfileForm />
+                <ProfileTabs />
             </DialogContent>
         </Dialog>
     )

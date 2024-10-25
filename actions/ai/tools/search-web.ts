@@ -49,6 +49,7 @@ function formatResponse(data: WebSearchResponse) {
 
 export async function searchWeb(query: string, dateString: string): Promise<any> {
     try {
+        // see https://docs.tavily.com/docs/rest-api/api-reference
         // adding date to query helps to get current information
         query = query + " " + format(new Date(dateString), 'PPP');
 
@@ -63,12 +64,16 @@ export async function searchWeb(query: string, dateString: string): Promise<any>
                 search_depth: "basic",
                 include_answer: true,
                 max_results: 5,
+                // days: 5,
             })
         });
+
         if (!response.ok) {
             throw new Error("Error searching web");
         }
+
         const data = await response.json() as WebSearchResponse;
+
         return formatResponse(data);
     } catch (e) {
         return null;
