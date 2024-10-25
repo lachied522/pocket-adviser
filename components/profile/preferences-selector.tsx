@@ -69,7 +69,7 @@ export default function PreferencesSelector({ value, onChange }: PreferencesSele
                     value[name]==="dislike" && "text-red-400 bg-red-100 border-red-200"
                 )}
             >
-              <CardContent className="text-xs font-medium px-3 sm:px-4 sm:py-2">
+              <CardContent className="text-xs font-medium px-3 sm:px-4 py-2">
                   {name}
               </CardContent>
             </Card>

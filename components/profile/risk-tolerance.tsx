@@ -26,8 +26,7 @@ export default function RiskTolerance() {
                 <h3 className='text-lg font-medium'>Help us understand your relationship with risk*</h3>
                 <p className='text-sm'>
                     * Risk of an investment is defined as the probability that it will incur a financial loss. 
-                    The higher the risk of an investment, the greater both the potential gain and 
-                    potential loss will be.
+                    The higher the risk of an investment, the greater both the <b>potential gain</b> and <b>potential loss</b> will be.
                 </p>
             </div>
 

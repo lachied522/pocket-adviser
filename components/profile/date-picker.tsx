@@ -59,7 +59,7 @@ export default function DatePicker({
         } else {
             onChange(undefined);
         }
-    }, [date, month, year]);
+    }, [date, month, year, onChange]);
 
     return (
         <Popover>

@@ -15,6 +15,7 @@ export const formSchema = z.object({
     riskToleranceQ2: z.coerce.number().nullable().default(3),
     riskToleranceQ3: z.coerce.number().nullable().default(3),
     riskToleranceQ4: z.coerce.number().nullable().default(3),
+    targetYield: z.number().nullable(),
     international: z.number().nullable(),
     preferences: z.record(
         z.string(),

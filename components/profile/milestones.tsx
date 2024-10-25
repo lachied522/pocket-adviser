@@ -47,14 +47,7 @@ interface MilestonesProps {
 
 export default function Milestones({ wealthData }: MilestonesProps) {
     const form = useFormContext<FormValues>();
-    const dob = form.watch("dob") || new Date();
     const milestones = form.watch("milestones") || [];
-
-    const retirementDate = useMemo(() => {
-        const _date = new Date(dob);
-        _date.setFullYear(_date.getFullYear() + 67);
-        return _date;
-    }, [dob]);
 
     const addMilestone = useCallback(
         (values: typeof milestones[number]) => {
@@ -120,7 +113,7 @@ export default function Milestones({ wealthData }: MilestonesProps) {
                                         wealthData.filter((d) => d.year === new Date(milestone.date).getFullYear())
                                         .map((d, _) => (
                                             <>
-                                                {d.wealth < milestone.target && (
+                                                {d.wealth < 100 && (
                                                 <HoverCard key={'alert'}>
                                                     <HoverCardTrigger>
                                                         <CircleAlert size={18} color='rgb(220 38 38)' />

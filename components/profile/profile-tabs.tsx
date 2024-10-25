@@ -20,26 +20,11 @@ import RiskTolerance from "./risk-tolerance";
 
 import { formSchema } from "./form-schema";
 
-function calculateAge(dob: Date) {
-    const birthDate = new Date(dob);
-    const today = new Date();
-  
-    let age = today.getFullYear() - birthDate.getFullYear();
-  
-    // adjust the age if the user hasn't had their birthday this year
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-  
-    return age;
-}
-
 const TABS = [
-    "Milestones",
-    "Finance",
-    "Risk Tolerance",
     "Preferences",
+    "Risk Tolerance",
+    "Finance",
+    "Milestones",
 ] as const;
 
 // constants for forecasting wealth
@@ -55,27 +40,28 @@ export default function ProfileTabs() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            milestones: state?.profile?.milestones as any, // TO DO: type this properly
             dob: state?.profile?.dob ?? new Date(),
-            income: state?.profile?.income ?? 20_000,
+            income: state?.profile?.income ?? 0,
             percentIncomeInvested: state?.profile?.percentIncomeInvested ?? 0.10,
             experience: state?.profile?.experience ?? 0,
             riskToleranceQ1: state?.profile?.riskToleranceQ1 ?? 3,
             riskToleranceQ2: state?.profile?.riskToleranceQ2 ?? 3,
             riskToleranceQ3: state?.profile?.riskToleranceQ3 ?? 3,
             riskToleranceQ4: state?.profile?.riskToleranceQ4 ?? 3,
-            international: state?.profile?.international ?? 70,
-            preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> || {},
+            targetYield: state?.profile?.targetYield ?? 0.01,
+            international: state?.profile?.international ?? 0.7,
+            preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> ?? {},
+            milestones: state?.profile?.milestones as any ?? [], // TO DO: type this properly
         },
     });
-    const dob = form.watch("dob");
-    const income = form.watch("income") || 0;
-    const percentIncomeInvested = form.watch("percentIncomeInvested") || 0;
-    const riskToleranceQ1 = form.watch("riskToleranceQ1") || 3;
-    const riskToleranceQ2 = form.watch("riskToleranceQ2") || 3;
-    const riskToleranceQ3 = form.watch("riskToleranceQ3") || 3;
-    const riskToleranceQ4 = form.watch("riskToleranceQ4") || 3;
-    const milestones = form.watch("milestones") || [];
+    const income = form.watch("income") ?? 0;
+    const percentIncomeInvested = form.watch("percentIncomeInvested") ?? 0.10;
+    const targetYield = form.watch("targetYield") ?? 0.01;
+    const riskToleranceQ1 = form.watch("riskToleranceQ1") ?? 3;
+    const riskToleranceQ2 = form.watch("riskToleranceQ2") ?? 3;
+    const riskToleranceQ3 = form.watch("riskToleranceQ3") ?? 3;
+    const riskToleranceQ4 = form.watch("riskToleranceQ4") ?? 3;
+    const milestones = form.watch("milestones") ?? [];
 
     const expectedReturn = useMemo(() => {
         // use CAPM model to calculate expected return based on risk tolerance
@@ -90,24 +76,18 @@ export default function ProfileTabs() {
     }, [riskToleranceQ1, riskToleranceQ2, riskToleranceQ3, riskToleranceQ4]);
 
     const wealthData = useMemo(() => {
-        // user age
-        const age = calculateAge(dob);
-        // user retirement age
-        const retirementAge = 60;
-
         const annualContribution = percentIncomeInvested * income;
-
-        const today = new Date();
+        
         const _data = [];
+        const date = new Date();
         let prevValue = portfolioValue;
-        for (let t=age; t<=retirementAge; t++) {
-            const yearsFromNow = t - age;
-            const year = today.getFullYear() + yearsFromNow;
-            // const wealth = portfolioValue + annualContribution * (Math.pow(1 + expectedReturn, yearsFromNow) - 1) * (1 + expectedReturn) / expectedReturn;
-            let wealth = (prevValue) * (1 + expectedReturn) + annualContribution;
+        for (let t = 0; t < 100; t++) {
+            date.setFullYear(new Date().getFullYear() + t);
+            
+            let wealth = t > 0? prevValue * (1 + expectedReturn) + annualContribution: portfolioValue;
             // adjust wealth for any milestones during year
             for (const obj of milestones) {
-                if (new Date(obj.date).getFullYear() + 1 === year) {
+                if (new Date(obj.date).getFullYear() === date.getFullYear()) {
                     wealth -= obj.target;
                 }
             }
@@ -115,17 +95,20 @@ export default function ProfileTabs() {
             // ensure wealth is positive
             wealth = Math.max(wealth, 0);
 
-            const principal = annualContribution * yearsFromNow;
+            const principal = annualContribution * t + portfolioValue;
+            const income = targetYield * wealth;
+
             _data.push({
-                year,
+                year: date.getFullYear(),
                 wealth,
+                income,
                 principal,
             });
             prevValue = wealth;
         }
 
         return _data;
-    }, [income, percentIncomeInvested, expectedReturn, portfolioValue, milestones]);
+    }, [income, percentIncomeInvested, expectedReturn, portfolioValue, targetYield, milestones]);
 
     const onSave = useCallback(
         async (data: any) => {
@@ -144,20 +127,21 @@ export default function ProfileTabs() {
         () => {
             // reset form state to initial values
             form.reset({
-                milestones: state?.profile?.milestones as any,
                 dob: state?.profile?.dob ?? new Date(),
-                income: state?.profile?.income ?? 20_000,
+                income: state?.profile?.income ?? 0,
                 percentIncomeInvested: state?.profile?.percentIncomeInvested ?? 0.10,
                 experience: state?.profile?.experience ?? 0,
                 riskToleranceQ1: state?.profile?.riskToleranceQ1 ?? 3,
                 riskToleranceQ2: state?.profile?.riskToleranceQ2 ?? 3,
                 riskToleranceQ3: state?.profile?.riskToleranceQ3 ?? 3,
                 riskToleranceQ4: state?.profile?.riskToleranceQ4 ?? 3,
-                international: state?.profile?.international ?? 70,
-                preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> || {},
+                targetYield: state?.profile?.targetYield ?? 0.01,
+                international: state?.profile?.international ?? 0.7,
+                preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> ?? {},
+                milestones: state?.profile?.milestones as any ?? [],
             });
         },
-        [form]
+        [form, state]
     );
 
     return (

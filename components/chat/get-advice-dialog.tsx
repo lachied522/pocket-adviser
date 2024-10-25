@@ -78,7 +78,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-w-md'>
+            <DialogContent className='max-w-lg'>
                 <DialogHeader>
                     <DialogTitle>
                         Quickly Ask for Ideas

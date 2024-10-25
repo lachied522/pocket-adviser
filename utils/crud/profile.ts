@@ -18,7 +18,8 @@ export async function updateProfile(data: Profile) {
             },
             data: {
                 ...data,
-                preferences: data.preferences || Prisma.JsonNull,
+                preferences: data.preferences ?? Prisma.JsonNull,
+                milestones: data.milestones ?? Prisma.JsonNull,
             },
         })
     }
@@ -26,7 +27,8 @@ export async function updateProfile(data: Profile) {
     return await prisma.profile.create({
         data: {
             ...data,
-            preferences: data.preferences || Prisma.JsonNull,
+            preferences: data.preferences ?? Prisma.JsonNull,
+            milestones: data.milestones ?? Prisma.JsonNull,
         }
     });
 }

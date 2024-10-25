@@ -40,7 +40,7 @@ function StockChart({ stockData }: { stockData: Omit<Stock, 'id'> }) {
             script.innerHTML = `
                 {
                     "autosize": true,
-                    "symbol": "NASDAQ:AAPL",
+                    "symbol": "${formatSymbol(stockData.symbol, stockData.exchange as 'ASX'|'NASDAQ'|'NYSE')}",
                     "interval": "D",
                     "timezone": "Etc/UTC",
                     "theme": "light",

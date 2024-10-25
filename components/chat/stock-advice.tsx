@@ -36,46 +36,6 @@ export default function StockAdvice({ data }: StockAdviceProps) {
                         The proposed transaction {data.is_recommended? <span>meets each</span>: <b>does not meet one or more</b>} of the following criteria.
                     </div>
 
-                    <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
-                        <div className='flex flex-row items-center gap-2'>
-                            {data.is_recommended_by_sector_allocation? (
-                            <Check color='rgb(74 222 128)' />
-                            ) : (
-                            <X color='rgb(248 113 113)' />
-                            )}
-                            <span className='md:text-lg font-medium'>Sector Allocation</span>
-                        </div>
-                        <span>{`The proposed is ${data.is_recommended_by_sector_allocation? 'within': 'outside'} the recommended sector allocation for your objective.`}</span>
-                    </div>
-
-                    {(typeof data.stockData.dividendYield === "number") && (
-                    <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
-                        <div className='flex flex-row items-center gap-2'>
-                            {data.is_recommended_by_income? (
-                            <Check color='rgb(74 222 128)' />
-                            ) : (
-                            <X color='rgb(248 113 113)' />
-                            )}
-                            <span className='md:text-lg font-medium'>Dividend Yield</span>
-                        </div>
-                        <span>{`${data.stockData.symbol.toUpperCase()}'s dividend yield appears to be ${data.is_recommended_by_income? 'appropriate': 'either too high or too low'} for your objective.`}</span>
-                    </div>
-                    )}
-
-                    {data.stockData.beta && (
-                    <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
-                        <div className='flex flex-row items-center gap-2'>
-                            {data.is_recommended_by_risk? (
-                            <Check color='rgb(74 222 128)' />
-                            ) : (
-                            <X color='rgb(248 113 113)' />
-                            )}
-                            <span className='md:text-lg font-medium'>Risk (beta)</span>
-                        </div>
-                        <span>{`${data.stockData.symbol.toUpperCase()}'s risk appears to be ${data.is_recommended_by_risk? 'appropriate': 'either too high or too low'} for your objective.`}</span>
-                    </div>
-                    )}
-
                     {data.stockData.priceTarget && data.stockData.previousClose && (
                     <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
                         <div className='flex flex-row items-center gap-2'>
@@ -90,6 +50,46 @@ export default function StockAdvice({ data }: StockAdviceProps) {
                     </div>
                     )}
 
+                    {data.stockData.beta && (
+                    <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
+                        <div className='flex flex-row items-center gap-2'>
+                            {data.is_recommended_by_risk? (
+                            <Check color='rgb(74 222 128)' />
+                            ) : (
+                            <X color='rgb(248 113 113)' />
+                            )}
+                            <span className='md:text-lg font-medium'>Risk (beta)</span>
+                        </div>
+                        <span>{`${data.stockData.symbol.toUpperCase()}'s risk appears to be ${data.is_recommended_by_risk? 'appropriate': 'either too high or too low'} for your profile.`}</span>
+                    </div>
+                    )}
+
+                    <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
+                        <div className='flex flex-row items-center gap-2'>
+                            {data.is_recommended_by_sector_allocation? (
+                            <Check color='rgb(74 222 128)' />
+                            ) : (
+                            <X color='rgb(248 113 113)' />
+                            )}
+                            <span className='md:text-lg font-medium'>Sector Allocation</span>
+                        </div>
+                        <span>{`The proposed transaction is ${data.is_recommended_by_sector_allocation? 'within': 'outside'} the recommended sector allocation for your profile.`}</span>
+                    </div>
+
+                    {(typeof data.stockData.dividendYield === "number") && (
+                    <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
+                        <div className='flex flex-row items-center gap-2'>
+                            {data.is_recommended_by_income? (
+                            <Check color='rgb(74 222 128)' />
+                            ) : (
+                            <X color='rgb(248 113 113)' />
+                            )}
+                            <span className='md:text-lg font-medium'>Dividend Yield</span>
+                        </div>
+                        <span>{`${data.stockData.symbol.toUpperCase()}'s dividend yield appears to be ${data.is_recommended_by_income? 'appropriate': 'either too high or too low'} for your profile.`}</span>
+                    </div>
+                    )}
+
                     <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
                         <div className='flex flex-row items-center gap-2'>
                             {data.is_utility_positive? (
@@ -99,7 +99,7 @@ export default function StockAdvice({ data }: StockAdviceProps) {
                             )}
                             <span className='md:text-lg font-medium'>Utility</span>
                         </div>
-                        <span>{`The proposed transaction ${data.is_utility_positive? 'increases': 'decreases'} the utility of your portfolio.`}</span>
+                        <span>{`The proposed transaction ${data.is_utility_positive? 'increases': 'does not increase'} the utility of your portfolio.`}</span>
                     </div>
 
                     <div className='grid grid-cols-[24px_208px_1fr] gap-x-2 gap-y-1 shrink-0'>
