@@ -53,9 +53,9 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     return (
         <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
             <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
-                <h4 className='md:text-lg font-medium text-slate-600'>News</h4>
+                <h4 className='md:text-lg font-medium'>News</h4>
 
-                {data.length > 0 && <div className='hidden md:block text-xs text-slate-600'>Tip: drag an article into the chat</div>}
+                {data.length > 0 && <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>}
             </div>
 
             <ScrollArea className='xl:h-[660px]'>

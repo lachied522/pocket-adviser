@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 
 import { ArrowBigUp, X } from "lucide-react";
 
@@ -14,16 +13,17 @@ import { useScrollAnchor } from "@/hooks/useScrollAnchor";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import SamplePrompts from "./sample-prompts";
-import NewsArticle from "./news-article";
 import { ChatMessage } from "./messages";
 
-import type { ClientMessage } from "@/actions/ai/chat";
 import type { StockNews } from "@/types/data";
+import type { Message } from "ai";
 
 export default function ChatArea() {
-    const { input, article, conversation, isLoading, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
+    const { input, article, messages, isLoading, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
     const { scrollAreaRef, anchorRef, setShouldAutoScroll } = useScrollAnchor();
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
+
+    console.log(messages);
 
     const onDrop = (e: React.DragEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -53,28 +53,17 @@ export default function ChatArea() {
             >
                 <ScrollArea ref={scrollAreaRef} className='h-[640px] 2xl:h-[720px] scroll-smooth'>
                     <div className='flex flex-col justify-start gap-3 md:px-3 py-3'>
-                        {conversation.map((message: ClientMessage) => (
-                        <div
+                        {messages.map((message: Message) => (
+                        <ChatMessage
                             key={message.id}
-                            className={cn(
-                                'flex flex-col items-start lg:pr-24 gap-2',
-                                message.role === 'user' && 'items-end lg:pr-0 lg:pl-24'
-                            )}
-                        >
-                            <div className='text-sm font-medium text-slate-600'>
-                                {message.role === "assistant"? "Pocket Adviser": "Me"}
-                            </div>
-                            {message.role === "assistant"? (
-                            <>{message.display}</>
-                            ) : (
-                            <>
-                                {message.article && <NewsArticle article={message.article} draggable={false} />}
-                                <ChatMessage role="user" content={message.display} />
-                            </>
-                            )}
-                        </div>
+                            id={message.id}
+                            role={message.role}
+                            content={message.content}
+                            toolInvocations={message.toolInvocations}
+                            data={message.data}
+                        />
                         ))}
-                        {conversation.length === 1 && conversation[0].role === 'assistant' && (
+                        {messages.length === 1 && messages[0].role === 'assistant' && (
                             <div className='p-6'>
                                 <SamplePrompts />
                             </div>

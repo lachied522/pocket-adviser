@@ -58,8 +58,8 @@ export const GlobalProvider = ({
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
   const { createGuestUserIfNecessary } = useCookies();
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
-  const [forexRate, setForexRate] = useState<number>(initalForexRate); // USDAUD forex rate
   const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
+  const [forexRate] = useState<number>(initalForexRate); // USDAUD forex rate
 
   const portfolioValue = useMemo(() => {
     if (!state) return 0;

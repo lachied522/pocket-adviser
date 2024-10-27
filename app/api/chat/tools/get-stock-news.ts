@@ -21,14 +21,15 @@ export async function getStockNews(
         if (name && symbol) {
             query = `What's the latest news for ${name} (${symbol}) stock?`;
         } else if (name) {
-            query = `What's the latest news for ${name} (${symbol}) stock?`;
+            query = `What's the latest news for ${name} stock?`;
         } else if (symbol) {
-            query = `What's the latest news for ${name} (${symbol}) stock?`;
+            query = `What's the latest news for ${symbol} stock?`;
         } else {
             throw new Error("At least one of 'name' or 'symbol' must be defined");
         }
         return await new TavilyClient().getLatestNews(query, days);
     } catch (e) {
+        console.error(e);
         return null;
     }
 }

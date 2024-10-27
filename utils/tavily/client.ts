@@ -30,6 +30,7 @@ type TavillyResponseBody = {
 }
 
 function formatResponse(data: TavillyResponseBody) {
+    console.log(data);
     return {
         query: data.query,
         answer: data.answer,
@@ -45,7 +46,7 @@ function formatResponse(data: TavillyResponseBody) {
     };
 }
 
-export class TavillyClient {
+export class TavilyClient {
     API_KEY = process.env.TAVILY_API_KEY;
     API_BASE_URL = `https://api.tavily.com/search`;
 
@@ -60,17 +61,21 @@ export class TavillyClient {
 
         const res = await fetch(this.API_BASE_URL, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 api_key: this.API_KEY,
                 ...body
             }),
         });
 
-        if (!res.ok) {
-            throw new Error(`Error searching web: ${res.status}`);
-        }
+        // if (!res.ok) {
+        //     throw new Error(`Error searching web: ${res.status}`);
+        // }
+        const response = await res.json();
 
-        return await res.json() as TavillyResponseBody;
+        return response as TavillyResponseBody;
     }
 
     async getGeneralSearch(

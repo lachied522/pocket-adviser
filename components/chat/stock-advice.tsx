@@ -29,7 +29,7 @@ export default function StockAdvice({ data }: StockAdviceProps) {
                 <CardContent className="flex flex-col gap-3.5 px-3 py-2">
                     <div className='grid grid-cols-2 md:grid-cols-[240px_1fr] items-start gap-2'>
                         <span className='md:text-lg font-medium'>Proposed Transaction</span>
-                        <span>{data.proposed_transaction}</span>
+                        <span className='line-clamp-1'>{data.proposed_transaction}</span>
                     </div>
 
                     <div>

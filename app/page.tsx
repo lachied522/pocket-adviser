@@ -9,7 +9,7 @@ import { getForexRate } from "@/utils/data/forex";
 
 import { GlobalProvider } from "@/context/GlobalContext";
 import { UIProvider } from "@/context/UIContext";
-import { AIProvider } from "@/context/AIContext";
+import { ChatProvider } from '@/context/ChatContext';
 
 import Container from "@/components/ui/container";
 import Header from "@/components/ui/header";
@@ -70,10 +70,7 @@ export default async function Page({
         initalForexRate={forexRate}
       >
         <UIProvider>
-          <AIProvider
-            userId={userData?.id}
-            adviceId={searchParams? parseInt(searchParams.adviceId as string): undefined}
-          >
+          <ChatProvider>
               <main className='min-h-screen'>
                 {/* Background Image */}
                 <div className='z-[-1] fixed inset-0 opacity-40 bg-slate-300'>
@@ -106,7 +103,7 @@ export default async function Page({
 
                 <Footer />
               </main>
-          </AIProvider>
+          </ChatProvider>
         </UIProvider>
       </GlobalProvider>
     )
