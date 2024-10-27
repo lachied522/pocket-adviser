@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import CalendarItem from "./calendar-item";
 
-import { type Calendar, getCalendar } from "@/utils/data/calendar";
+import { type Calendar, getCalendar } from "@/utils/financial_modelling_prep/calendar";
 
 function CalendarSkeleton() {
     return (

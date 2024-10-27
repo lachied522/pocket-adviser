@@ -1,14 +1,12 @@
 "use server";
 
-import StockDataClient from "@/utils/data/client";
+import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
 import type { StockNews } from "@/types/data";
 
-const client = new StockDataClient();
-
 export async function getNewsAction(symbols: string[], page: number = 0, limit: number = 12) {
     try {
-        const data = await client.getNewsArticles(symbols, page, limit);
+        const data = await new FinancialModellingPrepClient().getNewsArticles(symbols, page, limit);
         const blacklist = [
             "www.youtube.com",
         ];

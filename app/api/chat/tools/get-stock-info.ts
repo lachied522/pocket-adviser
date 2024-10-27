@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-import StockDataClient from "@/utils/data/client";
-
 import { getStockBySymbol } from "@/utils/crud/stocks";
+import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
 import type { Stock } from "@prisma/client";
 
@@ -30,7 +29,7 @@ export async function getStockInfo(symbol: string, exchange: "ASX"|"NASDAQ"|"NYS
         let stock = await getStockBySymbol(symbol);
         if (!stock) {
             // stock not in DB, try fetching directly from API
-            const data = await new StockDataClient().getCompanyProfile(symbol);
+            const data = await new FinancialModellingPrepClient().getCompanyProfile(symbol);
             if (!data) {
                 // stock not found
                 return null;

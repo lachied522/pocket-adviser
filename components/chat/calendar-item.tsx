@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { format } from "date-fns";
 
-import type { Calendar } from "@/utils/data/calendar";
+import type { Calendar } from "@/utils/financial_modelling_prep/calendar";
 
 interface CalendarItemProps {
     item: Calendar[number]

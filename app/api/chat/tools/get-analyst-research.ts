@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import StockDataClient from "@/utils/data/client";
 import { TavilyClient } from "@/utils/tavily/client";
+import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
 export const description = "Get analyst price targets and analysis for a stock";
 
@@ -33,7 +33,7 @@ export async function getAnalystResearch(
 
         const [searchResults, analystRatings] = await Promise.all([
             new TavilyClient().getLatestNews(query, 7),
-            new StockDataClient().getAnalystResearch(symbol),
+            new FinancialModellingPrepClient().getAnalystResearch(symbol),
         ]);
 
         return {

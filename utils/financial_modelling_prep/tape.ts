@@ -1,14 +1,11 @@
 import { kv } from "@vercel/kv";
 
-import StockDataClient from "@/utils/data/client";
-
-import { getAggregatedStockData } from "@/utils/data/helpers";
+import { FinancialModellingPrepClient } from "./client";
+import { getAggregatedStockData } from "./helpers";
 
 import type { Stock } from "@prisma/client";
 
-const client = new StockDataClient();
-
-async function getTrendingStocks() {
+async function getTrendingStocks(client: FinancialModellingPrepClient) {
     const [nasdaq, asx] = await Promise.all([
         client.getAllStocksByExchange("NASDAQ"),
         client.getAllStocksByExchange("ASX"),
@@ -39,11 +36,12 @@ export async function getStockTape(): Promise<TAPE> {
     let res: TAPE|null = await kv.get(KEY);
 
     if (res) return res;
-
+    
     // kv miss, fetch new data
+    const client = new FinancialModellingPrepClient();
     const [spxQuote, stocks] = await Promise.all([
         client.getQuote("^SPX"),
-        getTrendingStocks(),
+        getTrendingStocks(client),
     ]);
 
     res = {

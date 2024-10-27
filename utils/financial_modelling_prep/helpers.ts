@@ -1,11 +1,11 @@
-import StockDataClient from "./client";
+import { FinancialModellingPrepClient } from "./client";
 
 import type { Stock } from "@prisma/client";
 import type { StockQuote, CompanyProfile, PriceTargetConsesus, IncomeGrowth, Ratios } from "@/types/data";
 
 type Exchange = 'NASDAQ'|'ASX';
 
-const client = new StockDataClient();
+const client = new FinancialModellingPrepClient();
 
 export async function getAggregatedStockData(
     symbol: string,

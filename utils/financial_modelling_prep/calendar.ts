@@ -1,16 +1,18 @@
 import { kv } from "@vercel/kv";
 import { PrismaClient } from '@prisma/client';
 
-import StockDataClient from "@/utils/data/client";
+import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
 import type { EarningsEvent, EconomicsEvent } from "@/types/data";
-
-const client = new StockDataClient();
 
 // key for data in kv store
 const KEY = "DATA_CALENDAR";
 
-async function fetchEarningsData(from: Date, to: Date) {
+async function fetchEarningsData(
+    from: Date,
+    to: Date,
+    client: FinancialModellingPrepClient
+) {
     // only want to return earnings events for symbols in the universe
     // Step 1: fetch all symbols in universe
     const prisma = new PrismaClient();
@@ -26,7 +28,12 @@ async function fetchEarningsData(from: Date, to: Date) {
     return data.filter((obj) => allSymbols.includes(obj.symbol));
 }
 
-async function fetchEcononmicsData(from: Date, to: Date, countryCodes = ["AU", "US"]) {
+async function fetchEcononmicsData(
+    from: Date,
+    to: Date,
+    client: FinancialModellingPrepClient,
+    countryCodes = ["AU", "US"],
+) {
     const data = await client.getEconomicsCalendar(from, to);
     return data.filter((obj) => countryCodes.includes(obj.country));
 }
@@ -43,9 +50,11 @@ export async function getCalendar(symbols: string[]) {
         const to = new Date();
         to.setMonth(from.getMonth() + 3);
 
+        const client = new FinancialModellingPrepClient();
+
         const [earningsData, economicsData] = await Promise.all([
-            fetchEarningsData(from, to),
-            fetchEcononmicsData(from, to),
+            fetchEarningsData(from, to, client),
+            fetchEcononmicsData(from, to, client),
         ]);
 
         allEvents = [

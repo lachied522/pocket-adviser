@@ -66,10 +66,10 @@ export default function Header() {
     }
 
     return (
-        <Container className='grid grid-cols-[45px_1fr] md:grid-cols-[1fr_minmax(320px,_1fr)_1fr] items-center px-2 pt-3.5'>
+        <Container className='grid grid-cols-[45px_1fr] md:grid-cols-[1fr_minmax(320px,_1fr)_1fr] items-center px-1 sm:px-1 md:px-2 pt-3.5'>
             <Logo />
 
-            <div className='hidden w-[300px] md:grid grid-cols-3 items-center justify-center mx-auto'>
+            <div className='hidden w-[300px] md:flex flex-row items-center justify-center gap-5 mx-auto'>
                 <AboutDialog>
                     <Button
                         variant='ghost'
@@ -97,11 +97,21 @@ export default function Header() {
                         Contact
                     </Button>
                 </a>
+
+                <a href="https://pocket-adviser.beehiiv.com/" className='flex items-center justify-center p-0'>
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 p-0'
+                    >
+                        Newsletter
+                    </Button>
+                </a>
             </div>
 
             <div className='place-self-end flex flex-row items-center gap-2'>
                 {state && !isGuest? (
-                <div className='text-sm sm:text-base text-white text-right font-medium shrink-0'>Welcome {state.name}</div>
+                <div className='text-sm lg:text-base text-white text-right font-medium shrink-0'>Welcome {state.name}</div>
                 ) : (
                 <div className='flex flex-row items-center gap-3.5'>
                     <AuthDialog initialTab="login">

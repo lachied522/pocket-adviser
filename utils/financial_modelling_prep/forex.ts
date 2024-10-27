@@ -1,14 +1,13 @@
 import { kv } from "@vercel/kv";
 
-import StockDataClient from "./client";
+import { FinancialModellingPrepClient } from "./client";
 
 import type { FXQuote } from "@/types/data";
 
 export async function getForexRate(symbol: "AUDUSD"|"USDAUD") {
     let res: FXQuote|null = await kv.get(`DATA_FX_${symbol}`);
     if (!res) {
-        const client = new StockDataClient();
-        res = await client.getForexPrice(symbol);
+        res = await new FinancialModellingPrepClient().getForexPrice(symbol);
         // update kv 
         kv.set(`DATA_FX_${symbol}`, res, { ex: 24 * 60 * 60 });
     }

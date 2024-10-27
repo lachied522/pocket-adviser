@@ -2,7 +2,7 @@ import { format } from "date-fns";
 
 import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote, EconomicsEvent, EarningsEvent } from "@/types/data";
 
-export default class StockDataClient {
+export class FinancialModellingPrepClient {
     API_KEY = process.env.FMP_API_KEY;
     API_BASE_URL = `https://financialmodelingprep.com/api`;
 

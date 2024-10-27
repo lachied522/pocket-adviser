@@ -90,7 +90,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
                         variant='ghost'
                         disabled={isLoading || page >= MAX_PAGES - 1}
                         onClick={() => setPage((curr) => curr + 1)}
-                        className='text-sm mt-3.5'
+                        className='text-sm xl:mt-3.5'
                     >
                         Get more
                     </Button>

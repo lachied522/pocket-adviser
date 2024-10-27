@@ -5,7 +5,7 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 import { getUserById } from "@/utils/crud/user";
 import { getStockById } from "@/utils/crud/stocks";
-import { getForexRate } from "@/utils/data/forex";
+import { getForexRate } from "@/utils/financial_modelling_prep/forex";
 import { getGreeting } from "./api/chat/greeting";
 
 import { GlobalProvider } from "@/context/GlobalContext";
@@ -89,12 +89,12 @@ export default async function Page({
                   <TickerTape />
                 </div>
 
-                <div className='flex flex-col px-1 sm:px-6 py-2 sm:py-5 xl:py-10 gap-2 sm:gap-5 xl:gap-10'>
-                  <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
+                <div className='flex flex-col px-1 md:px-6 py-2 sm:py-5 xl:py-10 gap-2 sm:gap-5 xl:gap-10'>
+                  <Container className='p-3.5 sm:p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
                     <Chat initialUserData={userData} initialStockData={stockData} />
                   </Container>
 
-                  <Container className='p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
+                  <Container className='p-3.5 sm:p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
                     <Portfolio />
                   </Container>
                 </div>

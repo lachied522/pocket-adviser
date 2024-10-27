@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { getStockTape } from "@/utils/data/tape";
+import { getStockTape } from "@/utils/financial_modelling_prep/tape";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import Container from "@/components/ui/container";
@@ -46,12 +46,10 @@ async function StockTapeBody() {
 
 export default function TickerTape() {
     return (
-        <Container>
-            <div className='w-full flex flex-row items-center justify-evenly px-1 py-2 gap-3.5 overflow-hidden'>
-                <Suspense fallback={<StockTapeSkeleton />}>
-                    <StockTapeBody />
-                </Suspense>
-            </div>
+        <Container className='w-full flex flex-row items-center justify-evenly px-1 sm:px-1 md:px-2 py-2 gap-1 md:gap-3.5 overflow-hidden'>
+            <Suspense fallback={<StockTapeSkeleton />}>
+                <StockTapeBody />
+            </Suspense>
         </Container>
     )
 }

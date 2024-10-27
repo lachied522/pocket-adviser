@@ -1,11 +1,10 @@
-import { CircleFadingPlus, ClipboardList, MessageCircleMore } from "lucide-react";
+import { CircleFadingPlus, MessageCircleMore, UserRound } from "lucide-react";
 
 import {
     Dialog,
     DialogClose,
     DialogContent,
     DialogHeader,
-    DialogOverlay,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
@@ -48,7 +47,7 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
 
                     <div className='grid grid-cols-1 sm:grid-cols-3 place-items-center gap-2 my-3'>
                         <div className='w-full max-w-[280px] sm:w-auto sm:max-w-max flex flex-row sm:flex-col items-center gap-3.5 md:gap-2 px-2 py-3 border-2 border-slate-200 rounded-xl'>
-                            <ClipboardList strokeWidth={1.5} className='h-full w-auto min-w-6' />
+                            <UserRound strokeWidth={1.5} className='h-full w-auto min-w-6' />
                             <span className='font-medium text-left sm:text-center'>1. Adjust your profile</span>
                         </div>
 
