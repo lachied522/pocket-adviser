@@ -5,7 +5,9 @@ import { openai } from '@ai-sdk/openai';
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
 import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
 import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from './tools/get-portfolio';
+import { description as getProfileDescription, parameters as getProfileParams, getProfile } from './tools/get-profile';
 import { description as getStockDescription, parameters as getStockParams, getStockInfo } from './tools/get-stock-info';
+import { description as getAnalystResearchDescription, parameters as getAnalystResearchParams, getAnalystResearch } from './tools/get-analyst-research';
 import { description as getMarketNewsDescription, parameters as getMarketNewsParams, getMarketNews } from './tools/get-market-news';
 import { description as getStockNewsDescription, parameters as getStockNewsParams, getStockNews } from './tools/get-stock-news';
 import { description as searchWebDescription, parameters as searchWebParams, searchWeb } from './tools/search-web';
@@ -43,10 +45,8 @@ function getAutoResponseForRecommendations(args: any, data: any) {
     const numTransactions = data.transactions.length;
 
     return (
-        `Here ${numTransactions > 1? "are": "is"} ${numTransactions} possible trade ${numTransactions > 1? "ideas": "idea"}` +
-        `${args.action === "review"? "": " for your $"} ` +
-        `${args.action === "review"? "": args.amount.toLocaleString()} ` +
-        `${args.action === "reivew"? "": args.action === "withdraw"? "withdrawal": "deposit"}. ` +
+        `Here ${numTransactions > 1? "are": "is"} ${numTransactions} possible trade ${numTransactions > 1? "ideas": "idea"} for your ` +
+        `${args.action === "review"? "portfolio": "$" + args.amount.toLocaleString() + (args.action === "withdraw"? "withdrawal": "deposit")}. ` +
         "Please note this is not formal advice. " +
         "Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂"
     );
@@ -62,10 +62,9 @@ function getAutoResponseForStockAdvice(args: any, data: any) {
 
 export async function* recursiveTextStream(
     messages: Message[],
-    toolName?: "getRecommendations"|"shouldBuyOrSellStock",
+    toolName?: "getRecommendations"|"shouldBuyOrSellStock"|"searchWeb",
     userId?: string
 ) {
-
     const coreMessages = convertToCoreMessages(messages);
 
     const systemMessage = await getSystemMessage();
@@ -97,11 +96,18 @@ export async function* recursiveTextStream(
                     return await getPortfolio(userId);
                 }
             },
+            getProfile: {
+                description: getProfileDescription,
+                parameters: getProfileParams,
+                execute: async function () {
+                    return await getProfile(userId);
+                },
+            },
             getStockInfo: {
                 description: getStockDescription,
                 parameters: getStockParams,
                 execute: async function (args) {
-                    return await getStockInfo(args.symbol, args.exchange, args.includeAnalystResearch);
+                    return await getStockInfo(args.symbol, args.exchange);
                 },
             },
             getMarketNews: {
@@ -115,14 +121,21 @@ export async function* recursiveTextStream(
                 description: getStockNewsDescription,
                 parameters: getStockNewsParams,
                 execute: async function (args) {
-                    return await getStockNews(args.name, args.symbol, args.days);
+                    return await getStockNews(args.symbol, args.name, args.days);
                 },
+            },
+            getAnalystResearch: {
+                description: getAnalystResearchDescription,
+                parameters: getAnalystResearchParams,
+                execute: async function (args) {
+                    return await getAnalystResearch(args.symbol, args.name, args.exchange)
+                }
             },
             searchWeb: {
                 description: searchWebDescription,
                 parameters: searchWebParams,
                 execute: async function (args) {
-                    return await searchWeb(args.query, args.date);
+                    return await searchWeb(args.query);
                 },
             },
             readUrl: {
@@ -136,15 +149,9 @@ export async function* recursiveTextStream(
     });
 
     // see https://sdk.vercel.ai/docs/ai-sdk-ui/stream-protocol
-    const tools: {
-        toolCallId: string
-        toolName: string
-        args: string
-    }[] = [];
     for await (const part of response.fullStream) {
         switch (part.type) {
             case 'text-delta': {
-                console.log(part.textDelta);
                 yield `0:${JSON.stringify(part.textDelta)}\n`;
                 break;
             }
@@ -199,6 +206,7 @@ export async function* recursiveTextStream(
                                 result: part.result,
                             })
                         }\n`;
+                        // must tell client that tool part is finished
                         yield `e:${JSON.stringify(FINISH_STEP)}\n`;
                         yield `0:${JSON.stringify(getAutoResponseForStockAdvice(part.args, part.result))}\n`;
                         yield `d:${JSON.stringify(FINISH_STREAM)}\n`;
@@ -229,8 +237,5 @@ export async function* recursiveTextStream(
                 break;
             }
         }
-    }
-
-    for (const tool of tools) {
     }
 }

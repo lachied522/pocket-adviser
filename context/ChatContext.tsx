@@ -35,23 +35,24 @@ export const useChatContext = () => {
 
 interface ChatProviderProps {
     children: React.ReactNode
+    initialMessage?: string
 }
 
 export function ChatProvider({
   children,
+  initialMessage,
 }: ChatProviderProps) {
     const { state } = useGlobalContext() as GlobalState;
     const [chatId, setChatId] = useState<number>(0);
     const [article, setArticle] = useState<StockNews|null>(null);
-    const [shouldAutoRespondToToolCall, setShouldAutoRespondToToolCall] = useState<boolean>(true);
     const { messages, input, isLoading, error, setInput, append, addToolResult } = useChat({
         id: chatId.toString(),
-        initialMessages: chatId < 1? [{ id: generateId(), role: "assistant", content: "Hello!" }]: [],
+        initialMessages: initialMessage && chatId < 1? [{ id: generateId(), role: "assistant", content: initialMessage }]: [],
         maxSteps: 3,
         sendExtraMessageFields: true,
         body: {
             userId: state?.id,
-            shouldAutoRespondToToolCall,
+            accountType: state?.accountType,
         },
         onToolCall({ toolCall }) {
             if (toolCall.toolName === "getPortfolio") {
@@ -66,12 +67,6 @@ export function ChatProvider({
     const onSubmit = useCallback(
         async (content: string, toolName?: string) => {
             if (isLoading) return;
-
-            if (toolName === 'getRecommendations' || toolName === 'shouldBuyOrSellStock') {
-                setShouldAutoRespondToToolCall(false);
-            } else {
-                setShouldAutoRespondToToolCall(true);
-            }
 
             setInput('');
             setArticle(null);

@@ -6,6 +6,7 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 import { getUserById } from "@/utils/crud/user";
 import { getStockById } from "@/utils/crud/stocks";
 import { getForexRate } from "@/utils/data/forex";
+import { getGreeting } from "./api/chat/greeting";
 
 import { GlobalProvider } from "@/context/GlobalContext";
 import { UIProvider } from "@/context/UIContext";
@@ -20,10 +21,6 @@ import TickerTape from "@/components/tape/ticker-tape";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
-
-// Force the page to be dynamic and allow streaming responses up to 30 seconds
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
 async function getStockData(userData: UserData|null) {
   if (!userData) return {};
@@ -54,11 +51,12 @@ export default async function Page({
     // fetch user data if able
     let userData: UserData|null = null;
     if (userId) {
-      userData = await getUserById(userId.value);
+        userData = await getUserById(userId.value);
     }
 
     // get stock data and forex rate simultaneously
-    const [stockData, forexRate] = await Promise.all([
+    const [greeting, stockData, forexRate] = await Promise.all([
+        getGreeting(userData),
         getStockData(userData),
         getForexRate("USDAUD"),
     ]);
@@ -70,7 +68,7 @@ export default async function Page({
         initalForexRate={forexRate}
       >
         <UIProvider>
-          <ChatProvider>
+          <ChatProvider initialMessage={greeting}>
               <main className='min-h-screen'>
                 {/* Background Image */}
                 <div className='z-[-1] fixed inset-0 opacity-40 bg-slate-300'>

@@ -30,7 +30,6 @@ type TavillyResponseBody = {
 }
 
 function formatResponse(data: TavillyResponseBody) {
-    console.log(data);
     return {
         query: data.query,
         answer: data.answer,
@@ -70,12 +69,11 @@ export class TavilyClient {
             }),
         });
 
-        // if (!res.ok) {
-        //     throw new Error(`Error searching web: ${res.status}`);
-        // }
-        const response = await res.json();
+        if (!res.ok) {
+            throw new Error(`Error searching web: ${res.status}`);
+        }
 
-        return response as TavillyResponseBody;
+        return await res.json() as TavillyResponseBody;
     }
 
     async getGeneralSearch(

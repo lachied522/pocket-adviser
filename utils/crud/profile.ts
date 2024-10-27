@@ -4,6 +4,13 @@ import { getPrismaClient } from "./client";
 
 const prisma = getPrismaClient();
 
+export async function getProfileByUserId(userId: string) {
+    // check if user already has profile
+    return await prisma.profile.findUnique({
+        where: { userId }
+    });
+}
+
 export async function updateProfile(data: Profile) {
     // check if user already has profile
     const profile = await prisma.profile.findUnique({

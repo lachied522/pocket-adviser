@@ -30,13 +30,13 @@ import type { Stock } from "@prisma/client";
 const prompts = (symbol: string) => [
     {
         display: `What's new with ${symbol}?`, // displayed on the button
-        input: `What's new with ${symbol}?`, // input passed to chat endpoint
-        tool: "searchWeb", // tool AI is required to use
+        input: `What's the latest news for ${symbol}?`, // input passed to chat endpoint
+        tool: "getStockNews", // tool AI is required to use
     },
     {
         display: 'What are analysts saying?',
         input: `What are analysts saying about ${symbol}?`,
-        tool: "getStockInfo",
+        tool: "getAnalystResearch",
     },
     {
         display: 'What are some similar stocks?',

@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 import { kv } from '@vercel/kv';
@@ -9,41 +9,24 @@ import { getSystemMessage } from './system';
 
 import type { UserData } from '@/types/helpers';
 
-// async generator function to give appearance of streaming a cached response
-async function* asyncTextGenerator(text: string, pieceLength: number, interval: number = 1000): AsyncGenerator<string> {
-    for (let i = 0; i < text.length; i += pieceLength) {
-        await new Promise(resolve => setTimeout(resolve, interval));
-        yield text.slice(i, i + pieceLength);
-    }
-}
-
 function todayDate() {
     return format(new Date(), 'd_MM_yyyy');
 }
   
-export async function getGreeting(user: UserData|null) {
+export async function getGreeting(user: UserData|null): Promise<string> {
     const key = `DEFAULT_GREETING_${todayDate()}`
-    let greeting = await kv.get(key);
+    const greeting = await kv.get(key);
     if (greeting) {
-        // const textStream = asyncTextGenerator(greeting as string, 5);
-        // for await (const text of textStream) {
-        //     yield text;
-        // }
-        return greeting;
+        return greeting as string;
     }
     // kv miss, generate new greeting
     const systemMessage = await getSystemMessage();
-    const { textStream } = await streamText({
+    const { text } = await generateText({
         model: openai('gpt-4o'),
         system: systemMessage,
-        messages: [{role: "user", content: "Hello! Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market."}],
+        messages: [{role: "user", content: "Breifly introduce yourself and tell me what you can do. Include a sentence about the current stock market."}],
     });
-    // stream greeting back and store full result in kv
-    greeting = "";
-    for await (const text of textStream) {
-        greeting += text;
-    }
     // update kv
-    kv.set(key, greeting, { ex: 24 * 60 * 60 });
-    return greeting;
+    kv.set(key, text, { ex: 24 * 60 * 60 });
+    return text;
 }

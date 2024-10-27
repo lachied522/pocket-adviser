@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { kv } from '@vercel/kv';
 import { Ratelimit } from '@upstash/ratelimit';
 
-import type { UserData } from '@/types/helpers';
+import type { AccountType } from '@prisma/client';
 
 const ratelimit = {
     slider: new Ratelimit({
@@ -28,11 +28,12 @@ export async function checkFixedLimit(ip: string) {
     return success;
 }
 
-export async function checkRateLimits(user: UserData|null) {
+export async function checkRateLimits(userId?: string, accountType: AccountType = "FREE") {
     const ip = headers().get("x-forwarded-for");
-    const key = user? user.id: ip!;
+    // rate limit by ip if userId is undefined
+    const key = userId? userId: ip!;
 
-    if (user && user.accountType!=="FREE") {
+    if (userId && accountType!=="FREE") {
         // just apply sliding limit
         const isWithinSlidingLimit = await checkSlidingLimit(key);
 

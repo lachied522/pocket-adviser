@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import { ArrowBigUp, X } from "lucide-react";
+import { ArrowBigUp, OctagonAlert, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,25 +19,29 @@ import type { StockNews } from "@/types/data";
 import type { Message } from "ai";
 
 export default function ChatArea() {
-    const { input, article, messages, isLoading, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
+    const { input, article, messages, isLoading, error, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
     const { scrollAreaRef, anchorRef, setShouldAutoScroll } = useScrollAnchor();
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 
-    console.log(messages);
-
-    const onDrop = (e: React.DragEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const data = JSON.parse(e.dataTransfer.getData("text"));
-        if ('article' in data) {
-            const article = data.article as StockNews;
-            setArticle(article);
-        }
-        if ('input' in data) {
-            setInput(data.input);
-        }
-        // reset state
-        setIsDragging(false);
-    }
+    const onDrop = useCallback(
+        (e: React.DragEvent<HTMLInputElement>) => {
+            e.preventDefault();
+            try {
+                const data = JSON.parse(e.dataTransfer.getData("text"));
+                if ('article' in data) {
+                    const article = data.article as StockNews;
+                    setArticle(article);
+                }
+                if ('input' in data) {
+                    setInput(data.input);
+                }
+                
+                setIsDragging(false);
+            } catch (e) {
+                // pass
+            }
+        }, [setArticle, setInput, setIsDragging]
+    );
 
     return (
         <div className='md:px-6 xl:px-3 order-last xl:order-2'>
@@ -56,18 +60,24 @@ export default function ChatArea() {
                         {messages.map((message: Message) => (
                         <ChatMessage
                             key={message.id}
-                            id={message.id}
                             role={message.role}
                             content={message.content}
                             toolInvocations={message.toolInvocations}
                             data={message.data}
                         />
                         ))}
-                        {messages.length === 1 && messages[0].role === 'assistant' && (
-                            <div className='p-6'>
-                                <SamplePrompts />
-                            </div>
+
+                        {!error && messages.length === 1 && messages[0].role === 'assistant' && (
+                        <SamplePrompts />
                         )}
+
+                        {error && (
+                        <div className='flex items-center justify-center gap-2 p-6'>
+                            <OctagonAlert size={16} color="rgb(220 38 38)" />
+                            <p className='text-sm'>Something went wrong. Please try again later.</p>
+                        </div>
+                        )}
+
                         <div className={cn("w-full h-px hidden", isLoading && "block")} ref={anchorRef} />
                     </div>
                 </ScrollArea>

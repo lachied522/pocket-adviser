@@ -7,8 +7,7 @@ export const description = "Get information about the user's portfolio and their
 
 export const parameters = z.object({});
 
-// it is necessary to define return type as any since the recursiveAICall doesn't know which function it is calling
-export async function getPortfolio(userId?: string|null): Promise<any> {
+export async function getPortfolio(userId?: string|null) {
     try {
         if (!userId) {
             return "The user's portfolio is empty";
@@ -57,7 +56,7 @@ export async function getPortfolio(userId?: string|null): Promise<any> {
             ),
         }
     } catch (e) {
-        console.log(e);
+        console.error(`Error getting portfolio: ${e}`);
         return "There was an error calling the function";
     }
 }

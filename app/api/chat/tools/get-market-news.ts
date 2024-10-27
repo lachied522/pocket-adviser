@@ -12,7 +12,7 @@ export const parameters = z.object({
 export async function getMarketNews(
     query: string,
     days?: number
-): Promise<any> {
+) {
     try {
         return await new TavilyClient().getLatestNews(query, days);
     } catch (e) {

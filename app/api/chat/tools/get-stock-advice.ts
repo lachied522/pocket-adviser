@@ -49,8 +49,12 @@ function formatResults(result: any) {
     return result;
 }
 
-// it is necessary to define return type as any since the recursiveAICall doesn't know which function it is calling
-export async function getStockAdvice(symbol: string, amount: number, exchange: string, userId?: string|null, ...args: any[]): Promise<any> {
+export async function getStockAdvice(
+    symbol: string,
+    amount: number,
+    exchange: string,
+    userId?: string|null,
+) {
     try {
         if (amount===0) {
             // TO DO: handle this

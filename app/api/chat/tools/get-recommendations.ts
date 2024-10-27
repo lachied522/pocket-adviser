@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 
 export const description = "Get a list of trade ideas based on the user's current portfolio and investment profile";

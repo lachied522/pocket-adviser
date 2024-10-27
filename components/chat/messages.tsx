@@ -2,23 +2,24 @@
 import { useEffect, useState } from "react";
 import Markdown from 'react-markdown'
 
+import { CheckCheck, OctagonAlert } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
-import StockCard from "../stocks/stock-card";
 import StockAdvice from "./stock-advice";
 import RecommendationsTable from "./recommendations-table";
 import SearchResults from "./search-results";
 import NewsArticle from "./news-article";
+import StockCard from "../stocks/stock-card";
 
 import type { Message, ToolInvocation } from "ai";
 import type { StockNews } from "@/types/data";
-import { CheckCheck, OctagonAlert } from "lucide-react";
 
 /** formatting functions for markdown */
 function H3(props: any) {
     return (
-        <h3 className="text-xl font-semibold">
+        <h3 className="font-semibold">
             {props.children}
         </h3>
     )
@@ -53,6 +54,14 @@ function Link(props: any) {
     );
 }
 
+function Strong(props: any) {
+    return (
+        <strong className="font-medium">
+            {props.children}
+        </strong>
+    )
+}
+
 /** end formatting functions */
 
 function TextMessage({
@@ -66,10 +75,10 @@ function TextMessage({
     return (
         <Card>
             <CardContent className={cn(
-                "max-w-[900px] font-medium px-3 py-2 text-wrap whitespace-pre-line",
+                "max-w-[900px] px-3 py-2 text-wrap whitespace-pre-line",
                 role === "user" && "bg-neutral-50 border-none"
             )}>
-                <Markdown components={{ h3: H3, ol: OrderedList, ul: UnorderedList, a: Link }}>
+                <Markdown components={{ h3: H3, ol: OrderedList, ul: UnorderedList, a: Link, strong: Strong }}>
                     {content}
                 </Markdown>
             </CardContent>
@@ -112,15 +121,14 @@ function ToolStatusMessage({ msg, isError }: { msg: string, isError: boolean }) 
     )
 }
 
-export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocation}) {
-    const { toolName, toolCallId, args, state } = toolInvocation;
+export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocation }) {
+    const { toolName, args, state } = toolInvocation;
     switch (toolName) {
         case "getRecommendations": {
             if (state === 'result') {
                 if (!toolInvocation.result) {
                     return <ToolStatusMessage msg="Error getting trade ideas" isError={true} />;
                 }
-
                 return <RecommendationsTable data={toolInvocation.result} />;
             } else {
                 return <LoadingMessage msg="Getting trade ideas" />;
@@ -129,18 +137,18 @@ export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocat
         case "shouldBuyOrSellStock": {
             if (state === 'result') {
                 if (!toolInvocation.result) {
-                    return <ToolStatusMessage msg="Error getting trade ideas" isError={true} />;
+                    return <ToolStatusMessage msg="Something went wrong" isError={true} />;
                 }
-                
                 return <StockAdvice data={toolInvocation.result} />;
             } else {
-                return (
-                    <LoadingMessage msg={`Getting info on`}/>
-                )
+                return <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`}/>;
             }
         }
         case "getStockInfo": {
             if (state === 'result') {
+                if (!toolInvocation.result) {
+                    return <ToolStatusMessage msg={`Error getting info on ${args.symbol.toUpperCase()}`} isError={true} />;
+                }
                 return <StockCard stockData={toolInvocation.result} />;
             } else {
                 return <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
@@ -148,83 +156,83 @@ export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocat
         }
         case "getPortfolio": {
             if (state === 'result') {
-                return <ToolStatusMessage msg="Retrieved portfolio" isError={!!!toolInvocation.result} />;
+                if (!toolInvocation.result) {
+                    return <ToolStatusMessage msg="Error retrieving portfolio" isError={true} />;
+                }
+                return <ToolStatusMessage msg="Retrieved portfolio" isError={false} />;
             } else {
                 return <LoadingMessage msg="Getting your portfolio" />;
             }
         }
-        case "getStockNews": {
+        case "getProfile": {
             if (state === 'result') {
                 if (!toolInvocation.result) {
-                    return (
-                        <ToolStatusMessage msg="Error getting stock news" isError={true} />
-                    )
+                    return <ToolStatusMessage msg="Error retrieving profile" isError={true} />;
                 }
-                return (
-                    <SearchResults data={toolInvocation.result} />
-                )
+                return <ToolStatusMessage msg="Retrieved profile" isError={false} />;
             } else {
-                return (
-                    <LoadingMessage msg={`Getting news on ${toolInvocation.args.name? toolInvocation.args.name: toolInvocation.args.symbol.toUpperCase()}`} />
-                )
+                return <LoadingMessage msg="Getting your profile" />;
             }
         }
         case "getMarketNews": {
             if (state === 'result') {
                 if (!toolInvocation.result) {
-                    return (
-                        <ToolStatusMessage msg="Error getting market news" isError={true} />
-                    )
+                    return <ToolStatusMessage msg="Error getting market news" isError={true} />;
                 }
-                return (
-                    <SearchResults data={toolInvocation.result} />
-                )
+                return <SearchResults data={toolInvocation.result} />;
             } else {
-                return (
-                    <LoadingMessage msg="Getting news articles" />
-                )
+                return <LoadingMessage msg="Getting news articles" />;
+            }
+        }
+        case "getStockNews": {
+            if (state === 'result') {
+                if (!toolInvocation.result) {
+                    return <ToolStatusMessage msg="Error getting stock news" isError={true} />;
+                }
+                return <SearchResults data={toolInvocation.result} />;
+            } else {
+                return <LoadingMessage msg={`Getting news on ${toolInvocation.args.name? toolInvocation.args.name: toolInvocation.args.symbol.toUpperCase()}`} />;
+            }
+        }
+        case "getAnalystResearch": {
+            if (state === 'result') {
+                if (!toolInvocation.result) {
+                    return <ToolStatusMessage msg="Error getting analyst research" isError={true} />;
+                }
+                return <ToolStatusMessage msg="Retrieved analyst research" isError={false} />;
+            } else {
+                return <LoadingMessage msg={`Getting research on ${toolInvocation.args.name? toolInvocation.args.name: toolInvocation.args.symbol.toUpperCase()}`} />;
             }
         }
         case "searchWeb": {
             if (state === 'result') {
                 if (!toolInvocation.result) {
-                    return (
-                        <ToolStatusMessage msg="Error searching web" isError={true} />
-                    )
+                    return <ToolStatusMessage msg="Error searching web" isError={true} />;
                 }
-                return (
-                    <SearchResults data={toolInvocation.result} />
-                )
+                return <SearchResults data={toolInvocation.result} />;
             } else {
-                return (
-                    <LoadingMessage msg="Searching web" />
-                )
+                return <LoadingMessage msg="Searching web" />;
             }
         }
         case "readUrl": {
             if (state === 'result') {
-                return (
-                    <ToolStatusMessage msg="Read article" isError={!!!toolInvocation.result} />
-                )
+                if (!toolInvocation.result) {
+                    return <ToolStatusMessage msg="Error reading article" isError={true} />;
+                }
+                return <ToolStatusMessage msg="Read article" isError={false} />;
             } else {
-                return (
-                    <LoadingMessage
-                        key={`loading-message-${toolCallId}`}
-                        msg="Reading url"
-                    />
-                )
+                return <LoadingMessage msg="Reading article"/>;
             }
         }
     }
 }
 
 export function ChatMessage({
-    id,
     role,
     content,
     toolInvocations,
     data,
-}: Message) {
+}: Omit<Message, 'id'>) {
     // @ts-ignore
     const article = (data && 'article' in data)? data.article as StockNews: null;
     return (

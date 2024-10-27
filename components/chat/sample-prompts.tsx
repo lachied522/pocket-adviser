@@ -82,7 +82,7 @@ export default function SamplePrompts() {
     }, []);
 
     return (
-        <div className="w-full hidden sm:flex flex-wrap sm:justify-center gap-2 pb-1 sm:pb-0 overflow-x-scroll sm:overflow-hidden">
+        <div className="w-full hidden sm:flex flex-wrap sm:justify-center gap-2 pb-1 sm:pb-0 overflow-x-scroll sm:overflow-hidden p-6">
             {samplePrompts.map((prompt) => (
             <Button
                 key={`sample-prompt-${prompt.input}`}
