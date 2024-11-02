@@ -51,7 +51,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     }, [page, getNews]);
 
     return (
-        <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
+        <div className='hidden sm:flex flex-col items-stretch gap-2 xl:gap-3.5'>
             <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
                 <h4 className='md:text-lg font-medium'>News</h4>
 
@@ -74,7 +74,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
                         {Array.from({length: 12}).map((_, index) => (
                         <Skeleton
                             key={`news-skelton-${index}`}
-                            className='h-24 xl:h-30 w-36 shrink-0 grow-0'
+                            className='h-24 xl:h-32 w-36 xl:w-44 shrink-0 grow-0'
                         />
                         ))}
                     </>

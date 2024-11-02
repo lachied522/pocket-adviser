@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
@@ -24,9 +26,10 @@ interface ConversationSelectorProps {
 
 export default function ConversationSelector({ id, name }: ConversationSelectorProps) {
     const { updateConversationAndUpdateState, deleteConversationAndUpdateState } = useGlobalContext() as GlobalState;
-    const { isLoading, conversationId, onSelectConversation } = useChatContext() as ChatState;
+    const { isLoading, conversationId, onSelectConversation, onNewChat } = useChatContext() as ChatState;
     const [isEditting, setIsEditting] = useState<boolean>(false);
     const [input, setInput] = useState<string>(name);
+    const isMobile = useMediaQuery();
     const inputRef = useRef<HTMLInputElement>(null);
 
     const onSubmit = useCallback(
@@ -42,7 +45,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                 setInput(name);
             }
         },
-        [name, updateConversationAndUpdateState, setIsEditting, setInput]
+        [id, name, updateConversationAndUpdateState, setIsEditting, setInput]
     );
 
     useEffect(() => {
@@ -59,7 +62,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                 if (!isLoading) onSelectConversation(id);
             }}
             className={cn(
-                'h-10 w-[180px] flex flex-row items-center justify-start text-sm font-medium px-4 py-3 rounded-md cursor-pointer select-none group relative hover:bg-slate-100',
+                'h-10 max-w-[200px] w-auto xl:w-[180px] flex flex-row items-center justify-start text-sm font-medium px-4 py-3 rounded-md cursor-pointer select-none group relative hover:bg-slate-100',
                 conversationId === id && 'bg-slate-100'
             )}
         >
@@ -79,7 +82,10 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
             <>
                 <span className="truncate">{name}</span>
 
-                <div className='hidden flex-row items-center gap-3 pl-4 pr-2 bg-gradient-to-r from-transparent to-slate-100 to-10% absolute right-0 group-hover:flex'>
+                <div className={cn(
+                    'hidden flex-row items-center gap-3 pl-4 pr-2 bg-gradient-to-r from-transparent to-slate-100 to-10% absolute right-0 group-hover:flex',
+                    conversationId === id && 'flex'
+                )}>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -87,7 +93,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                         }}
                         className='bg-transparent hover:bg-transparent'
                     >
-                        <PencilLine size={16} className='text-slate-600 hover:text-black' />
+                        <PencilLine size={isMobile? 18: 16} className='text-slate-600 hover:text-black' />
                     </button>
 
                     <Dialog>
@@ -96,7 +102,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                                 onClick={(e) => e.stopPropagation()}
                                 className='bg-transparent hover:bg-transparent'
                             >
-                                <Trash2 size={16} className='text-slate-600 hover:text-red-600' />
+                                <Trash2 size={isMobile? 18: 16} className='text-slate-600 hover:text-red-600' />
                             </button>
                         </DialogTrigger>
                         <DialogContent className='max-w-lg'>
@@ -122,7 +128,10 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                                     <Button
                                         type='button'
                                         variant='destructive'
-                                        onClick={() => deleteConversationAndUpdateState(id)}
+                                        onClick={() => {
+                                            deleteConversationAndUpdateState(id);
+                                            if (conversationId === id) onNewChat(); // switch to new chat
+                                        }}
                                     >
                                         Delete
                                     </Button>

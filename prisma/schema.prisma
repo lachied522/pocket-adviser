@@ -146,6 +146,7 @@ model Conversation {
   messages  Json?
   name      String
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
   userId    String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

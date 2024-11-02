@@ -4,11 +4,11 @@ import { getPrismaClient } from "./client";
 
 const prisma = getPrismaClient();
 
-export async function insertConversation(data: Omit<Conversation, 'id'|'createdAt'>) {
+export async function insertConversation(data: Omit<Conversation, 'id'|'createdAt'|'updatedAt'>) {
     return await prisma.conversation.create({
         data: {
             ...data,
-            messages: data.messages || Prisma.JsonNull,
+            messages: data.messages  || Prisma.JsonNull,
         }
     });
 }
@@ -27,7 +27,8 @@ export async function updateConversation(
         where: { id },
         data: {
             name: data.name,
-            ...(data.messages? {messages: data.messages || Prisma.JsonNull}: {}),
+            updatedAt: new Date().toISOString(),
+            ...(data.messages? { messages: data.messages || Prisma.JsonNull }: {}),
         },
     });
 }

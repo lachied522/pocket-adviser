@@ -29,6 +29,13 @@ type TavillyResponseBody = {
     }[]
 }
 
+function filterResponse(data: TavillyResponseBody, relevance: number) {
+    return {
+        ...data,
+        results: data.results.filter((obj) => obj.score > relevance),
+    }
+}
+
 function formatResponse(data: TavillyResponseBody) {
     return {
         query: data.query,
@@ -79,15 +86,23 @@ export class TavilyClient {
     async getGeneralSearch(
         query: string,
         include_answer: boolean = true,
-        max_results: number = 5
+        max_results: number = 5,
+        relevance: number = 0.5,
     ) {
-        const data = await this.makeAuthenticatedAPIRequest({
+        let data = await this.makeAuthenticatedAPIRequest({
             query,
             include_answer,
             max_results,
             topic: 'general',
             search_depth: 'basic',
         });
+
+        if (relevance) {
+            data = filterResponse(data, relevance);
+        }
+
+        console.log(data);
+
         return formatResponse(data);
     }
 
@@ -96,8 +111,9 @@ export class TavilyClient {
         days: number = 5,
         include_answer: boolean = true,
         max_results: number = 5,
+        relevance: number = 0.5,
     ) {
-        const data = await this.makeAuthenticatedAPIRequest({
+        let data = await this.makeAuthenticatedAPIRequest({
             query,
             days,
             include_answer,
@@ -105,6 +121,13 @@ export class TavilyClient {
             topic: 'news',
             search_depth: 'basic',
         });
+
+        if (relevance) {
+            data = filterResponse(data, relevance);
+        }
+
+        console.log(data);
+
         return formatResponse(data);
     }
 }

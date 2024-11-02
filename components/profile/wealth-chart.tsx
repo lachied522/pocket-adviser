@@ -61,7 +61,7 @@ export default function WealthChart({ data, milestones, expectedReturn }: Wealth
     }, [data]);
 
     return (
-        <div className='flex flex-col mb-6'>
+        <div className='hidden sm:flex flex-col mb-6'>
             <div className='w-full flex flex-col sm:flex-row items-start sm:items-center justify-between'>
                 <h3 className='text-lg font-medium'>
                     Your projected wealth

@@ -24,7 +24,7 @@ import type { FormValues } from "./form-schema";
 export default function Preferences() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-6 px-2 mt-6'>
+        <div className='flex flex-col gap-6 px-2'>
             <h3 className='text-lg font-medium'>Help us understand your investment preferences</h3>
 
             <FormField

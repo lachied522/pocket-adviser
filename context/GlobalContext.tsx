@@ -35,7 +35,7 @@ export type GlobalState = {
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<number>
   updateHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
   deleteHoldingAndUpdateState: (holdingId: number) => Promise<void>
-  insertConversationAndUpdateState: (conversation: Omit<Conversation, 'id'|'userId'>) => Promise<string>
+  insertConversationAndUpdateState: (conversation: Omit<Conversation, 'id'|'userId'|'createdAt'|'updatedAt'>) => Promise<string>
   updateConversationAndUpdateState: (conversation: Pick<Conversation, 'id'|'name'>) => Promise<void>
   deleteConversationAndUpdateState: (conversationId: string) => Promise<void>
 }
@@ -212,7 +212,7 @@ export const GlobalProvider = ({
   );
 
   const insertConversationAndUpdateState = useCallback(
-    async (conversation: Omit<Conversation, 'id'|'userId'>) => {
+    async (conversation: Omit<Conversation, 'id'|'userId'|'createdAt'|'updatedAt'>) => {
       let userId = state?.id;
       if (!userId) {
           userId = await createGuestUserIfNecessary() as string;

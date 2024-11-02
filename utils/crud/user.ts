@@ -23,6 +23,9 @@ export async function getUserById(id: string) {
                     name: true,
                 },
                 take: 10,
+                orderBy: {
+                    updatedAt: 'desc',
+                }
             },
         }
     });

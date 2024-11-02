@@ -89,8 +89,7 @@ export function ChatProvider({
             console.log(res);
             if (res) {
                 setChatId((curr) => curr + 1);
-                // @ts-ignore
-                setInitialMessages(res.messages || []);
+                setInitialMessages(res.messages as any);
                 setConversationId(newConversationId);
             }
             // reset input and article
@@ -107,19 +106,27 @@ export function ChatProvider({
                 // create new conversation record
                 const lastUserMessage = newMessages.filter((message) => message.role === "user")?.[0].content;
                 const _conversationId = await insertConversationAndUpdateState({
-                    name: lastUserMessage?.slice(0, 20) || "New conversation",
-                    // @ts-ignore
-                    messages: [...newMessages]
+                    name: lastUserMessage?.slice(0, 50) || "New conversation",
+                    messages: [
+                        // convert to JSON-compatible array
+                        ...newMessages.map(
+                            (message) => ({
+                                id: message.id,
+                                role: message.role,
+                                content: message.content,
+                                data: message.data,
+                                createdAt: message.createdAt?.toISOString(),
+                                toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
+                            })
+                        )
+                    ],
                 });
                 setConversationId(_conversationId);
-                console.log("inserted conversation");
             } else {
-                // @ts-ignore
                 await appendMessagesAction(conversationId, newMessages);
-                console.log("updated conversation");
             }
         },
-        [conversationId, insertConversationAndUpdateState]
+        [conversationId, insertConversationAndUpdateState, setConversationId]
     );
 
     const onSubmit = useCallback(
@@ -141,8 +148,8 @@ export function ChatProvider({
 
     useEffect(() => {
         // sync conversation with db once assistant message is received
-        if (messageQueue.length > 1 && messageQueue[messageQueue.length - 1].role === "assistant") {
-            // @ts-ignore
+        const lastMessage = messageQueue.length > 1? messageQueue[messageQueue.length - 1]: null;
+        if (lastMessage && lastMessage.role === "assistant" && lastMessage.content.length > 0) {
             saveConversation(messageQueue);
             setMessageQueue([]);
         }

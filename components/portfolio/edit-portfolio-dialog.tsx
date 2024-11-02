@@ -1,13 +1,12 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Search, Trash } from "lucide-react";
+import { Search, Trash, Trash2 } from "lucide-react";
 
 import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -17,7 +16,6 @@ import {
     Table,
     TableBody,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -33,13 +31,23 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import type { Holding, Stock } from "@prisma/client";
 
-interface EditHoldingProps {
+type ModifiedHolding = Holding & {
+    inserted?: boolean
+    updated?: boolean
+    deleted?: boolean
+}
+
+const MAX_PAGE_SIZE = 20;
+
+function EditHolding({
+    holding,
+    onUpdate,
+    onRemove
+} : {
     holding: Holding
     onUpdate: (values: Holding) => void
     onRemove: () => void
-}
-
-function EditHolding({ holding, onUpdate, onRemove }: EditHoldingProps) {
+}) {
     const { getStockData } = useGlobalContext() as GlobalState;
     const [stockData, setStockData] = useState<Stock|null>(null);
 
@@ -92,18 +100,13 @@ function EditHolding({ holding, onUpdate, onRemove }: EditHoldingProps) {
                     type='button'
                     variant='ghost'
                     onClick={onRemove}
+                    className='group hover:bg-transparent'
                 >
-                    <Trash size={18} strokeWidth={2.5} />
+                    <Trash2 size={18} strokeWidth={2.5} className='group-hover:text-red-400' />
                 </Button>
             </TableCell>
         </TableRow>
     )
-}
-
-type ModifiedHolding = Holding & {
-    inserted?: boolean
-    updated?: boolean
-    deleted?: boolean
 }
 
 export default function EditPortfolioDialog({
@@ -128,7 +131,7 @@ export default function EditPortfolioDialog({
     const currentPage = useMemo(() => {
         return modifiedHoldings
         .filter((holding) => !holding.deleted)
-        .slice(5 * page, 5 * (page + 1));
+        .slice(MAX_PAGE_SIZE * page, MAX_PAGE_SIZE * (page + 1));
     }, [modifiedHoldings, page]);
 
     const onSubmit = async () => {
@@ -202,7 +205,7 @@ export default function EditPortfolioDialog({
         // clear search
         clearSearch();
         // navigate to last page if necessary
-        if (page < Math.floor((Math.max(newValue.filter((holding) => !holding.deleted).length, 1) - 1) / 5)) setPage((curr) => curr + 1);
+        if (page < Math.floor((Math.max(newValue.filter((holding) => !holding.deleted).length, 1) - 1) / MAX_PAGE_SIZE)) setPage((curr) => curr + 1);
     }
 
     const onUpdateHolding = (holding: Holding) => {
@@ -231,15 +234,16 @@ export default function EditPortfolioDialog({
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='flex flex-col gap-6'>
+            <DialogContent className='max-h-full max-w-6xl'>
                 <DialogHeader>
                     <DialogTitle>
                         Edit Your Portfolio
                     </DialogTitle>
                 </DialogHeader>
-                <ScrollArea className='max-h-[80vh]'>
+
+                <ScrollArea className='h-[60vh] sm:h-[80vh]'>
                     <div className='flex flex-col gap-6'>
-                        <p className='font-medium'>Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.</p>
+                        <p className=''>Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.</p>
 
                         <div className='flex flex-col gap-2'>
                             <span className='text-lg font-medium'>Add a stock</span>
@@ -323,7 +327,7 @@ export default function EditPortfolioDialog({
                                         variant="outline"
                                         size="sm"
                                         onClick={() => setPage((curr) => curr + 1)}
-                                        disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / 5)}
+                                        disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / MAX_PAGE_SIZE)}
                                     >
                                         Next
                                     </Button>

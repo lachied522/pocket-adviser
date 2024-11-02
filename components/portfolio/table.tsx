@@ -38,12 +38,11 @@ export default function StockTable<TData, TValue>({
     const [sorting, setSorting] = useState([{
         id: 'symbol', desc: false,
     }]);
-
     const [pagination, setPagination] = useState({
         pageIndex: 0, // initial page index
         pageSize: 10, // default page size
     });
-    
+
     // see https://ui.shadcn.com/docs/components/data-table
     const table = useReactTable<PopulatedHolding>({
         data,
@@ -75,7 +74,7 @@ export default function StockTable<TData, TValue>({
                                 : flexRender(
                                     header.column.columnDef.header,
                                     header.getContext()
-                                    )}
+                                )}
                             </TableHead>
                             )
                         })}
