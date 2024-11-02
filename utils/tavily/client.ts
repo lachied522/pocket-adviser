@@ -101,8 +101,6 @@ export class TavilyClient {
             data = filterResponse(data, relevance);
         }
 
-        console.log(data);
-
         return formatResponse(data);
     }
 
@@ -125,8 +123,6 @@ export class TavilyClient {
         if (relevance) {
             data = filterResponse(data, relevance);
         }
-
-        console.log(data);
 
         return formatResponse(data);
     }

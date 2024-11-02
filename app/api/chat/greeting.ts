@@ -12,7 +12,7 @@ import type { UserData } from '@/types/helpers';
 function todayDate() {
     return format(new Date(), 'd_MM_yyyy');
 }
-  
+
 export async function getGreeting(user: UserData|null): Promise<string> {
     const key = `DEFAULT_GREETING_${todayDate()}`
     const greeting = await kv.get(key);
