@@ -1,4 +1,4 @@
-import type { Holding, Profile, Stock, User } from "@prisma/client";
+import type { Conversation, Holding, Profile, Stock, User } from "@prisma/client";
 
 export type ResolvedPromise<T> = T extends Promise<infer R> ? R: never;
 
@@ -12,6 +12,7 @@ export type UserData = (
     User & {
         profile: Profile | null
         holdings: Holding[]
+        conversations: Pick<Conversation, 'id'|'name'>[]
     }
 )
 

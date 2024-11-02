@@ -39,10 +39,8 @@ export async function updateHolding(data: Holding) {
   });
 }
 
-export async function deleteHolding(data: Holding) {
+export async function deleteHolding(id: number) {
   return await prisma.holding.delete({
-    where: {
-      id: data.id,
-    },
+    where: { id },
   });
 }

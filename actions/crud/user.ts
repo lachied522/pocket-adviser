@@ -1,5 +1,4 @@
 "use server";
-
 import { createUser, getUserById, updateUser } from "@/utils/crud/user";
 
 import type { User } from "@prisma/client";

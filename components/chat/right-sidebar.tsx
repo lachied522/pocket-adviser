@@ -59,7 +59,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
             </div>
 
             <ScrollArea className='xl:h-[660px]'>
-                <div className='flex flex-row xl:flex-col items-center pb-2 xl:px-2 xl:py-0 gap-2'>
+                <div className='flex flex-row xl:flex-col items-center pb-2 xl:py-0 gap-2'>
                     {data.map((article) => (
                     <NewsArticle
                         key={`article-${article.title}`}
@@ -74,7 +74,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
                         {Array.from({length: 12}).map((_, index) => (
                         <Skeleton
                             key={`news-skelton-${index}`}
-                            className='h-24 md:h-36 w-36 md:w-48 shrink-0 grow-0'
+                            className='h-24 xl:h-30 w-36 shrink-0 grow-0'
                         />
                         ))}
                     </>

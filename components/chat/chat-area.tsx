@@ -44,7 +44,7 @@ export default function ChatArea() {
     );
 
     return (
-        <div className='md:px-6 xl:px-3 order-last xl:order-2'>
+        <div className='order-last xl:order-2'>
             <div
                 onDragEnter={() => setIsDragging(true)}
                 onDragLeave={() => setIsDragging(false)}
@@ -53,7 +53,7 @@ export default function ChatArea() {
                     setIsDragging(true);
                 }}
                 onDrop={onDrop}
-                className={cn('max-w-[960px] flex flex-col gap-3 mx-auto rounded-lg md:border md:border-white md:shadow-inner md:shadow-slate-50', isDragging && 'border-slate-200')}
+                className={cn('flex-1 flex flex-col gap-3 mx-auto rounded-lg md:border md:border-white md:shadow-inner md:shadow-slate-50', isDragging && 'border-slate-200')}
             >
                 <ScrollArea ref={scrollAreaRef} className='h-[640px] 2xl:h-[720px] scroll-smooth'>
                     <div className='flex flex-col justify-start gap-3 md:px-3 py-3'>

@@ -4,18 +4,22 @@ import { ArrowUpDown, MessageCirclePlus, SearchCheck, UserRound } from "lucide-r
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import ProfileDialog from "../profile/profile-dialog";
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
+import ConversationSelector from "./conversation-selector";
 
 export default function LeftSidebar() {
-    const { onReset } = useChatContext() as ChatState;
+    const { state } = useGlobalContext() as GlobalState;
+    const { conversationId, onNewChat } = useChatContext() as ChatState;
 
     return (
-        <div className='grid grid-cols-1 auto-rows-min gap-2 xl:gap-6'>
+        <div className='xl:w-[200px] grid grid-cols-1 auto-rows-min gap-2 xl:gap-6'>
             <div className='flex flex-wrap items-center'>
                 <ProfileDialog>
                     <Button
@@ -33,7 +37,9 @@ export default function LeftSidebar() {
             <div className='flex flex-wrap lg:flex-row xl:flex-col items-center xl:items-start gap-3.5'>
                 <Button
                     variant='ghost'
-                    onClick={onReset}
+                    onClick={() => {
+                        if (conversationId) onNewChat();
+                    }}
                     className='xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                 >
                     <MessageCirclePlus size={16} />
@@ -60,6 +66,19 @@ export default function LeftSidebar() {
                     </Button>
                 </GetAdviceDialog>
             </div>
+
+            <Separator className='xl:w-[180px]' />
+
+            <ScrollArea className='xl:h-[360px]'>
+                <div className='flex flex-wrap lg:flex-row xl:flex-col items-center xl:items-start gap-3.5'>
+                    {state?.conversations.map((conversation) => (
+                    <ConversationSelector
+                        key={`conversation-${conversation.id}`}
+                        {...conversation}
+                    />
+                    ))}
+                </div>
+            </ScrollArea>
         </div>
     )
 }

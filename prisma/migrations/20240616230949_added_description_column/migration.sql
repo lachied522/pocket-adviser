@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "Stock" ADD COLUMN     "description" TEXT,
-ALTER COLUMN "country" DROP DEFAULT,
-ALTER COLUMN "isEtf" DROP DEFAULT;

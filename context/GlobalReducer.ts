@@ -14,10 +14,19 @@ export type Action = {
     payload: UserData['holdings'][number]
 } | {
     type: 'DELETE_HOLDING'
-    payload: UserData['holdings'][number]
+    payload: UserData['holdings'][number]['id']
 } | {
     type: 'UPDATE_PROFILE'
     payload: UserData['profile']
+} | {
+    type: 'INSERT_CONVERSATION'
+    payload: UserData['conversations'][number]
+} | {
+    type: 'UPDATE_CONVERSATION'
+    payload: UserData['conversations'][number]
+} | {
+    type: 'DELETE_CONVERSATION'
+    payload: UserData['conversations'][number]['id']
 }
 
 export function GlobalReducer(state: UserData|null, action: Action) {
@@ -61,7 +70,7 @@ export function GlobalReducer(state: UserData|null, action: Action) {
         case 'DELETE_HOLDING': {
             return {
                 ...state,
-                holdings: state.holdings.filter((holding) => holding.stockId !== action.payload.stockId),
+                holdings: state.holdings.filter((holding) => holding.stockId !== action.payload),
             }
         }
 
@@ -73,6 +82,35 @@ export function GlobalReducer(state: UserData|null, action: Action) {
                     ...(state.profile? state.profile: {}),
                     ...action.payload,
                 }
+            }
+        }
+
+        case 'INSERT_CONVERSATION': {
+            return {
+                ...state,
+                conversations: [action.payload, ...state.conversations]
+            }
+        }
+
+        case 'UPDATE_CONVERSATION': {
+            return {
+                ...state,
+                conversations: state.conversations.map((conversation) => {
+                    if (conversation.id === action.payload.id) {
+                        return {
+                            ...conversation,
+                            ...action.payload,
+                        }
+                    }
+                    return conversation;
+                })
+            }
+        }
+
+        case 'DELETE_CONVERSATION': {
+            return {
+                ...state,
+                conversations: state.conversations.filter((converastion) => converastion.id !== action.payload),
             }
         }
 

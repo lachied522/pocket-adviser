@@ -29,6 +29,7 @@ model User {
   sessions         Session[]
   holdings         Holding[]
   recommendations  Advice[]
+  conversations    Conversation[]
   profile          Profile?
 }
 
@@ -128,7 +129,7 @@ model Holding {
 }
 
 model Advice {
-  id                Int      @id @default(autoincrement())
+  id                String   @id @default(cuid())
   action            Action   @default(REVIEW)
   amount            Float?   @default(0)
   transactions      Json[]
@@ -136,6 +137,16 @@ model Advice {
   finalAdjUtility   Float?
   createdAt         DateTime @default(now())
   userId            String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  messages  Json?
+  name      String
+  createdAt DateTime  @default(now())
+  userId    String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

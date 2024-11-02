@@ -1,5 +1,5 @@
 
-import { generateId, convertToCoreMessages, streamText, type Message, type TextStreamPart } from 'ai';
+import { convertToCoreMessages, streamText, type Message } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
@@ -60,11 +60,15 @@ function getAutoResponseForStockAdvice(args: any, data: any) {
     return "Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
 }
 
-export async function* recursiveTextStream(
+export async function* streamAIResponse({
+    messages,
+    toolName,
+    userId,
+}: {
     messages: Message[],
     toolName?: "getRecommendations"|"shouldBuyOrSellStock"|"searchWeb",
-    userId?: string
-) {
+    userId?: string,
+}) {
     const coreMessages = convertToCoreMessages(messages);
 
     const systemMessage = await getSystemMessage();

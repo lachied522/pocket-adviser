@@ -13,13 +13,14 @@ import {
 import { updateUserAction } from "@/actions/crud/user";
 import { updateProfileAction } from "@/actions/crud/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
+import { insertConversationAction, updateConversationAction, deleteConversationAction } from "@/actions/crud/conversation";
 import { getStockByIdAction } from "@/actions/data/stocks";
 
 import { useCookies } from "@/hooks/useCookies";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
-import type { Holding, Profile, Stock, User } from "@prisma/client";
+import type { Conversation, Holding, Profile, Stock, User } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
 
 export type GlobalState = {
@@ -31,9 +32,12 @@ export type GlobalState = {
   getStockData: (stockId: number) => Promise<Stock>
   updateUserAndUpdateState: (user: Partial<User>) => Promise<void>
   updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
-  insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<void>
+  insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<number>
   updateHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
-  deleteHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
+  deleteHoldingAndUpdateState: (holdingId: number) => Promise<void>
+  insertConversationAndUpdateState: (conversation: Omit<Conversation, 'id'|'userId'>) => Promise<string>
+  updateConversationAndUpdateState: (conversation: Pick<Conversation, 'id'|'name'>) => Promise<void>
+  deleteConversationAndUpdateState: (conversationId: string) => Promise<void>
 }
 
 const GlobalContext = createContext<any>(null);
@@ -135,9 +139,6 @@ export const GlobalProvider = ({
         type: 'UPDATE_PROFILE',
         payload: res
       });
-
-      console.log('state updated', profile);
-
     },
     [state]
   );
@@ -148,6 +149,7 @@ export const GlobalProvider = ({
       if (!userId) {
           userId = await createGuestUserIfNecessary() as string;
       }
+
       const res = await insertHoldingAction({
           ...holding,
           userId,
@@ -170,38 +172,99 @@ export const GlobalProvider = ({
               payload: res,
           });
       }
+
+      return res.id;
     },
     [state, dispatch]
   );
 
   const updateHoldingAndUpdateState = useCallback(
     async (holding: Omit<Holding, 'userId'>) => {
-      if (!state) return; // this should not happen
+      if (!state) return;
 
       const res = await updateHoldingAction({
         ...holding,
         userId: state.id,
       });
+
       // update state
       dispatch({
         type: 'UPDATE_HOLDING',
         payload: res
-      })
+      });
     },
     [state, dispatch]
   );
 
   const deleteHoldingAndUpdateState = useCallback(
-    async (holding: Omit<Holding, 'userId'>) => {
-      if (!state) return; //
-      const res = await deleteHoldingAction({
-        ...holding,
-        userId: state.id,
-      });
+    async (holdingId: number) => {
+      if (!state) return;
+
+      const res = await deleteHoldingAction(holdingId);
+
       // update state
       dispatch({
         type: 'DELETE_HOLDING',
-        payload: res
+        payload: res.id
+      });
+    },
+    [state, dispatch]
+  );
+
+  const insertConversationAndUpdateState = useCallback(
+    async (conversation: Omit<Conversation, 'id'|'userId'>) => {
+      let userId = state?.id;
+      if (!userId) {
+          userId = await createGuestUserIfNecessary() as string;
+      }
+
+      const res = await insertConversationAction({
+        ...conversation,
+        userId,
+      });
+
+      // update state
+      dispatch({
+        type: 'INSERT_CONVERSATION',
+        payload: {
+            id: res.id,
+            name: res.name,
+        }
+      });
+
+      return res.id;
+    },
+    [state, dispatch]
+  );
+
+  const updateConversationAndUpdateState = useCallback(
+    async (conversation: Omit<Conversation, 'userId'>) => {
+      if (!state) return;
+
+      const res = await updateConversationAction(conversation.id, conversation);
+
+      // update state
+      dispatch({
+        type: 'UPDATE_CONVERSATION',
+        payload: {
+          id: res.id,
+          name: res.name,
+        }
+      })
+    },
+    [state, dispatch]
+  );
+
+  const deleteConversationAndUpdateState = useCallback(
+    async (conversationId: string) => {
+      if (!state) return;
+
+      const res = await deleteConversationAction(conversationId);
+
+      // update state
+      dispatch({
+        type: 'DELETE_CONVERSATION',
+        payload: res.id,
       })
     },
     [state, dispatch]
@@ -220,6 +283,9 @@ export const GlobalProvider = ({
         insertHoldingAndUpdateState,
         updateHoldingAndUpdateState,
         deleteHoldingAndUpdateState,
+        insertConversationAndUpdateState,
+        updateConversationAndUpdateState,
+        deleteConversationAndUpdateState,
         dispatch
       }}
     >

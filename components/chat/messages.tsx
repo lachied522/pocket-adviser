@@ -121,7 +121,7 @@ function ToolStatusMessage({ msg, isError }: { msg: string, isError: boolean }) 
     )
 }
 
-export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocation }) {
+function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
     const { toolName, args, state } = toolInvocation;
     switch (toolName) {
         case "getRecommendations": {
@@ -191,7 +191,7 @@ export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocat
                 }
                 return <SearchResults data={toolInvocation.result} />;
             } else {
-                return <LoadingMessage msg={`Getting news on ${toolInvocation.args.name? toolInvocation.args.name: toolInvocation.args.symbol.toUpperCase()}`} />;
+                return <LoadingMessage msg={`Getting news on ${args.name? args.name: args.symbol.toUpperCase()}`} />;
             }
         }
         case "getAnalystResearch": {
@@ -201,7 +201,7 @@ export function ToolInvocation({ toolInvocation }: { toolInvocation: ToolInvocat
                 }
                 return <ToolStatusMessage msg="Retrieved analyst research" isError={false} />;
             } else {
-                return <LoadingMessage msg={`Getting research on ${toolInvocation.args.name? toolInvocation.args.name: toolInvocation.args.symbol.toUpperCase()}`} />;
+                return <LoadingMessage msg={`Getting research on ${args.name? args.name: args.symbol.toUpperCase()}`} />;
             }
         }
         case "searchWeb": {
@@ -250,17 +250,15 @@ export function ChatMessage({
             <NewsArticle article={article} />
             )}
 
-            {content.length > 0? (
+            {toolInvocations?.map((toolInvocation: ToolInvocation) => (
+            <ToolMessage
+                key={toolInvocation.toolCallId}
+                toolInvocation={toolInvocation}
+            />
+            ))}
+
+            {content && content.length > 0 && (
             <TextMessage content={content} role={role as "user"|"assistant"} />
-            ) : (
-            <>
-                {toolInvocations?.map((toolInvocation: ToolInvocation) => (
-                    <ToolInvocation
-                        key={toolInvocation.toolCallId}
-                        toolInvocation={toolInvocation}
-                    />
-                ))}
-            </>
             )}
         </div>
     )

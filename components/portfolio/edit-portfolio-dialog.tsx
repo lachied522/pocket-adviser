@@ -149,7 +149,7 @@ export default function EditPortfolioDialog({
                     units: modifiedHolding.units,
                 }));
             } else if (modifiedHolding.deleted) {
-                promises.push(deleteHoldingAndUpdateState(modifiedHolding));
+                promises.push(deleteHoldingAndUpdateState(modifiedHolding.id));
             }
         }
 

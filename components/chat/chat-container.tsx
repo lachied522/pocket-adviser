@@ -19,7 +19,7 @@ export default function ChatContainer({ initialUserData, initialStockData }: Cha
     ) || [];
     
     return (
-        <div className='grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] justify-start gap-2 xl:gap-6'>
+        <div className='grid grid-cols-1 xl:grid-cols-[200px_1fr_200px] justify-start gap-2 xl:gap-6'>
             <div className='flex flex-col gap-3.5 md:gap-6 order-first'>
                 <H3 className=''>My Adviser</H3>
 

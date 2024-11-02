@@ -3,13 +3,14 @@ import {
   createContext,
   useContext,
   useState,
-  useRef,
   useEffect,
   useCallback,
 } from "react";
 
 import { useChat } from 'ai/react';
 import { generateId, type Message } from 'ai';
+
+import { getConversationAction, appendMessagesAction } from "@/actions/crud/conversation";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
@@ -21,10 +22,12 @@ export type ChatState = {
     messages: Message[]
     isLoading: boolean
     error?: Error
+    conversationId?: string
     setInput: React.Dispatch<React.SetStateAction<string>>
     setArticle: React.Dispatch<React.SetStateAction<StockNews|null>>
     onSubmit: (content: string, tool?: string) => void
-    onReset: () => void
+    onSelectConversation: (conversationId?: string) => Promise<void>
+    onNewChat: () => void
 }
 
 const ChatContext = createContext<any>(null);
@@ -42,47 +45,108 @@ export function ChatProvider({
   children,
   initialMessage,
 }: ChatProviderProps) {
-    const { state } = useGlobalContext() as GlobalState;
-    const [chatId, setChatId] = useState<number>(0);
+    const { state, insertConversationAndUpdateState } = useGlobalContext() as GlobalState;
+    const [conversationId, setConversationId] = useState<string|undefined>(undefined); // id of conversation in db
+    const [chatId, setChatId] = useState<number>(0); // id of conversation in chat state, used for getting resetting chat
+    const [initialMessages, setInitialMessages] = useState<Message[]>(
+        initialMessage? [{ id: generateId(), role: "assistant", content: initialMessage }]: []
+    );
     const [article, setArticle] = useState<StockNews|null>(null);
-    const { messages, input, isLoading, error, setInput, append, addToolResult } = useChat({
+    // messages to be saved to db
+    const [messageQueue, setMessageQueue] = useState<Message[]>(
+        initialMessage? [{ id: generateId(), role: "assistant", content: initialMessage }]: []
+    );
+    const { messages, input, isLoading, error, setInput, append } = useChat({
         id: chatId.toString(),
-        initialMessages: initialMessage && chatId < 1? [{ id: generateId(), role: "assistant", content: initialMessage }]: [],
+        initialMessages,
         maxSteps: 3,
         sendExtraMessageFields: true,
         body: {
             userId: state?.id,
             accountType: state?.accountType,
+            conversationId,
         },
-        onToolCall({ toolCall }) {
-            if (toolCall.toolName === "getPortfolio") {
-                // addToolResult({
-                //     toolCallId: toolCall.toolCallId,
-                //     result: state?.holdings,
-                // })
-            }
+        onFinish(message) {
+            setMessageQueue((curr) => [...curr, message]);
         }
     });
+
+    const onNewChat = useCallback(
+        () => {
+            setChatId((curr) => curr + 1);
+            setConversationId(undefined);
+            setInitialMessages([]);
+            setMessageQueue([]);
+            setInput('');
+            setArticle(null);
+        },
+        [setChatId, setConversationId, setInitialMessages, setMessageQueue, setInput, setArticle]
+    );
+
+    const onSelectConversation = useCallback(
+        async (newConversationId: string) => {
+            const res = await getConversationAction(newConversationId);
+            console.log(res);
+            if (res) {
+                setChatId((curr) => curr + 1);
+                // @ts-ignore
+                setInitialMessages(res.messages || []);
+                setConversationId(newConversationId);
+            }
+            // reset input and article
+            setInput('');
+            setArticle(null);
+            setMessageQueue([]);
+        },
+        [setChatId, setConversationId, setInitialMessages, setMessageQueue, setInput, setArticle]
+    );
+
+    const saveConversation = useCallback(
+        async (newMessages: Message[]) => {
+            if (!conversationId) {
+                // create new conversation record
+                const lastUserMessage = newMessages.filter((message) => message.role === "user")?.[0].content;
+                const _conversationId = await insertConversationAndUpdateState({
+                    name: lastUserMessage?.slice(0, 20) || "New conversation",
+                    // @ts-ignore
+                    messages: [...newMessages]
+                });
+                setConversationId(_conversationId);
+                console.log("inserted conversation");
+            } else {
+                // @ts-ignore
+                await appendMessagesAction(conversationId, newMessages);
+                console.log("updated conversation");
+            }
+        },
+        [conversationId, insertConversationAndUpdateState]
+    );
 
     const onSubmit = useCallback(
         async (content: string, toolName?: string) => {
             if (isLoading) return;
-
-            setInput('');
+            const message = {
+                id: generateId(),
+                role: 'user' as const,
+                data: { article },
+                content,
+            };
+            setMessageQueue((curr) => [...curr, message]);
+            append(message, { body: { toolName, article } });
             setArticle(null);
-            append({ role: 'user', content, data: { article } }, { body: { toolName, article } });
+            setInput('');
         },
-        [isLoading, article, setInput, setArticle, append]
+        [isLoading, article, setInput, setArticle, setMessageQueue, append]
     );
 
-    const onReset = useCallback(
-        async () => {
-            setChatId((curr) => curr + 1);
-            setInput('');
-            setArticle(null);
-        },
-        [setChatId, setInput, setArticle]
-    );
+    useEffect(() => {
+        // sync conversation with db once assistant message is received
+        if (messageQueue.length > 1 && messageQueue[messageQueue.length - 1].role === "assistant") {
+            // @ts-ignore
+            saveConversation(messageQueue);
+            setMessageQueue([]);
+        }
+    }, [messageQueue, saveConversation, setMessageQueue]);
 
     return (
         <ChatContext.Provider
@@ -92,10 +156,12 @@ export function ChatProvider({
                 messages,
                 isLoading,
                 error,
+                conversationId,
                 setInput,
                 setArticle,
+                onSelectConversation,
+                onNewChat,
                 onSubmit,
-                onReset,
             }}
         >
             {children}

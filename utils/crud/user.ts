@@ -17,13 +17,20 @@ export async function getUserById(id: string) {
         include: {
             profile: true,
             holdings: true,
+            conversations: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+                take: 10,
+            },
         }
     });
 }
 
-export async function updateUser(userId: string, data: Partial<User>) {
+export async function updateUser(id: string, data: Partial<User>) {
     return await prisma.user.update({
-        where: { id: userId },
+        where: { id },
         data,
     })
 }
