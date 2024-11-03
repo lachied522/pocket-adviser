@@ -129,7 +129,7 @@ model Holding {
 }
 
 model Advice {
-  id                String   @id @default(cuid())
+  id                Int      @id @default(autoincrement())
   action            Action   @default(REVIEW)
   amount            Float?   @default(0)
   transactions      Json[]
@@ -142,11 +142,11 @@ model Advice {
 }
 
 model Conversation {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   messages  Json?
   name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
   userId    String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
