@@ -1,5 +1,5 @@
 
-import { convertToCoreMessages, streamText, type Message } from 'ai';
+import { streamText, type CoreMessage } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
@@ -14,6 +14,10 @@ import { description as searchWebDescription, parameters as searchWebParams, sea
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
 import { getSystemMessage } from './system';
+
+import type { AccountType } from '@prisma/client';
+
+export type ToolName = "getRecommendations" | "shouldBuyOrSellStock" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
 
 const FINISH_STEP = {
     finishReason: "stop",
@@ -64,19 +68,20 @@ export async function* streamAIResponse({
     messages,
     toolName,
     userId,
+    accountType = "FREE",
+    onFinish
 }: {
-    messages: Message[],
-    toolName?: "getRecommendations"|"shouldBuyOrSellStock"|"searchWeb",
-    userId?: string,
+    messages: CoreMessage[]
+    toolName?: ToolName
+    userId?: string
+    accountType?: AccountType
+    onFinish: (text: string) => void
 }) {
-    const coreMessages = convertToCoreMessages(messages);
-
-    const systemMessage = await getSystemMessage();
-
+    const systemMessage = await getSystemMessage(userId, accountType);
     const response = await streamText({
         model: openai('gpt-4o'),
         system: systemMessage,
-        messages: coreMessages,
+        messages,
         toolChoice: toolName? { type: 'tool', toolName }: 'auto',
         tools: {
             getRecommendations: {
@@ -149,6 +154,9 @@ export async function* streamAIResponse({
                     return await readUrl(args.url);
                 },
             },
+        },
+        onFinish({ text }) {
+            onFinish(text);
         },
     });
 

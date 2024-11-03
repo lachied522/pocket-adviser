@@ -71,17 +71,17 @@ export default async function Page({
           <ChatProvider initialMessage={greeting}>
               <main className='min-h-screen'>
                 {/* Background Image */}
-                <div className='z-[-1] fixed inset-0 opacity-40 bg-slate-300'>
-                      <Image
-                        src='/background-image-main.jpg'
-                        alt='background-image'
-                        sizes='100vw'
-                        fill
-                        priority
-                        style={{
-                          objectFit: 'cover',
-                        }}
-                      />
+                <div className='z-[-1] fixed inset-0 opacity-80 bg-sky-600 blur-sm'>
+                    <Image
+                      src='/background-image-main.jpg'
+                      alt='background-image'
+                      sizes='100vw'
+                      fill
+                      priority
+                      style={{
+                        objectFit: 'cover',
+                      }}
+                    />
                 </div>
                 
                 <div className='bg-sky-600/80'>

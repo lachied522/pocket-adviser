@@ -1,11 +1,23 @@
 "use server";
 import type { NextRequest } from 'next/server';
+import { convertToCoreMessages, type Message } from 'ai';
 
-import { streamAIResponse } from './stream-ai-response';
+import type { AccountType } from '@prisma/client';
+
+import { streamAIResponse, type ToolName } from './stream-ai-response';
 import { checkRateLimits } from './ratelimit';
+import { updateNotes } from './notes';
+
+type RequestBody = {
+    messages: Message[]
+    article: any
+    toolName?: ToolName
+    userId?: string
+    accountType?: AccountType
+}
 
 export async function POST(request: NextRequest) {
-    const { messages, article, toolName, userId, accountType } = await request.json();
+    const { messages, article, toolName, userId, accountType } = await request.json() as RequestBody;
 
     // check rate limit
     const rateLimitMessage = await checkRateLimits(userId, accountType);
@@ -28,16 +40,25 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    const coreMessages = convertToCoreMessages(messages);
+
     if (article) {
-        messages[messages.length - 1].content =
-        messages[messages.length - 1].content +
+        coreMessages[coreMessages.length - 1].content =
+        coreMessages[coreMessages.length - 1].content +
         `\n\nArticle:${JSON.stringify(article)}`;
     }
 
     const response = streamAIResponse({
-        messages,
+        messages: coreMessages,
         toolName,
         userId,
+        accountType,
+        onFinish: (text: string) => {
+            if (messages.length > 3 && text.length > 0 && userId && accountType === "PAID") {
+                const _messages = convertToCoreMessages([...messages, { role: "assistant", content: text }]);
+                updateNotes(_messages, userId);
+            }
+        }
     });
 
     const stream = new ReadableStream({

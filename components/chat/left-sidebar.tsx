@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpDown, History, MessageCirclePlus, PencilRuler, SearchCheck, UserRound } from "lucide-react";
+import { ArrowUpDown, History, MessageCirclePlus, NotebookPen, PencilRuler, SearchCheck, UserRound } from "lucide-react";
 
 import {
     DropdownMenu,
@@ -17,6 +17,7 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import ProfileDialog from "../profile/profile-dialog";
+import NotesDialog from "./notes-dialog";
 import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import ConversationSelector from "./conversation-selector";
@@ -27,7 +28,7 @@ export default function LeftSidebar() {
     const isMobile = useMediaQuery(1280);
 
     return (
-        <div className='xl:w-[200px] flex flex-row xl:flex-col justify-between xl:justify-normal gap-2 xl:gap-6'>
+        <div className='xl:w-[200px] flex flex-row xl:flex-col justify-between xl:justify-normal gap-3'>
             <ProfileDialog>
                 <Button
                     variant='ghost'
@@ -37,6 +38,16 @@ export default function LeftSidebar() {
                     Profile
                 </Button>
             </ProfileDialog>
+
+            <NotesDialog>
+                <Button
+                    variant='ghost'
+                    className='w-auto xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                >
+                    <NotebookPen size={16} />
+                    Notes ✨
+                </Button>
+            </NotesDialog>
 
             {isMobile? (
             <div className='flex flex-row items-center justify-end gap-3'>
