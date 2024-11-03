@@ -40,11 +40,11 @@ const formSchema = z.object({
     mailFrequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "NEVER"]).optional(),
 });
 
-interface EmailsDialogProps {
+interface SettingsDialogProps {
     children: React.ReactNode
 }
 
-export default function EmailsDialog({ children } : EmailsDialogProps) {
+export default function SettingsDialog({ children } : SettingsDialogProps) {
     const { state, updateUserAndUpdateState } = useGlobalContext() as GlobalState;
     const { openPricing } = useUIContext() as UIState;
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,7 +52,7 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: state?.email || '',
-            mailFrequency: state?.mailFrequency || "WEEKLY",
+            mailFrequency: state?.mailFrequency || "NEVER",
         },
     });
     const closeRef = useRef<HTMLButtonElement>(null);
@@ -83,8 +83,8 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle className='flex flex-row items-center gap-1'>
-                        Email Preferences
+                    <DialogTitle>
+                        Settings
                     </DialogTitle>
                 </DialogHeader>
 
@@ -139,10 +139,10 @@ export default function EmailsDialog({ children } : EmailsDialogProps) {
                                         <FormDescription>
                                             How often would you like to receive updates from Pocket Adviser?
                                         </FormDescription>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value || "NEVER"}>
                                             <FormControl>
                                                 <SelectTrigger className='w-[180px]'>
-                                                    <SelectValue placeholder="Weekly" />
+                                                    <SelectValue placeholder="Never" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent className='w-[180px]'>

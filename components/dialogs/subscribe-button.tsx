@@ -1,15 +1,16 @@
 "use client";
 import { useState } from "react";
 
+import { ExternalLink } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 import { createCheckoutSession } from "@/actions/billing/portals";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type UIState, useUIContext } from "@/context/UIContext";
-import { ExternalLink } from "lucide-react";
 
-export default function SubscirbeButton() {
+export default function SubscribeButton() {
     const { state } = useGlobalContext() as GlobalState;
     const { openSignup } = useUIContext() as UIState;
     const [isCheckoutLoading, setIsCheckoutLoading] = useState<boolean>(false);

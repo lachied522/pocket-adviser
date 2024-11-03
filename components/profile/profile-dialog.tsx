@@ -163,7 +163,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
             </DialogTrigger>
             <DialogContent className='max-h-full max-w-6xl'>
                 <DialogHeader>
-                    <DialogTitle className='flex flex-row items-center gap-1'>
+                    <DialogTitle>
                         Profile
                     </DialogTitle>
                 </DialogHeader>

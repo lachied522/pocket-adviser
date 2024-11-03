@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { cn } from "@/components/utils";
 
 import { getNewsAction } from "@/actions/data/news";
 
@@ -20,6 +21,7 @@ interface NewsCarouselProps {
 export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isVisible, setIsVisible] = useState<boolean>(true);
     const [page, setPage] = useState<number>(0);
 
     const getNews = useCallback(
@@ -51,14 +53,25 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
     }, [page, getNews]);
 
     return (
-        <div className='hidden sm:flex flex-col items-stretch gap-2 xl:gap-3.5'>
-            <div className='flex flex-row items-center xl:flex-col xl:items-start gap-x-1 gap-y-2'>
+        <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
+            <div className='flex flex-row xl:flex-col items-center xl:items-start justify-between xl:justify-normal gap-x-1 gap-y-2'>
                 <h4 className='md:text-lg font-medium'>News</h4>
 
-                {data.length > 0 && <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>}
+                {isVisible && data.length > 0 && (
+                <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>
+                )}
+
+                <Button
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => setIsVisible((curr) => !curr)}
+                    className='xl:hidden'
+                >
+                    {isVisible? "Hide": "Show"}
+                </Button>
             </div>
 
-            <ScrollArea className='xl:h-[660px]'>
+            <ScrollArea className={cn('hidden xl:h-[660px]', isVisible && 'block')}>
                 <div className='flex flex-row xl:flex-col items-center pb-2 xl:py-0 gap-2'>
                     {data.map((article) => (
                     <NewsArticle

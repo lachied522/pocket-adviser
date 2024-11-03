@@ -31,7 +31,7 @@ export default function WelcomeDialog({ openRef }: WelcomeDialogProps) {
                 className='max-w-lg'
             >
                 <DialogHeader>
-                    <DialogTitle className='flex flex-row items-center gap-1'>
+                    <DialogTitle>
                         Welcome
                     </DialogTitle>
                 </DialogHeader>

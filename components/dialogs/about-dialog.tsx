@@ -21,9 +21,13 @@ export default function AboutDialog({ children }: AboutDialogProps) {
                 {children}
             </DialogTrigger>
             <DialogContent className='max-w-2xl'>
+                <DialogHeader>
+                    <DialogTitle>
+                        About Pocket Adviser
+                    </DialogTitle>
+                </DialogHeader>
                 <ScrollArea className='max-h-[75vh] sm:max-h-[80vh]'>
                     <div className='flex flex-col gap-6 pr-3 md:pr-0'>
-                        <H3>About Pocket Adviser</H3>
                         <p>
                             Hello! 🙋‍♂️
                             <br /><br />

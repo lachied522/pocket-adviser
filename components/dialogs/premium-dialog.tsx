@@ -7,7 +7,6 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { H1, H3 } from "@/components/ui/typography";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import SubscribeButton from "./subscribe-button";
@@ -16,7 +15,6 @@ interface PremiumDialogProps {
     children: React.ReactNode
 }
 
-
 export default function PremiumDialog({ children }: PremiumDialogProps) {
     return (
         <Dialog>
@@ -24,10 +22,13 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                 { children }
             </DialogTrigger>
             <DialogContent className='max-w-2xl'>
+                <DialogHeader>
+                    <DialogTitle>
+                        Pocket Adviser Premium
+                    </DialogTitle>
+                </DialogHeader>
                 <ScrollArea className='max-h-[80vh]'>
                     <div className='flex flex-col gap-6'>
-                        <H3>Pocket Adviser Premium</H3>
-
                         <div className='max-w-[calc(90vw-30px)] overflow-x-auto md:w-[400px] flex flex-col gap-2 p-2 sm:p-5 bg-sky-50 border-2 border-sky-600 rounded-lg'>
                             <div className='flex flex-col items-start md:flex-row md:items-end justify-between gap-2 md:gap-10'>
                                 <div className=''>

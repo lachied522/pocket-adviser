@@ -12,7 +12,12 @@ export function Provider({
   session,
 }: ProviderProps) {
   return (
-    <SessionProvider session={session}>
+    <SessionProvider
+        session={session}
+        refetchInterval={5 * 60}
+        // Re-fetches session when window is focused
+        refetchOnWindowFocus={false}
+    >
         {children}
     </SessionProvider>
   )

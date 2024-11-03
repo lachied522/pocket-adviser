@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import Logo from "@/components/ui/logo";
 import Container from "@/components/ui/container";
 import AboutDialog from "@/components/dialogs/about-dialog";
-import EmailsDialog from "@/components/dialogs/emails-dialog";
+import SettingsDialog from "@/components/dialogs/settings-dialog";
 import PremiumDialog from "@/components/dialogs/premium-dialog";
 import AuthDialog from "@/components/auth/auth-dialog";
 
@@ -109,7 +109,7 @@ export default function Header() {
                 </a>
             </div>
 
-            <div className='place-self-end flex flex-row items-center gap-2'>
+            <div className='place-self-end flex flex-row items-center gap-3'>
                 {state && !isGuest? (
                 <div className='text-sm lg:text-base text-white text-right font-medium shrink-0'>Welcome {state.name}</div>
                 ) : (
@@ -146,46 +146,13 @@ export default function Header() {
                             className='h-8 w-8 p-0 hover:bg-slate-100/10'
                         >
                             {isMobile ? (
-                            <Menu size={18} strokeWidth={2} color='white' />
+                            <Menu size={20} strokeWidth={2} color='white' />
                             ) : (
-                            <Settings size={18} strokeWidth={2} color='white' />
+                            <Settings size={20} strokeWidth={2} color='white' />
                             )}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className='w-fit flex flex-col justify-center p-2 bg-slate-100'>
-                        {state && !isGuest && (
-                        <>
-                            <Button
-                                aria-label='billing'
-                                variant='ghost'
-                                size='sm'
-                                onClick={onBillingButtonClick}
-                                className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
-                            >
-                                <ScrollText size={18} strokeWidth={2} />
-                                <span className='text-xs'>Billing</span>
-                            </Button>
-
-                            <Separator className='my-1' />
-
-                            <EmailsDialog>
-                                <Button
-                                    aria-label='email-preferences'
-                                    variant='ghost'
-                                    size='sm'
-                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
-                                >
-                                    <Mail size={18} strokeWidth={2} />
-                                    <span className='text-xs'>Email</span>
-                                </Button>
-                            </EmailsDialog>
-                        </>
-                        )}
-
-                        {isMobile && state && !isGuest && (
-                        <Separator className='my-1' />
-                        )}
-
                         {isMobile && (
                         <>
                             <AboutDialog>
@@ -209,38 +176,37 @@ export default function Header() {
                                     <span className='text-xs'>Premium</span>
                                 </Button>
                             </PremiumDialog>
+                        </>
+                        )}
+
+                        {state && !isGuest && (
+                        <>
+                            {isMobile && <Separator className='my-1' />}
+
+                            <Button
+                                aria-label='billing'
+                                variant='ghost'
+                                size='sm'
+                                onClick={onBillingButtonClick}
+                                className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+                            >
+                                <ScrollText size={18} strokeWidth={2} />
+                                <span className='text-xs'>Billing</span>
+                            </Button>
 
                             <Separator className='my-1' />
-                            
-                            <a href="mailto:lachie@pocketadviser.com.au">
-                                <Button
-                                    type='button'
-                                    variant='ghost'
-                                    size='sm'
-                                    className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
-                                >
-                                    <Mail size={18} strokeWidth={2} />
-                                    <span className='text-xs'>Contact</span>
-                                </Button>
-                            </a>
-                            
-                            {/* {state && !isGuest && (
-                            <>
-                                <Separator className='my-1' />
 
+                            <SettingsDialog>
                                 <Button
-                                    title='Logout'
-                                    aria-label='logout'
+                                    aria-label='email-preferences'
                                     variant='ghost'
                                     size='sm'
-                                    onClick={onSignOut}
                                     className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
                                 >
-                                    <LogOut size={18} strokeWidth={2.5} />
-                                    <span className='text-xs'>Logout</span>
+                                    <Settings size={18} strokeWidth={2} />
+                                    <span className='text-xs'>Settings</span>
                                 </Button>
-                            </>
-                            )} */}
+                            </SettingsDialog>
                         </>
                         )}
                     </PopoverContent>
