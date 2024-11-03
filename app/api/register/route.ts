@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     });
 
     if (exist) {
-        return new NextResponse("User already exists", { status: 400 });
+        return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
     // create hashed password

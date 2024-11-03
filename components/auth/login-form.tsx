@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,7 +8,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,11 +24,12 @@ const formSchema = z.object({
 });
 
 interface LoginFormProps {
+    loginError: string|null
     onSuccess: (provider: "credentials"|"github"|"google", values: any) => Promise<void>
     onNavigateSignup: () => void
 }
 
-export default function LoginForm({ onSuccess, onNavigateSignup }: LoginFormProps) {
+export default function LoginForm({ loginError, onSuccess, onNavigateSignup }: LoginFormProps) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -39,9 +39,19 @@ export default function LoginForm({ onSuccess, onNavigateSignup }: LoginFormProp
         },
     });
 
+    useEffect(() => {
+        if (loginError) {
+            form.setError("email", { message: loginError });
+            form.setError("password", { message: loginError });
+        } else {
+            form.clearErrors();
+        }
+    }, [form, loginError]);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setIsLoading(true);
         await onSuccess("credentials", values);
+        setIsLoading(false);
     }
 
     return (

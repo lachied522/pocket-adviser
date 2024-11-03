@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 
@@ -7,7 +7,6 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -17,27 +16,46 @@ import { Button } from "@/components/ui/button";
 import SignupForm from "./signup-form";
 import LoginForm from "./login-form";
 
-interface GetAdviceDialogProps {
+interface AuthDialogProps {
     children: React.ReactNode
     initialTab?: 'login'|'signup'
 }
 
-export default function AuthDialog({ children, initialTab }: GetAdviceDialogProps) {
+export default function AuthDialog({ children, initialTab }: AuthDialogProps) {
     const [tab, setTab] = useState<'login'|'signup'>(initialTab || 'signup');
+    const [loginError, setLoginError] = useState<string|null>(null);
     const closeRef = useRef<HTMLButtonElement>(null);
 
-    const onSignin = async (provider: "credentials"|"github"|"google", values?: any) => {
-        if (provider === "credentials") {
-            await signIn("credentials", {
-                ...values,
-                redirect: false,
-            });
-            // refresh page
-            window.location.reload();
-        } else {
-            await signIn(provider);
-        }
-    }
+    const onSignin = useCallback(
+        async (provider: "credentials"|"github"|"google", values?: any) => {
+            setLoginError(null);
+
+            if (provider === "credentials") {
+                const response = await signIn("credentials", {
+                    ...values,
+                    redirect: false,
+                });
+
+                if (!response) {
+                    setLoginError("Something went wrong");
+                    return;
+                }
+
+                if (response.error) {
+                    // Auth.js cannot only provide generic error message
+                    // see https://github.com/nextauthjs/next-auth/discussions/8999
+                    setLoginError("Email or password incorrect");
+                    return;
+                }
+
+                // success - reload page
+                window.location.reload();
+            } else {
+                await signIn(provider);
+            }
+        },
+        [setLoginError]
+    );
 
     return (
         <Dialog>
@@ -61,6 +79,7 @@ export default function AuthDialog({ children, initialTab }: GetAdviceDialogProp
                     <LoginForm
                         onSuccess={onSignin}
                         onNavigateSignup={() => setTab('signup')}
+                        loginError={loginError}
                     />
                     )}
 

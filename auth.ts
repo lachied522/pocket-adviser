@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import NextAuth from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -39,28 +39,22 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           password: { label: "Password", type: "password" },
         },
         authorize: async (credentials) => {
-          if (!credentials) {
-              return null;
-          }
-
-          // logic to verify if user exists
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string }
           });
 
           if (!user) {
-            // No user found, so this is their first attempt to login
-            // meaning this is also the place you could do registration
-            throw new Error("User not found.");
+              // this error will never reach the client, will show as uncaught error on server
+              // see https://github.com/nextauthjs/next-auth/discussions/8999
+              throw new AuthError("User not found");
           }
 
           const passwordsMatch = await bcrypt.compare(credentials.password as string, user.hashedPassword!);
 
           if (!passwordsMatch) {
-              throw new Error("Passwords do not match.");
+              throw new AuthError("Passwords do not match");
           }
 
-          // return user object with the their profile data
           return user;
         },
       }),

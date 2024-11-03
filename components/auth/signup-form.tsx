@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,7 +8,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -40,33 +39,42 @@ export default function SignupForm({ onSuccess, onNavigateLogin }: SignupFormPro
         defaultValues: {},
     });
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        setIsLoading(true);
+    const onSubmit = useCallback(
+        async (values: z.infer<typeof formSchema>) => {
+            setIsLoading(true);
 
-        const response = await fetch('/api/register', {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: {
-                "Content-Type": "application/json"
+            const response = await fetch('/api/register', {
+                method: "POST",
+                body: JSON.stringify(values),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                const { error } = await response.json();
+                if (error === "User already exists") {
+                    form.setError("email", { message: "Email already in use" });
+                } else {
+                    form.setError("email", { message: "Something went wrong" });
+                }
+                setIsLoading(false);
+                return;
             }
-        });
 
-        if (!response.ok) {
-            // TO DO
-            return;
-        }
+            // sign in with credentials
+            await onSuccess("credentials", {
+                ...values,
+                redirect: false,
+            });
 
-        setIsLoading(false);
+            // reset form after 1 sec
+            setTimeout(() => form.reset(), 1000);
 
-        // sign in with credentials
-        await onSuccess("credentials", {
-            ...values,
-            redirect: false,
-        });
-
-        // reset form after 1 sec
-        setTimeout(() => form.reset(), 1000);
-    }
+            setIsLoading(false);
+        },
+        [form, setIsLoading, onSuccess]
+    );
 
     return (
         <Form {...form}>
