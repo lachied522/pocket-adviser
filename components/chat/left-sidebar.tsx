@@ -28,26 +28,28 @@ export default function LeftSidebar() {
     const isMobile = useMediaQuery(1280);
 
     return (
-        <div className='xl:w-[200px] flex flex-row xl:flex-col justify-between xl:justify-normal gap-3'>
-            <ProfileDialog>
-                <Button
-                    variant='ghost'
-                    className='w-auto xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
-                >
-                    <UserRound size={16} />
-                    Profile
-                </Button>
-            </ProfileDialog>
+        <div className='xl:w-[200px] flex flex-wrap xl:flex-col justify-between xl:justify-normal gap-3'>
+            <div className='flex flex-row xl:flex-col justify-between xl:justify-normal gap-3'>
+                <ProfileDialog>
+                    <Button
+                        variant='ghost'
+                        className='w-auto xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                    >
+                        <UserRound size={16} />
+                        Profile
+                    </Button>
+                </ProfileDialog>
 
-            <NotesDialog>
-                <Button
-                    variant='ghost'
-                    className='w-auto xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
-                >
-                    <NotebookPen size={16} />
-                    Notes ✨
-                </Button>
-            </NotesDialog>
+                <NotesDialog>
+                    <Button
+                        variant='ghost'
+                        className='w-auto xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                    >
+                        <NotebookPen size={16} />
+                        Notes ✨
+                    </Button>
+                </NotesDialog>
+            </div>
 
             {isMobile? (
             <div className='flex flex-row items-center justify-end gap-3'>
@@ -131,7 +133,7 @@ export default function LeftSidebar() {
                 </DropdownMenu>
             </div>
             ) : (
-            <>
+            <div className='hidden sm:flex flex-row xl:flex-col gap-3'>
                 <Separator className='hidden xl:block xl:w-[180px] my-2 xl:my-auto' />
             
                 <ScrollArea className=''>
@@ -183,7 +185,7 @@ export default function LeftSidebar() {
                     </div>
                     <ScrollBar orientation="horizontal" />
                 </ScrollArea>
-            </>
+            </div>
             )}            
         </div>
     )
