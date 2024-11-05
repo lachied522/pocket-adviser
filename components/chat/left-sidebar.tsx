@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowUpDown, History, MessageCirclePlus, NotebookPen, PencilRuler, SearchCheck, UserRound } from "lucide-react";
 
 import {
@@ -11,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
+import { getMoreConversationsAction } from "@/actions/crud/conversation";
+
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
@@ -22,10 +25,61 @@ import GetAdviceDialog from "./get-advice-dialog";
 import CheckupDialog from "./checkup-dialog";
 import ConversationSelector from "./conversation-selector";
 
+const CONVERSATIONS_PER_PAGE = 10;
+
+// TO DO: handle pagination on mobile
+
 export default function LeftSidebar() {
-    const { state } = useGlobalContext() as GlobalState;
+    const { state, dispatch } = useGlobalContext() as GlobalState;
     const { conversationId, onNewChat } = useChatContext() as ChatState;
+    const [shouldFetchMore, setShouldFetchMore] = useState<boolean>((state?.conversations || []).length >= CONVERSATIONS_PER_PAGE);
+    const [isAtBottom, setIsAtBottom] = useState<boolean>(false);
+    const bottomRef = useRef<HTMLDivElement>(null);
     const isMobile = useMediaQuery(1280);
+
+    const fetchConversations = useCallback(
+        async (nextPage: number) => {
+            if (state?.id && shouldFetchMore) {
+                const _conversations = await getMoreConversationsAction(state.id, nextPage, CONVERSATIONS_PER_PAGE);
+                for (const _conversation of _conversations) {
+                    dispatch({
+                        type: 'INSERT_CONVERSATION_END',
+                        payload: _conversation,
+                    });
+                }
+                setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
+            }
+        },
+        [state?.id, shouldFetchMore, setShouldFetchMore, dispatch]
+    );
+
+    useEffect(() => {
+        if (state?.conversations && isAtBottom) {
+            fetchConversations(Math.floor(state.conversations.length / CONVERSATIONS_PER_PAGE));
+        }
+    }, [state?.conversations, isAtBottom]);
+
+    useEffect(() => {
+        // trigger fetch for when bottomRef is in view
+        let observer = new IntersectionObserver(
+            entries => {
+                entries.forEach(entry => {
+                    setIsAtBottom(entry.isIntersecting);
+                })
+            },
+            {
+                rootMargin: '0px 0px -100px 0px'
+            }
+        );
+
+        if (bottomRef.current) {
+            observer.observe(bottomRef.current);
+        }
+
+        return () => {
+            observer.disconnect();
+        }
+    }, []);
 
     return (
         <div className='xl:w-[200px] flex flex-wrap xl:flex-col justify-between xl:justify-normal gap-3'>
@@ -117,9 +171,9 @@ export default function LeftSidebar() {
                         className='w-auto p-2'
                     >
                         <ScrollArea className='h-[440px]'>
-                            <div className='flex flex-col items-center gap-3.5'>
-                                {state?.conversations.map((conversation) => (
-                                <DropdownMenuItem key={`conversation-${conversation.id}`} asChild>
+                            <div className='flex flex-col items-center gap-2 relative'>
+                                {state?.conversations.map((conversation, index) => (
+                                <DropdownMenuItem key={`conversation-${conversation.id}-${index}`}  asChild>
                                     <ConversationSelector {...conversation} />
                                 </DropdownMenuItem>
                                 ))}
@@ -176,12 +230,14 @@ export default function LeftSidebar() {
 
                 <ScrollArea className='xl:h-[440px]'>
                     <div className='flex flex-row xl:flex-col items-center xl:items-start gap-3.5 pb-2 xl:pb-0'>
-                        {state?.conversations.map((conversation) => (
+                        {state?.conversations.map((conversation, index) => (
                         <ConversationSelector
-                            key={`conversation-${conversation.id}`}
+                            key={`conversation-${conversation.id}-${index}`}
                             {...conversation}
                         />
                         ))}
+
+                        <div className='w-full h-px' ref={bottomRef} />
                     </div>
                     <ScrollBar orientation="horizontal" />
                 </ScrollArea>

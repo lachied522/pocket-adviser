@@ -10,11 +10,24 @@ import {
 import { useChat } from 'ai/react';
 import { generateId, type Message } from 'ai';
 
-import { getConversationAction, appendMessagesAction } from "@/actions/crud/conversation";
+import { getConversationAction, updateConversationAction } from "@/actions/crud/conversation";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import type { StockNews } from "@/types/data";
+import type { Conversation } from "@prisma/client";
+
+function convertToSafeMessages(messages: Message[]) {
+    // convert to JSON-compatible array
+    return [...messages.map((message) => ({
+        id: message.id,
+        role: message.role,
+        content: message.content,
+        data: message.data,
+        createdAt: message.createdAt instanceof Date? message.createdAt.toISOString(): message.createdAt,
+        toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
+    }))] satisfies Conversation["messages"]
+}
 
 export type ChatState = {
     input: string
@@ -46,16 +59,12 @@ export function ChatProvider({
   initialMessage,
 }: ChatProviderProps) {
     const { state, insertConversationAndUpdateState } = useGlobalContext() as GlobalState;
-    const [conversationId, setConversationId] = useState<string|undefined>(undefined); // id of conversation in db
+    const [conversationId, setConversationId] = useState<string|null>(null); // id of conversation in db
     const [chatId, setChatId] = useState<number>(0); // id of conversation in chat state, used for getting resetting chat
     const [initialMessages, setInitialMessages] = useState<Message[]>(
         initialMessage? [{ id: generateId(), role: "assistant", content: initialMessage }]: []
     );
     const [article, setArticle] = useState<StockNews|null>(null);
-    // messages to be saved to db
-    const [messageQueue, setMessageQueue] = useState<Message[]>(
-        initialMessage? [{ id: generateId(), role: "assistant", content: initialMessage }]: []
-    );
     const { messages, input, isLoading, error, setInput, append } = useChat({
         id: chatId.toString(),
         initialMessages,
@@ -66,67 +75,66 @@ export function ChatProvider({
             accountType: state?.accountType,
             conversationId,
         },
-        onFinish(message) {
-            setMessageQueue((curr) => [...curr, message]);
+        async onFinish(message: Message) {
+            try {
+                // sometimes message.content is undefined ???
+                if (message.role === "assistant" && message.content.length > 0) {
+                    await syncConversation(conversationId, messages);
+                }
+            } catch (e) {
+                // pass
+            }
         }
     });
 
+    const syncConversation = useCallback(
+        async (id: string|null, _messages: Message[]) => {
+            if (id) {
+                try {
+                    await updateConversationAction(
+                        id,
+                        { messages: convertToSafeMessages(_messages) }
+                    );   
+                } catch (e) {
+                    // TO DO
+                    console.error("Couldn't update conversation for ", id);
+                }
+            } else {
+               // create new conversation record
+               const lastUserMessage = _messages.filter((message) => message.role === "user")?.[0].content;
+               const _id = await insertConversationAndUpdateState({
+                   name: lastUserMessage?.slice(0, 50) || "New conversation",
+                   messages: convertToSafeMessages(_messages),
+               });
+               setConversationId(_id);
+            }
+        },
+        [insertConversationAndUpdateState, setConversationId]
+    );
+
     const onNewChat = useCallback(
         () => {
-            setChatId((curr) => curr + 1);
-            setConversationId(undefined);
             setInitialMessages([]);
-            setMessageQueue([]);
-            setInput('');
+            setChatId((curr) => curr + 1); // required to reset chat state
+            setConversationId(null);
             setArticle(null);
+            setInput('');
         },
-        [setChatId, setConversationId, setInitialMessages, setMessageQueue, setInput, setArticle]
+        [setChatId, setConversationId, setInitialMessages, setInput, setArticle]
     );
 
     const onSelectConversation = useCallback(
         async (newConversationId: string) => {
             const res = await getConversationAction(newConversationId);
-            console.log(res);
             if (res) {
                 setChatId((curr) => curr + 1);
                 setInitialMessages(res.messages as any);
                 setConversationId(newConversationId);
             }
-            // reset input and article
-            setInput('');
             setArticle(null);
-            setMessageQueue([]);
+            setInput('');
         },
-        [setChatId, setConversationId, setInitialMessages, setMessageQueue, setInput, setArticle]
-    );
-
-    const saveConversation = useCallback(
-        async (newMessages: Message[]) => {
-            if (!conversationId) {
-                // create new conversation record
-                const lastUserMessage = newMessages.filter((message) => message.role === "user")?.[0].content;
-                const _conversationId = await insertConversationAndUpdateState({
-                    name: lastUserMessage?.slice(0, 50) || "New conversation",
-                    messages: [
-                        // convert to JSON-compatible array
-                        ...newMessages.map(
-                            (message) => ({
-                                id: message.id,
-                                role: message.role,
-                                content: message.content,
-                                data: message.data,
-                                createdAt: message.createdAt?.toISOString(),
-                                toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
-                            })
-                        )
-                    ],
-                });
-                setConversationId(_conversationId);
-            } else {
-                await appendMessagesAction(conversationId, newMessages);
-            }
-        },
-        [conversationId, insertConversationAndUpdateState, setConversationId]
+        [setChatId, setConversationId, setInitialMessages, setInput, setArticle]
     );
 
     const onSubmit = useCallback(
@@ -138,22 +146,12 @@ export function ChatProvider({
                 data: { article },
                 content,
             };
-            setMessageQueue((curr) => [...curr, message]);
             append(message, { body: { toolName, article } });
             setArticle(null);
             setInput('');
         },
-        [isLoading, article, setInput, setArticle, setMessageQueue, append]
+        [isLoading, article, setInput, setArticle, append]
     );
-
-    useEffect(() => {
-        // sync conversation with db once assistant message is received
-        const lastMessage = messageQueue.length > 1? messageQueue[messageQueue.length - 1]: null;
-        if (lastMessage && lastMessage.role === "assistant" && lastMessage.content.length > 0) {
-            saveConversation(messageQueue);
-            setMessageQueue([]);
-        }
-    }, [messageQueue, saveConversation, setMessageQueue]);
 
     return (
         <ChatContext.Provider

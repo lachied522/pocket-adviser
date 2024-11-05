@@ -6,7 +6,6 @@ export function useScrollAnchor() {
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const anchorRef = useRef<HTMLDivElement>(null); // placeholder element at bottom of scroll area
-    const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // timeout for handling scroll delay
 
     const scrollToBottom = useCallback(
         () => {

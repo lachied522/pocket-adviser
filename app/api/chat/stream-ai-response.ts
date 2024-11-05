@@ -19,21 +19,25 @@ import type { AccountType } from '@prisma/client';
 
 export type ToolName = "getRecommendations" | "shouldBuyOrSellStock" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
 
-const FINISH_STEP = {
-    finishReason: "stop",
-    usage: {
-        promptTokens: 0,
-        completionTokens: 0,
-    },
-    isContinued: false,
+function getFinishStep(finishReason: "stop"|"tool-calls") {
+    return {
+        finishReason,
+        usage: {
+            promptTokens: 0,
+            completionTokens: 0,
+        },
+        isContinued: false,
+    }
 }
 
-const FINISH_STREAM = {
-    finishReason: "stop",
-    usage: {
-        promptTokens: 0,
-        completionTokens: 0,
-    },
+function getFinishStream(finishReason: "stop"|"tool-calls") {
+    return {
+        finishReason,
+        usage: {
+            promptTokens: 0,
+            completionTokens: 0,
+        },
+    }
 }
 
 // TO DO: type this properly
@@ -50,7 +54,7 @@ function getAutoResponseForRecommendations(args: any, data: any) {
 
     return (
         `Here ${numTransactions > 1? "are": "is"} ${numTransactions} possible trade ${numTransactions > 1? "ideas": "idea"} for your ` +
-        `${args.action === "review"? "portfolio": "$" + args.amount.toLocaleString() + (args.action === "withdraw"? "withdrawal": "deposit")}. ` +
+        `${args.action === "review"? "portfolio": "$" + args.amount.toLocaleString() + (args.action === "withdraw"? " withdrawal": " deposit")}. ` +
         "Please note this is not formal advice. " +
         "Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂"
     );
@@ -206,9 +210,10 @@ export async function* streamAIResponse({
                             })
                         }\n`;
                         // must tell client that tool part is finished
-                        yield `e:${JSON.stringify(FINISH_STEP)}\n`;
+                        yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
                         yield `0:${JSON.stringify(getAutoResponseForRecommendations(part.args, part.result))}\n`;
-                        yield `d:${JSON.stringify(FINISH_STREAM)}\n`;
+                        yield `e:${JSON.stringify(getFinishStep("stop"))}\n`;
+                        yield `d:${JSON.stringify(getFinishStream("stop"))}\n`;
                         break;
                     }
                     case 'shouldBuyOrSellStock': {
@@ -219,9 +224,10 @@ export async function* streamAIResponse({
                             })
                         }\n`;
                         // must tell client that tool part is finished
-                        yield `e:${JSON.stringify(FINISH_STEP)}\n`;
+                        yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
                         yield `0:${JSON.stringify(getAutoResponseForStockAdvice(part.args, part.result))}\n`;
-                        yield `d:${JSON.stringify(FINISH_STREAM)}\n`;
+                        yield `e:${JSON.stringify(getFinishStep("stop"))}\n`;
+                        yield `d:${JSON.stringify(getFinishStream("stop"))}\n`;
                         break;
                     }
                     default: {

@@ -19,7 +19,10 @@ export type Action = {
     type: 'UPDATE_PROFILE'
     payload: UserData['profile']
 } | {
-    type: 'INSERT_CONVERSATION'
+    type: 'INSERT_CONVERSATION_START'
+    payload: UserData['conversations'][number]
+} | {
+    type: 'INSERT_CONVERSATION_END'
     payload: UserData['conversations'][number]
 } | {
     type: 'UPDATE_CONVERSATION'
@@ -85,10 +88,17 @@ export function GlobalReducer(state: UserData|null, action: Action) {
             }
         }
 
-        case 'INSERT_CONVERSATION': {
+        case 'INSERT_CONVERSATION_START': {
             return {
                 ...state,
                 conversations: [action.payload, ...state.conversations]
+            }
+        }
+
+        case 'INSERT_CONVERSATION_END': {
+            return {
+                ...state,
+                conversations: [...state.conversations, action.payload]
             }
         }
 

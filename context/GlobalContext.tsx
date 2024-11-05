@@ -225,7 +225,7 @@ export const GlobalProvider = ({
 
       // update state
       dispatch({
-        type: 'INSERT_CONVERSATION',
+        type: 'INSERT_CONVERSATION_START',
         payload: {
             id: res.id,
             name: res.name,
@@ -250,7 +250,7 @@ export const GlobalProvider = ({
           id: res.id,
           name: res.name,
         }
-      })
+      });
     },
     [state, dispatch]
   );
@@ -265,7 +265,7 @@ export const GlobalProvider = ({
       dispatch({
         type: 'DELETE_CONVERSATION',
         payload: res.id,
-      })
+      });
     },
     [state, dispatch]
   );

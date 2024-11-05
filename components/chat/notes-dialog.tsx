@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 
-import { Trash2 } from "lucide-react";
+import { Check, Trash2, X } from "lucide-react";
 
 import {
     Dialog,
@@ -36,16 +36,17 @@ export default function NotesDialog({ children }: NotesDialogProps) {
     const { state } = useGlobalContext() as GlobalState;
     const [notes, setNotes] = useState<Note[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState<boolean>(false);
 
     useEffect(() => {
-        if (state && state.accountType !== "FREE") {
-            (async function getNotes() {
+        (async function getNotes() {
+            if (state && state.accountType !== "FREE") {
                 setIsLoading(true);
                 const _notes = await getNotesAction(state.id);
                 setNotes(_notes);
-                setIsLoading(false);
-            })();
-        }
+            }
+            setIsLoading(false);
+        })();
     }, [state]);
 
     const onDelete = useCallback(async (id: string) => {
@@ -54,9 +55,12 @@ export default function NotesDialog({ children }: NotesDialogProps) {
     }, [setNotes]);
 
     const onDeleteAll = useCallback(async () => {
+        setIsLoading(true);
         await Promise.all(notes.map((note) => deleteNoteAction(note.id)))
         setNotes([]);
-    }, [setNotes]);
+        setIsLoading(false);
+        setIsConfirmDeleteVisible(false);
+    }, [setNotes, setIsLoading, setIsConfirmDeleteVisible]);
 
     return (
         <Dialog>
@@ -75,14 +79,37 @@ export default function NotesDialog({ children }: NotesDialogProps) {
 
                 <ScrollArea className='h-[600px]'>
                     <div className='flex flex-col gap-2'>
+                        {isConfirmDeleteVisible? (
+                        <div className='w-full flex flex-row items-center justify-end gap-2'>
+                            <span>Are you sure?</span>
+                            <Button
+                                variant='ghost'
+                                size='sm'
+                                onClick={() => setIsConfirmDeleteVisible(false)}
+                                disabled={isLoading}
+                            >
+                                <X size={18} color='rgb(220 38 38)' />
+                            </Button>
+                            <Button
+                                variant='ghost'
+                                size='sm'
+                                onClick={onDeleteAll}
+                                disabled={isLoading}
+                            >
+                                <Check size={18} color='rgb(22 163 74)' />
+                            </Button>
+                        </div>
+                        ) : (
                         <Button
                             variant='ghost'
                             size='sm'
+                            onClick={() => setIsConfirmDeleteVisible(true)}
                             disabled={isLoading}
                             className='font-medium py-3 border border-neutral-600 self-end'
                         >
                             Clear notes
                         </Button>
+                        )}
 
                         {isLoading? (
                         <div className='flex flex-col gap-2'>

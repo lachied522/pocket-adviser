@@ -19,6 +19,21 @@ export async function getConversationById(id: string) {
     });
 }
 
+export async function getConversationsByUserId(userId: string, page: number = 0, take: number = 10) {
+    return await prisma.conversation.findMany({
+        where: { userId },
+        select: {
+            id: true,
+            name: true
+        },
+        orderBy: {
+            updatedAt: 'desc',
+        },
+        skip: page * take,
+        take,
+    });
+}
+
 export async function updateConversation(
     id: string,
     data: Partial<Conversation>
