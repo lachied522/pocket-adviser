@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
-import { Search, Trash, Trash2 } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
+
+import debounce from "lodash.debounce";
 
 import {
     Dialog,
@@ -9,6 +11,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogTrigger,
     DialogFooter,
 } from "@/components/ui/dialog";
@@ -31,11 +34,14 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import type { Holding, Stock } from "@prisma/client";
 
-type ModifiedHolding = Holding & {
-    inserted?: boolean
-    updated?: boolean
-    deleted?: boolean
-}
+type ModifiedHolding = (
+    Omit<Holding, 'userId'> & 
+    {
+        inserted?: boolean
+        updated?: boolean
+        deleted?: boolean
+    }
+)
 
 const MAX_PAGE_SIZE = 20;
 
@@ -44,8 +50,8 @@ function EditHolding({
     onUpdate,
     onRemove
 } : {
-    holding: Holding
-    onUpdate: (values: Holding) => void
+    holding: ModifiedHolding
+    onUpdate: (values: ModifiedHolding) => void
     onRemove: () => void
 }) {
     const { getStockData } = useGlobalContext() as GlobalState;
@@ -119,8 +125,7 @@ export default function EditPortfolioDialog({
     const [searchString, setSearchString] = useState<string>('');
     const [searchResults, setSearchResults] = useState<Stock[]>([]);
     const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
-    const [isSearchEmpty, setIsSearchEmpty] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
     const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -134,100 +139,113 @@ export default function EditPortfolioDialog({
         .slice(MAX_PAGE_SIZE * page, MAX_PAGE_SIZE * (page + 1));
     }, [modifiedHoldings, page]);
 
-    const onSubmit = async () => {
-        setIsLoading(true);
-        // initiliase promises array
-        const promises: Promise<any>[] = [];
-        // delete any stocks that are in state but not modified array
-        for (const modifiedHolding of modifiedHoldings) {
-            if (modifiedHolding.inserted) {
-                promises.push(insertHoldingAndUpdateState({
-                    stockId: modifiedHolding.stockId,
-                    units: modifiedHolding.units,
-                }));
-            } else if (modifiedHolding.updated) {
-                promises.push(updateHoldingAndUpdateState({
-                    id: modifiedHolding.id,
-                    stockId: modifiedHolding.stockId,
-                    units: modifiedHolding.units,
-                }));
-            } else if (modifiedHolding.deleted) {
-                promises.push(deleteHoldingAndUpdateState(modifiedHolding.id));
+    const onSubmit = useCallback(
+        async () => {
+            setIsSubmitLoading(true);
+            // initiliase promises array
+            const promises: Promise<any>[] = [];
+            // delete any stocks that are in state but not modified array
+            for (const modifiedHolding of modifiedHoldings) {
+                if (modifiedHolding.inserted) {
+                    promises.push(insertHoldingAndUpdateState({
+                        stockId: modifiedHolding.stockId,
+                        units: modifiedHolding.units,
+                    }));
+                } else if (modifiedHolding.updated) {
+                    promises.push(updateHoldingAndUpdateState({
+                        id: modifiedHolding.id,
+                        stockId: modifiedHolding.stockId,
+                        units: modifiedHolding.units,
+                    }));
+                } else if (modifiedHolding.deleted) {
+                    promises.push(deleteHoldingAndUpdateState(modifiedHolding.id));
+                }
             }
-        }
 
-        await Promise.all(promises);
-        setIsLoading(false);
-        // close dialog
-        if (closeRef.current) {
-            closeRef.current.click();
-        }
-    }
-
-    const onSearch = async () => {
-        setIsSearchEmpty(false);
-        setIsSearchLoading(true);
-        const data = await searchStocksAction(searchString);
-        if (data.length === 0) {
-            setIsSearchEmpty(true);
-        }
-        setSearchResults(data);
-        setIsSearchLoading(false);
-    }
-
-    const clearSearch = () => {
-        setSearchString('');
-        setSearchResults([]);
-    }
-
-    const onAddHolding = (stock: Stock) => {
-        let newValue = [...modifiedHoldings];
-        // check that stock is not already in portfolio
-        if (!modifiedHoldings.find((obj) => obj.stockId === stock.id)) {
-            // add stock to modified holdings array
-            // create temporary id which will be overwritten when added to db
-            const existingIds = modifiedHoldings.map((obj) => obj.id);
-            let id = 1;
-            while (existingIds.includes(id)) {
-                id++;
+            await Promise.all(promises);
+            // close dialog
+            if (closeRef.current) {
+                closeRef.current.click();
             }
-            const newHolding: ModifiedHolding = {
-                id,
-                units: 0,
-                stockId: stock.id,
-                userId: '',
-                inserted: true,
+            setIsSubmitLoading(false);
+        },
+        [modifiedHoldings, setIsSubmitLoading, insertHoldingAndUpdateState, updateHoldingAndUpdateState, deleteHoldingAndUpdateState]
+    );
+
+    const debouncedSearch = debounce(
+        async (_searchString: string) => {
+            try {
+                if (_searchString.length > 0) {
+                    const data = await searchStocksAction(_searchString);
+                    setSearchResults(data);
+                    setIsSearchLoading(false);    
+                } else {
+                    setSearchResults([]);
+                    setIsSearchLoading(false);
+                }
+
+            } catch (e) {
+                // pass
             }
-            newValue.push(newHolding);
-        }
-        // update state
-        setModifiedHoldings(newValue);
-        // clear search
-        clearSearch();
-        // navigate to last page if necessary
-        if (page < Math.floor((Math.max(newValue.filter((holding) => !holding.deleted).length, 1) - 1) / MAX_PAGE_SIZE)) setPage((curr) => curr + 1);
-    }
+        },
+        500,
+    );
 
-    const onUpdateHolding = (holding: Holding) => {
-        setModifiedHoldings((curr) => (
-            curr.map((obj) => obj.id === holding.id? { ...holding, updated: true }: obj)
-        ));
-    }
+    const clearSearch = useCallback(
+        () => {
+            setSearchString('');
+            setSearchResults([]);
+        }, [setSearchString, setSearchResults]
+    );
 
-    const onRemoveHolding = (holding: Holding) => {
-        setModifiedHoldings((curr) => (
-            curr.map((obj) => obj.id === holding.id? { ...holding, deleted: true }: obj)
-        ));
-        // navigate to first page
-        setPage(0);
-    }
+    const onAddHolding = useCallback(
+        (stock: Stock) => {            
+            // update state
+            setModifiedHoldings((curr) => {
+                // check that stock is not already in portfolio
+                if (curr.find((obj) => obj.stockId === stock.id)) return curr;
+                // add stock to modified holdings array
+                // create temporary id which will be overwritten when added to db
+                const existingIds = curr.map((obj) => obj.id);
+                let id = 1;
+                while (existingIds.includes(id)) {
+                    id++;
+                }
+                return [
+                    ...curr,
+                    {
+                        id,
+                        units: 0,
+                        stockId: stock.id,
+                        inserted: true,
+                    }
+                ]
+            });
+            // clear search
+            clearSearch();
+        },
+        [setModifiedHoldings, clearSearch]
+    );
 
-    const onCancel = () => {
-        // reset modified holdings array
-        setModifiedHoldings(state?.holdings || []);
-        // clear search
-        clearSearch();
-    }
+    const onUpdateHolding = useCallback(
+        (holding: ModifiedHolding) => {
+            setModifiedHoldings((curr) => (
+                curr.map((obj) => obj.id === holding.id? { ...holding, updated: true }: obj)
+            ));
+        },
+        [setModifiedHoldings]
+    )
+
+    const onRemoveHolding = useCallback(
+        (holding: ModifiedHolding) => {
+            setModifiedHoldings((curr) => (
+                curr.map((obj) => obj.id === holding.id? { ...holding, deleted: true }: obj)
+            ));
+            // navigate to first page
+            setPage(0);
+        },
+        [setModifiedHoldings, setPage]
+    );
 
     return (
         <Dialog>
@@ -239,146 +257,143 @@ export default function EditPortfolioDialog({
                     <DialogTitle>
                         Edit Your Portfolio
                     </DialogTitle>
+                    <DialogDescription>
+                        Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.
+                    </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className='h-[60vh] sm:h-[80vh]'>
-                    <div className='flex flex-col gap-6'>
-                        <p className=''>Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.</p>
-
-                        <div className='flex flex-col gap-2'>
-                            <span className='text-lg font-medium'>Add a stock</span>
-                            <div className='h-full w-full flex flex-row items-center border border-neutral-200 rounded-lg overflow-hidden'>
-                                <Input
-                                    type='text'
-                                    value={searchString}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                        setSearchString(e.target.value);
-                                        setIsSearchEmpty(false);
-                                    }}
-                                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                                        if (e.key === 'Enter') onSearch();
-                                    }}
-                                    placeholder='e.g. AAPL, BHP'
-                                    className='h-full py-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
-                                />
-                                <Button
-                                    variant='secondary'
-                                    onClick={onSearch}
-                                    className='h-full aspect-square p-3'
-                                >
-                                    <Search size={22} color='black' />
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className='relative'>
-                            <div className='text-lg font-medium mb-2'>Edit or remove stocks</div>
-                            <div className='h-[380px] grid grid-cols-1 items-start gap-2'>
-                                <div className='rounded-md border'>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Symbol</TableHead>
-                                                <TableHead>Units</TableHead>
-                                                <TableHead>Value ($)</TableHead>
-                                                <TableHead>Remove</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            <>
-                                                {modifiedHoldings.length > 0? (
-                                                <>
-                                                    {currentPage.map((holding) => (
-                                                    <EditHolding
-                                                        key={`edit-holding-${holding.id}`}
-                                                        holding={holding}
-                                                        onUpdate={onUpdateHolding}
-                                                        onRemove={() => onRemoveHolding(holding)}
-                                                    />
-                                                    ))}
-                                                </>
-                                                ) : (
-                                                <TableRow>
-                                                    <TableCell colSpan={4} className='p-6'>
-                                                        <div className='w-full flex items-center justify-center text-center'>
-                                                            Use the search bar above to add stocks to your portfolio.
-                                                        </div>
-                                                    </TableCell>
-                                                </TableRow>
-                                                )}
-                                            </>
-                                        </TableBody>
-                                    </Table>
-                                </div>
-
-                                <div className="flex items-center justify-end space-x-2 py-4 place-self-end">
-                                    <div className='text-xs'>
-                                        Showing {currentPage.length} of {modifiedHoldings.filter((holding) => !holding.deleted).length}
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setPage((curr) => curr - 1)}
-                                        disabled={page === 0}
-                                    >
-                                        Previous
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setPage((curr) => curr + 1)}
-                                        disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / MAX_PAGE_SIZE)}
-                                    >
-                                        Next
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {searchString.length > 0 && (
-                            <div className='bg-white inset-0 absolute'>
-                                {isSearchLoading ? (
-                                <div className='h-[240px] w-full flex flex-col gap-3 py-3'>
-                                    <Skeleton className='h-12 w-full bg-slate-100' />
-                                    <Skeleton className='h-12 w-full bg-slate-100' />
-                                    <Skeleton className='h-12 w-full bg-slate-100' />
-                                </div>
-                                ) : (
-                                <>
-                                    {searchResults.length > 0? (
-                                    <ScrollArea className='h-[240px] py-3'>
-                                        {searchResults.map((stock) => (
-                                        <Button
-                                            key={`search-result-${stock.symbol}`}
-                                            variant='ghost'
-                                            onClick={() => {
-                                                onAddHolding(stock);
-                                                setSearchResults([]);
-                                            }}
-                                            className='h-12 w-full grid grid-cols-[100px_1fr] place-items-start gap-2 p-3 mb-3'
-                                        >
-                                            <div className='text-lg font-medium'>{stock.symbol.toUpperCase()}</div>
-                                            <div className='text-lg truncate'>
-                                                {stock.name}
-                                            </div>
-                                        </Button>
-                                        ))}
-                                    </ScrollArea>
-                                    ) : (
-                                    <>
-                                        {isSearchEmpty && (
-                                        <div className='w-full text-center p-12'>
-                                            Pocket Adviser only covers a limited number of stocks, and it looks like we don&apos;t cover this one!
-                                        </div>
-                                        )}
-                                    </>
-                                    )}
-                                </>
-                                )}
-                            </div>
-                            )}
+                <div className='flex flex-col gap-6'>
+                    <div className='flex flex-col gap-2'>
+                        <span className='text-lg font-medium'>Add a stock</span>
+                        <div className='h-full w-full flex flex-row items-center border border-neutral-200 rounded-lg overflow-hidden'>
+                            <Input
+                                type='text'
+                                value={searchString}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    setIsSearchLoading(true);
+                                    setSearchString(e.target.value);
+                                    debouncedSearch(e.target.value);
+                                }}
+                                // onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                //     if (e.key === 'Enter') debouncedSearch(searchString);
+                                // }}
+                                placeholder='e.g. AAPL, BHP'
+                                className='h-full py-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                            />
+                            <Button
+                                variant='secondary'
+                                onClick={() => debouncedSearch(searchString)}
+                                className='h-full aspect-square p-3'
+                            >
+                                <Search size={22} color='black' />
+                            </Button>
                         </div>
                     </div>
-                </ScrollArea>
+
+                    <div className='grid grid-cols-1 items-start gap-2 relative'>
+                        <div className='text-lg font-medium mb-2'>Edit or remove stocks</div>
+
+                        <ScrollArea className='h-[60vh]'>
+                            <div className='rounded-md border'>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Symbol</TableHead>
+                                            <TableHead>Units</TableHead>
+                                            <TableHead>Value ($)</TableHead>
+                                            <TableHead>Remove</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <>
+                                            {modifiedHoldings.filter((obj) => !obj.deleted).length > 0? (
+                                            <>
+                                                {currentPage.map((holding) => (
+                                                <EditHolding
+                                                    key={`edit-holding-${holding.id}`}
+                                                    holding={holding}
+                                                    onUpdate={onUpdateHolding}
+                                                    onRemove={() => onRemoveHolding(holding)}
+                                                />
+                                                ))}
+                                            </>
+                                            ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className='p-6'>
+                                                    <div className='w-full flex items-center justify-center text-center'>
+                                                        Use the search bar above to add stocks to your portfolio.
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                            )}
+                                        </>
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            <div className="flex items-center justify-end space-x-2 py-4 place-self-end">
+                                <div className='text-xs'>
+                                    Showing {currentPage.length} of {modifiedHoldings.filter((holding) => !holding.deleted).length}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage((curr) => curr - 1)}
+                                    disabled={page === 0}
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage((curr) => curr + 1)}
+                                    disabled={page >= Math.floor((Math.max(modifiedHoldings.length, 1) - 1) / MAX_PAGE_SIZE)}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </ScrollArea>
+
+                        {searchString.length > 0 && (
+                        <div className='bg-white inset-0 absolute'>
+                            {isSearchLoading ? (
+                            <div className='h-[360px] w-full flex flex-col gap-3 py-3'>
+                                {Array.from({ length: 10 }).map((_, i) => (
+                                <Skeleton key={`search-skeleton-${i}`} className='h-12 w-full bg-slate-100 shrink-0 grow-0' />
+                                ))}
+                            </div>
+                            ) : (
+                            <>
+                                {searchResults.length > 0? (
+                                <ScrollArea className='h-[360px] py-3'>
+                                    {searchResults.map((stock) => (
+                                    <Button
+                                        key={`search-result-${stock.symbol}`}
+                                        variant='ghost'
+                                        onClick={() => {
+                                            onAddHolding(stock);
+                                            setSearchResults([]);
+                                        }}
+                                        className='h-12 w-full grid grid-cols-[100px_1fr] place-items-start gap-2 p-3 mb-3'
+                                    >
+                                        <div className='text-lg font-medium'>{stock.symbol.toUpperCase()}</div>
+                                        <div className='text-lg truncate'>
+                                            {stock.name}
+                                        </div>
+                                    </Button>
+                                    ))}
+                                </ScrollArea>
+                                ) : (
+                                <div className='w-full text-center p-12'>
+                                    Pocket Adviser only covers a limited number of stocks, and it looks like we don&apos;t cover this one!
+                                </div>
+                                )}
+                            </>
+                            )}
+                        </div>
+                        )}
+                    </div>
+                </div>
 
                 <DialogFooter>
                     <div  className='w-full flex flex-row items-end justify-between'>
@@ -387,13 +402,16 @@ export default function EditPortfolioDialog({
                                 ref={closeRef}
                                 type='button'
                                 variant='secondary'
-                                onClick={onCancel}
+                                onClick={() => {
+                                    setModifiedHoldings(state?.holdings || []);
+                                    clearSearch();
+                                }}
                             >
                                 Cancel
                             </Button>
                         </DialogClose>
 
-                        <Button onClick={onSubmit}>
+                        <Button onClick={onSubmit} disabled={isSubmitLoading}>
                             Save
                         </Button>
                     </div>

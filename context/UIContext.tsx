@@ -7,7 +7,7 @@ import {
   useEffect,
 } from "react";
 
-import { useCookies } from "@/hooks/useCookies";
+import { getUserIdFromCookies } from "@/utils/cookies";
 
 import WelcomeDialog from "@/components/dialogs/welcome-dialog";
 
@@ -31,7 +31,6 @@ interface UIProviderProps {
 export function UIProvider({
   children,
 }: UIProviderProps) {
-    const { getUserIdFromCookies } = useCookies();
     const welcomeDialogRef = useRef<HTMLButtonElement>(null);
     const signupRef = useRef<HTMLButtonElement>(null);
     const pricingRef = useRef<HTMLButtonElement>(null);

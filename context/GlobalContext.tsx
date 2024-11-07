@@ -10,13 +10,13 @@ import {
   useRef
 } from "react";
 
-import { updateUserAction } from "@/actions/crud/user";
+import { createUserAction, updateUserAction } from "@/actions/crud/user";
 import { updateProfileAction } from "@/actions/crud/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { insertConversationAction, updateConversationAction, deleteConversationAction } from "@/actions/crud/conversation";
 import { getStockByIdAction } from "@/actions/data/stocks";
 
-import { useCookies } from "@/hooks/useCookies";
+import { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie } from "@/utils/cookies";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
@@ -60,10 +60,39 @@ export const GlobalProvider = ({
   initalForexRate,
 }: GlobalProviderProps) => {
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
-  const { createGuestUserIfNecessary } = useCookies();
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
   const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
   const [forexRate] = useState<number>(initalForexRate); // USDAUD forex rate
+
+  const createGuestUserIfNecessary = useCallback(
+    async () => {
+      // check if userId already exists in cookies to avoid unnecessary user creation
+      const _userId = getUserIdFromCookies();
+      if (_userId) {
+          console.log('user retrieved from cookies');
+          return _userId;
+      };
+    
+      const _user = await createUserAction({ guest: true });
+      console.log('guest created');
+    
+      // set cookies
+      setUserIdCookie(_user.id);
+      setIsGuestCookie(true);
+      // update state
+      dispatch({
+        type: 'SET_DATA',
+        payload: {
+            ..._user,
+            holdings: [],
+            conversations: [],
+            profile: null,
+        } satisfies UserData,
+      });
+      return _user.id;
+    },
+    [dispatch]
+  );
 
   const portfolioValue = useMemo(() => {
     if (!state) return 0;
@@ -155,23 +184,11 @@ export const GlobalProvider = ({
           userId,
       });
 
-      if (!state) {
-          // set state
-          dispatch({
-            type: 'SET_DATA',
-            payload: {
-                id: userId,
-                holdings: [res],
-                profile: null,
-            } as UserData,
-          });
-      } else {
-          // update state
-          dispatch({
-              type: 'INSERT_HOLDING',
-              payload: res,
-          });
-      }
+      // update state
+      dispatch({
+          type: 'INSERT_HOLDING',
+          payload: res,
+      });
 
       return res.id;
     },
@@ -200,13 +217,17 @@ export const GlobalProvider = ({
     async (holdingId: number) => {
       if (!state) return;
 
-      const res = await deleteHoldingAction(holdingId);
+      try {
+        const res = await deleteHoldingAction(holdingId);
 
-      // update state
-      dispatch({
-        type: 'DELETE_HOLDING',
-        payload: res.id
-      });
+        // update state
+        dispatch({
+          type: 'DELETE_HOLDING',
+          payload: res.id
+        });
+      } catch (e) {
+        // TO DO: sometimes user deletes a holding that is not yet in DB, which will cause error
+      }
     },
     [state, dispatch]
   );

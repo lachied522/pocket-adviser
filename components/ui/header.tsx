@@ -20,7 +20,7 @@ import SettingsDialog from "@/components/dialogs/settings-dialog";
 import PremiumDialog from "@/components/dialogs/premium-dialog";
 import AuthDialog from "@/components/auth/auth-dialog";
 
-import { useCookies } from "@/hooks/useCookies";
+import { getIsGuestFromCookies, removeCookies } from "@/utils/cookies";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import { createBillingPortalSession } from "@/actions/billing/portals";
@@ -31,7 +31,6 @@ import { type UIState, useUIContext } from "@/context/UIContext";
 export default function Header() {
     const { state } = useGlobalContext() as GlobalState;
     const { signupRef } = useUIContext() as UIState;
-    const { getIsGuestFromCookies, removeCookies } = useCookies();
     const [isGuest, setIsGuest] = useState<boolean>(true);
     const [isBillingPortalLoading, setIsBillingPortalLoading] = useState<boolean>(false);
     const isMobile = useMediaQuery();
