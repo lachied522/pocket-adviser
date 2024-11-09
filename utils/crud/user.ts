@@ -13,6 +13,12 @@ export async function createUser(data: any) {
 export async function getUserById(id: string) {
     return await prisma.user.findUnique({
         where: { id },
+    });
+}
+
+export async function getUserDataByUserId(id: string) {
+    return await prisma.user.findUnique({
+        where: { id },
         relationLoadStrategy: "join",
         include: {
             profile: true,

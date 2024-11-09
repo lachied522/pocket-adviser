@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 import { signOut } from "next-auth/react";
 
-import { BookA, LogOut, Mail, Menu, ScrollText, Settings, Sparkles } from "lucide-react";
+import { BookA, LogOut, Menu, Settings, Sparkles } from "lucide-react";
 
 import {
     Popover,
@@ -13,17 +14,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-import Logo from "@/components/ui/logo";
 import Container from "@/components/ui/container";
 import AboutDialog from "@/components/dialogs/about-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
 import PremiumDialog from "@/components/dialogs/premium-dialog";
-import AuthDialog from "@/components/auth/auth-dialog";
+import BillingButton from "./billing-button";
+import Logo from "./logo";
 
 import { getIsGuestFromCookies, removeCookies } from "@/utils/cookies";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-
-import { createBillingPortalSession } from "@/actions/billing/portals";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type UIState, useUIContext } from "@/context/UIContext";
@@ -32,7 +31,6 @@ export default function Header() {
     const { state } = useGlobalContext() as GlobalState;
     const { signupRef } = useUIContext() as UIState;
     const [isGuest, setIsGuest] = useState<boolean>(true);
-    const [isBillingPortalLoading, setIsBillingPortalLoading] = useState<boolean>(false);
     const isMobile = useMediaQuery();
 
     useEffect(() => {
@@ -46,22 +44,6 @@ export default function Header() {
         removeCookies();
         // signout
         await signOut();
-    }
-
-    const onBillingButtonClick = async () => {
-        if (isBillingPortalLoading) return; // prevent multiple requests
-        setIsBillingPortalLoading(true);
-
-        // create billing portal session and open in new tab
-        const res = await createBillingPortalSession(state!);
-
-        if (!(res && res.url)) {
-            // TO DO
-            return;
-        }
-
-        window.open(res.url, '_blank');
-        setIsBillingPortalLoading(false);
     }
 
     return (
@@ -78,14 +60,14 @@ export default function Header() {
                     </Button>
                 </AboutDialog>
 
-                <PremiumDialog>
+                <Link href='\pricing' target="_blank">
                     <Button
                         variant='ghost'
                         className='h-auto text-white hover:text-white hover:bg-transparent hover:opacity-90 p-0'
                     >
-                        Premium
+                        Pricing
                     </Button>
-                </PremiumDialog>
+                </Link>
 
                 <a href="mailto:lachie@pocketadviser.com.au" className='flex items-center justify-center p-0'>
                     <Button
@@ -97,7 +79,7 @@ export default function Header() {
                     </Button>
                 </a>
 
-                <a href="https://pocket-adviser.beehiiv.com/" className='flex items-center justify-center p-0'>
+                <a href="https://pocket-adviser.beehiiv.com/" target="_blank" className='flex items-center justify-center p-0'>
                     <Button
                         type='button'
                         variant='ghost'
@@ -113,7 +95,7 @@ export default function Header() {
                 <div className='text-sm lg:text-base text-white text-right font-medium shrink-0'>Welcome {state.name}</div>
                 ) : (
                 <div className='flex flex-row items-center gap-3.5'>
-                    <AuthDialog initialTab="login">
+                    <Link href='/login'>
                         <Button
                             variant='outline'
                             size='sm'
@@ -121,8 +103,8 @@ export default function Header() {
                         >
                             <span className='text-xs md:text-sm'>Login</span>
                         </Button>
-                    </AuthDialog>
-                    <AuthDialog initialTab="signup">
+                    </Link>
+                    <Link href='signup'>
                         <Button
                             ref={signupRef}
                             variant='secondary'
@@ -131,7 +113,7 @@ export default function Header() {
                         >
                             <span className='text-xs md:text-sm'>Signup</span>
                         </Button>
-                    </AuthDialog>
+                    </Link>
                 </div>
                 )}
 
@@ -182,16 +164,7 @@ export default function Header() {
                         <>
                             {isMobile && <Separator className='my-1' />}
 
-                            <Button
-                                aria-label='billing'
-                                variant='ghost'
-                                size='sm'
-                                onClick={onBillingButtonClick}
-                                className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
-                            >
-                                <ScrollText size={18} strokeWidth={2} />
-                                <span className='text-xs'>Billing</span>
-                            </Button>
+                            <BillingButton userId={state?.id} />
 
                             <Separator className='my-1' />
 

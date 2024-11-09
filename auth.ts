@@ -74,8 +74,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             cookieStore.set({ name: COOKIE_NAME_FOR_USER_ID, value: user.id, maxAge: defaultExpiry });
             cookieStore.set({ name: COOKIE_NAME_FOR_IS_GUEST, value: "false", maxAge: defaultExpiry });
         }
-        // revalidate path
-        revalidatePath('/', 'layout');
         return true;
       },
       jwt({ token, user }) {

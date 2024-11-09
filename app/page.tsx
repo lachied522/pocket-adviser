@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
-import { getUserById } from "@/utils/crud/user";
+import { getUserDataByUserId } from "@/utils/crud/user";
 import { getStockById } from "@/utils/crud/stocks";
 import { getForexRate } from "@/utils/financial_modelling_prep/forex";
 import { getGreeting } from "./api/chat/greeting";
@@ -13,11 +13,12 @@ import { UIProvider } from "@/context/UIContext";
 import { ChatProvider } from '@/context/ChatContext';
 
 import Container from "@/components/ui/container";
-import Header from "@/components/ui/header";
 import Chat from "@/components/chat/chat-container";
 import Portfolio from "@/components/portfolio/portfolio";
-import Footer from "@/components/ui/footer";
 import TickerTape from "@/components/tape/ticker-tape";
+
+import Header from "./header";
+import Footer from "./footer";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -46,12 +47,12 @@ export default async function Page({
 }) {
     // check if userId is in cookies
     const cookieStore = cookies();
-    const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID);
+    const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
 
     // fetch user data if able
     let userData: UserData|null = null;
     if (userId) {
-        userData = await getUserById(userId.value);
+        userData = await getUserDataByUserId(userId);
     }
 
     // get stock data and forex rate simultaneously

@@ -97,6 +97,7 @@ export default function LeftSidebar() {
                 <NotesDialog>
                     <Button
                         variant='ghost'
+                        disabled={!state || state.accountType === "FREE"}
                         className='w-auto xl:w-[180px] flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
                     >
                         <NotebookPen size={16} />

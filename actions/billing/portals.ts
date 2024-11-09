@@ -2,18 +2,25 @@
 import { headers } from "next/headers";
 
 import { stripe } from "@/utils/stripe/server";
+import { getUserById } from "@/utils/crud/user";
 
-import { PrismaClient, User } from "@prisma/client";
+import { PrismaClient, type User } from "@prisma/client";
 
 const prisma = new PrismaClient;
 
 export async function createBillingPortalSession(
-    user: User,
+    userId: string,
 ) {
+    const user = await getUserById(userId);
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
     if (!user.stripeCustomerId) {
         // user is not set up with stripe
         // direct to checkout session instead
-        return await createCheckoutSession(user);
+        return await createCheckoutSession(userId, user);
     }
 
     // create billingportal object
@@ -27,8 +34,17 @@ export async function createBillingPortalSession(
 }
 
 export async function createCheckoutSession(
-    user: User
+    userId: string,
+    user?: User | null
 ) {
+    if (!user) {
+        user = await getUserById(userId);
+    }
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
     // see https://github.com/vercel/next.js/blob/canary/examples/with-stripe-typescript/app/actions/stripe.ts
     const PRICE_ID = process.env.STRIPE_PRICE_ID;
     if (!PRICE_ID) {
@@ -50,7 +66,7 @@ export async function createCheckoutSession(
         stripeCustomerId = customer.id;
     }
 
-    const origin: string = headers().get("origin") as string;
+    const origin = headers().get("origin") as string;
 
     // create checkout object
     const session = await stripe.checkout.sessions.create({
