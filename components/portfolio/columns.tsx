@@ -66,7 +66,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
             height={16}
             width={16}
         />
-        <span className='text-base sm:text-lg font-medium'>
+        <span className='text-sm lg:text-base font-medium'>
           {(row.getValue('symbol') as string).toUpperCase()}
         </span>
       </div>
@@ -78,7 +78,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Name"} />
     ),
     cell: ({ row }) => (
-      <div className='max-w-[180px] sm:max-w-[240px] text-base sm:text-lg font-medium truncate py-5'>
+      <div className='max-w-[180px] sm:max-w-[240px] text-sm lg:text-base font-medium line-clamp-1 py-5'>
         {(row.getValue('name') as string).toUpperCase()}
       </div>
     )
@@ -89,7 +89,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Sector"} />
     ),
     cell: ({ row }) => (
-      <div className='text-base sm:text-lg font-medium capitalize line-clamp-1 py-5'>
+      <div className='text-sm lg:text-base font-medium capitalize line-clamp-1 py-5'>
         {row.getValue('sector')}
       </div>
     )
@@ -100,7 +100,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Market Cap"} />
     ),
     cell: ({ row }) => (
-      <div className='text-base sm:text-lg font-medium capitalize line-clamp-1 py-5'>
+      <div className='text-sm lg:text-base font-medium capitalize line-clamp-1 py-5'>
         {formatMarketCap(row.getValue('marketCap'))}
       </div>
     )
@@ -111,7 +111,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Units"} />
     ),
     cell: ({ row }) => (
-      <div className='text-base sm:text-lg font-medium py-5'>{row.getValue('units')}</div>
+      <div className='text-sm lg:text-base font-medium py-5'>{row.getValue('units')}</div>
     )
   },
   {
@@ -120,7 +120,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Price"} />
     ),
     cell: ({ row }) => (
-      <div className='text-base sm:text-lg font-medium py-5'>
+      <div className='text-sm lg:text-base font-medium py-5'>
         {formatDollar(row.getValue('previousClose'))}
         <span className='text-sm'>{` ${row.original['currency']}`}</span>
       </div>
@@ -132,7 +132,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Change"} />
     ),
     cell: ({ row }) => (
-      <div className='text-lg font-medium py-5'>{formatPercent(row.getValue('changesPercentage'))}</div>
+      <div className='text-sm lg:text-base font-medium py-5'>{formatPercent(row.getValue('changesPercentage'))}</div>
     )
   },
   {
@@ -141,7 +141,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Value"} />
     ),
     cell: ({ row }) => (
-      <div className='text-base sm:text-lg font-medium py-5'>{formatDollar(row.getValue('value'))}</div>
+      <div className='text-sm lg:text-base font-medium py-5'>{formatDollar(row.getValue('value'))}</div>
     )
   },
   {
@@ -150,7 +150,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"EPS"} />
     ),
     cell: ({ row }) => (
-      <div className='sm:text-lg font-medium py-5'>
+      <div className='text-sm lg:text-base font-medium py-5'>
         {row.getValue('eps')}
         <span className='text-sm'>{` ${row.original['currency']}`}</span>
       </div>
@@ -163,7 +163,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"PE"} />
     ),
     cell: ({ row }) => (
-      <div className='sm:text-lg font-medium py-5'>{row.getValue('pe')}</div>
+      <div className='text-sm lg:text-base font-medium py-5'>{row.getValue('pe')}</div>
     )
   },
   {
@@ -172,7 +172,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"EPS Growth"} />
     ),
     cell: ({ row }) => (
-      <div className='sm:text-lg font-medium py-5'>
+      <div className='text-sm lg:text-base font-medium py-5'>
         {formatPercent(Number(row.getValue('epsGrowth')) * 100)}
       </div>
     )
@@ -183,7 +183,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Dividend"} />
     ),
     cell: ({ row }) => (
-      <div className='sm:text-lg font-medium py-5'>
+      <div className='text-sm lg:text-base font-medium py-5'>
         {formatDollar(row.getValue('dividendAmount'))}
         <span className='text-sm'>{` ${row.original['currency']}`}</span>
       </div>
@@ -195,7 +195,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Yield"} />
     ),
     cell: ({ row }) => (
-      <div className='sm:text-lg font-medium py-5'>
+      <div className='text-sm lg:text-base font-medium py-5'>
         {formatPercent(Number(row.getValue('dividendYield')) * 100)}
       </div>
     )
@@ -206,7 +206,7 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
       <HeaderCell column={column} title={"Total"} />
     ),
     cell: ({ row }) => (
-      <div className='sm:text-lg font-medium py-5'>
+      <div className='text-sm lg:text-base font-medium py-5'>
         {formatDollar(row.getValue('dividendTotal'))}
       </div>
     )

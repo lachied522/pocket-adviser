@@ -19,7 +19,6 @@ import UtilityDialog from "@/components/dialogs/utility-dialog";
 import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type UIState, useUIContext } from "@/context/UIContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import type { Recommendation } from "@/types/helpers";
@@ -34,7 +33,6 @@ interface RecommendationsTableProps {
 
 export default function RecommendationsTable({ data }: RecommendationsTableProps) {
     const { state } = useGlobalContext() as GlobalState;
-    const { openSignup } = useUIContext() as UIState;
     const { onSubmit } = useChatContext() as ChatState;
 
     const total = useMemo(() => {
@@ -133,7 +131,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                     </div>
                 </div>
 
-                <div className='w-full flex flex-row justify-end'>
+                {/* <div className='w-full flex flex-row justify-end'>
                     <Button
                         variant='default'
                         onClick={() => {
@@ -146,7 +144,7 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                         <RefreshCw size={16} />
                         Regenerate
                     </Button>
-                </div>
+                </div> */}
             </div>
             )}
         </div>

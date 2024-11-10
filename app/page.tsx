@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import Image from "next/image";
 
 import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
@@ -9,16 +8,15 @@ import { getForexRate } from "@/utils/financial_modelling_prep/forex";
 import { getGreeting } from "./api/chat/greeting";
 
 import { GlobalProvider } from "@/context/GlobalContext";
-import { UIProvider } from "@/context/UIContext";
 import { ChatProvider } from '@/context/ChatContext';
+import { SidebarProvider } from "@/components/ui/sidebar";
 
-import Container from "@/components/ui/container";
-import Chat from "@/components/chat/chat-container";
-import Portfolio from "@/components/portfolio/portfolio";
 import TickerTape from "@/components/tape/ticker-tape";
-
-import Header from "./header";
-import Footer from "./footer";
+import ChatArea from "@/components/chat/chat-area";
+import NewsArea from "@/components/chat/news-area";
+import SidebarOuterTrigger from "./sidebar-outer-trigger";
+import SettingsMenu from "./settings-menu";
+import Sidebar from "./app-sidebar";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -68,42 +66,23 @@ export default async function Page({
         initialStockData={stockData}
         initalForexRate={forexRate}
       >
-        <UIProvider>
-          <ChatProvider initialMessage={greeting}>
-              <main className='min-h-screen'>
-                {/* Background Image */}
-                <div className='z-[-1] fixed inset-0 opacity-80 bg-sky-600 blur-sm'>
-                    <Image
-                      src='/background-image-main.jpg'
-                      alt='background-image'
-                      sizes='100vw'
-                      fill
-                      priority
-                      style={{
-                        objectFit: 'cover',
-                      }}
-                    />
-                </div>
-                
-                <div className='bg-sky-600/80'>
-                  <Header />
-                  <TickerTape />
-                </div>
+        <ChatProvider initialMessage={greeting}>
+          <SidebarProvider>
+            <Sidebar />
+            <main className='h-screen flex flex-col overflow-hidden'>
 
-                <div className='flex flex-col px-1 md:px-6 py-2 sm:py-5 xl:py-10 gap-2 sm:gap-5 xl:gap-10'>
-                  <Container className='p-3.5 sm:p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                    <Chat initialUserData={userData} initialStockData={stockData} />
-                  </Container>
+              <div className='flex flex-row items-center overflow-hidden'>
+                <SidebarOuterTrigger />
+                <TickerTape />
+                <SettingsMenu />
+              </div>
 
-                  <Container className='p-3.5 sm:p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                    <Portfolio />
-                  </Container>
-                </div>
+              <NewsArea symbols={[]} />
 
-                <Footer />
-              </main>
-          </ChatProvider>
-        </UIProvider>
+              <ChatArea />
+            </main>
+          </SidebarProvider>
+        </ChatProvider>
       </GlobalProvider>
     )
 }

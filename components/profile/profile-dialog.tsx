@@ -11,8 +11,10 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogTrigger,
-    DialogClose
+    DialogClose,
+    DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -161,70 +163,76 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-h-full max-w-6xl'>
-                <DialogHeader>
-                    <DialogTitle>
-                        Profile
-                    </DialogTitle>
-                </DialogHeader>
+            <DialogContent className='h-screen w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-hidden'>
+                <div className='w-full max-w-6xl mx-auto overflow-hidden'>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Profile
+                        </DialogTitle>
+                        <DialogDescription>
+                            Tell Pocket Adviser about yourself.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <FormProvider {...form}>
-                    <form onSubmit={form.handleSubmit(onSave)} className='flex flex-col gap-3'>
-                        <div className='flex flex-wrap items-center justify-start gap-1 sm:gap-3'>
-                            {TABS.map((tab) => (
-                            <Button
-                                key={`tab-${tab}`}
-                                type='button'
-                                variant='outline'
-                                onClick={() => setActiveTab(tab)}
-                                className={
-                                    cn(
-                                        'h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm sm:py-2 rounded-md',
-                                        activeTab === tab && 'border border-sky-600'
-                                    )
-                                }
-                            >
-                                {tab}
-                            </Button>
-                            ))}
-                        </div>
-                        
-                        <ScrollArea className='h-[60vh] sm:h-[80vh]'>
-                            <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
-                            {activeTab === "Finance"? (
-                            <Finance />
-                            ): activeTab === "Milestones"? (
-                            <MilestonesForm wealthData={wealthData} />
-                            ): activeTab === "Risk Tolerance"? (
-                            <RiskTolerance />
-                            ): (
-                            <Preferences />
-                            )}
-                        </ScrollArea>
-
-                        <div className='w-full flex flex-row items-end justify-between pt-3'>
-                            <DialogClose asChild>
+                    <FormProvider {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSave)}
+                            className='h-[calc(100%-30px)] flex flex-col'
+                        >
+                            <div className='flex flex-wrap items-center justify-start gap-3 py-3'>
+                                {TABS.map((tab) => (
                                 <Button
-                                    ref={closeRef}
-                                    onClick={onCancel}
+                                    key={`tab-${tab}`}
                                     type='button'
-                                    variant='secondary'
+                                    variant='outline'
+                                    onClick={() => setActiveTab(tab)}
+                                    className={
+                                        cn(
+                                            'h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm sm:py-2 rounded-md',
+                                            activeTab === tab && 'border border-primary'
+                                        )
+                                    }
                                 >
-                                    Cancel
+                                    {tab}
                                 </Button>
-                            </DialogClose>
-
-                            <Button
-                                type='submit'
-                                disabled={isSubmitLoading}
-                                className='h-10 flex flex-row items-center gap-2'
-                                onClick={() => console.log(form.formState.errors)}
-                            >
-                                Save
-                            </Button>
-                        </div>
-                    </form>
-                </FormProvider>
+                                ))}
+                            </div>
+                    
+                            <div className='flex-1 overflow-y-scroll'>
+                                <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
+                                {activeTab === "Finance"? (
+                                <Finance />
+                                ): activeTab === "Milestones"? (
+                                <MilestonesForm wealthData={wealthData} />
+                                ): activeTab === "Risk Tolerance"? (
+                                <RiskTolerance />
+                                ): (
+                                <Preferences />
+                                )}
+                            </div>
+                            <div className='w-full flex flex-row justify-between py-3'>
+                                <DialogClose asChild>
+                                    <Button
+                                        ref={closeRef}
+                                        onClick={onCancel}
+                                        type='button'
+                                        variant='secondary'
+                                    >
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    type='button'
+                                    disabled={isSubmitLoading}
+                                    onClick={form.handleSubmit(onSave)}
+                                    className='h-10 flex flex-row items-center gap-2'
+                                >
+                                    Save
+                                </Button>
+                            </div>
+                        </form>
+                    </FormProvider>
+                </div>
             </DialogContent>
         </Dialog>
     )

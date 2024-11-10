@@ -46,10 +46,10 @@ async function StockTapeBody() {
 
 export default function TickerTape() {
     return (
-        <Container className='w-full flex flex-row items-center justify-evenly px-1 sm:px-1 md:px-2 py-2 gap-1 md:gap-3.5 overflow-hidden'>
+        <div className='flex flex-row items-center justify-evenly px-1 md:px-2 py-2 gap-1 md:gap-3 overflow-hidden'>
             <Suspense fallback={<StockTapeSkeleton />}>
                 <StockTapeBody />
             </Suspense>
-        </Container>
+        </div>
     )
 }

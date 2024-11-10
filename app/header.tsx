@@ -17,7 +17,6 @@ import { Separator } from "@/components/ui/separator";
 import Container from "@/components/ui/container";
 import AboutDialog from "@/components/dialogs/about-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
-import PremiumDialog from "@/components/dialogs/premium-dialog";
 import BillingButton from "./billing-button";
 import Logo from "./logo";
 
@@ -25,11 +24,9 @@ import { getIsGuestFromCookies, removeCookies } from "@/utils/cookies";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type UIState, useUIContext } from "@/context/UIContext";
 
 export default function Header() {
     const { state } = useGlobalContext() as GlobalState;
-    const { signupRef } = useUIContext() as UIState;
     const [isGuest, setIsGuest] = useState<boolean>(true);
     const isMobile = useMediaQuery();
 
@@ -106,7 +103,6 @@ export default function Header() {
                     </Link>
                     <Link href='signup'>
                         <Button
-                            ref={signupRef}
                             variant='secondary'
                             size='sm'
                             className='h-7 md:h-9'
@@ -148,7 +144,7 @@ export default function Header() {
 
                             <Separator className='my-1' />
 
-                            <PremiumDialog>
+                            <Link href='\pricing' target="_blank">
                                 <Button
                                     variant='ghost'
                                     className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
@@ -156,7 +152,7 @@ export default function Header() {
                                     <Sparkles size={18} strokeWidth={2} />
                                     <span className='text-xs'>Premium</span>
                                 </Button>
-                            </PremiumDialog>
+                            </Link>
                         </>
                         )}
 

@@ -33,7 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type UIState, useUIContext } from "@/context/UIContext";
+import Link from "next/link";
 
 const formSchema = z.object({
     email: z.string().min(1, { message: "Please provide your email" }).email("Please provide a valid email"),
@@ -46,7 +46,6 @@ interface SettingsDialogProps {
 
 export default function SettingsDialog({ children } : SettingsDialogProps) {
     const { state, updateUserAndUpdateState } = useGlobalContext() as GlobalState;
-    const { openPricing } = useUIContext() as UIState;
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -109,54 +108,33 @@ export default function SettingsDialog({ children } : SettingsDialogProps) {
                             )}
                         />
 
-                        <div className='flex flex-col gap-6 relative'>
-                            {!state || state.accountType === "FREE" && (
-                            <div className='z-10 flex items-center justify-center absolute inset-0 bg-white/90 select-text'>
-                                <div className='flex flex-col items-center gap-3.5 p-12'>
-                                    <span className='text-lg font-medium'>Paid Feature</span>
-                                    <p className='text-center font-medium'>Get a personalised email to your inbox from Pocket Adviser</p>
-                                    <Button
-                                        type='button'
-                                        onClick={() => {
-                                            // close this modal
-                                            if (closeRef.current) closeRef.current.click();
-                                            // open pricing after
-                                            openPricing();
-                                        }}
-                                    >
-                                        See Pricing
-                                    </Button>
-                                </div>
-                            </div>
+                        <FormField
+                            control={form.control}
+                            name="mailFrequency"
+                            disabled={!state || state.accountType === "FREE"}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email Frequency</FormLabel>
+                                    <FormDescription>
+                                        How often would you like to receive updates from Pocket Adviser?
+                                    </FormDescription>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value || "NEVER"} disabled={field.disabled}>
+                                        <FormControl>
+                                            <SelectTrigger className='w-[180px]'>
+                                                <SelectValue placeholder="Never" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent className='w-[180px]'>
+                                            <SelectItem value="NEVER">Never</SelectItem>
+                                            <SelectItem value="DAILY">Daily</SelectItem>
+                                            <SelectItem value="WEEKLY">Weekly</SelectItem>
+                                            <SelectItem value="MONTHLY">Monthly</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
                             )}
-
-                            <FormField
-                                control={form.control}
-                                name="mailFrequency"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email Frequency</FormLabel>
-                                        <FormDescription>
-                                            How often would you like to receive updates from Pocket Adviser?
-                                        </FormDescription>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value || "NEVER"}>
-                                            <FormControl>
-                                                <SelectTrigger className='w-[180px]'>
-                                                    <SelectValue placeholder="Never" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className='w-[180px]'>
-                                                <SelectItem value="NEVER">Never</SelectItem>
-                                                <SelectItem value="DAILY">Daily</SelectItem>
-                                                <SelectItem value="WEEKLY">Weekly</SelectItem>
-                                                <SelectItem value="MONTHLY">Monthly</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        />
                         
                         <div className='h-full flex flex-row items-end justify-between'>
                             <DialogClose asChild>

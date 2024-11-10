@@ -62,8 +62,8 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                 if (!isLoading) onSelectConversation(id);
             }}
             className={cn(
-                'sm:h-10 max-w-[200px] w-full xl:w-[180px] flex flex-row items-center justify-start text-sm font-medium px-4 py-3 rounded-md cursor-pointer select-none group relative hover:bg-slate-100',
-                conversationId === id && 'bg-slate-100'
+                'sm:h-10 max-w-[200px] w-full flex flex-row items-center justify-start text-sm font-medium px-4 py-3 rounded-md cursor-pointer select-none group/selector relative hover:bg-zinc-100',
+                conversationId === id && 'bg-zinc-100'
             )}
         >
             {isEditting? (
@@ -76,15 +76,15 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                     if (e.key === 'Enter') onSubmit(input);
                 }}
                 onBlur={() => onSubmit(input)}
-                className='w-full max-w-full bg-slate-50 border'
+                className='w-[calc(100%-10px)] max-w-full bg-zinc-50 border'
             />
             ) : (
             <>
                 <span className="truncate">{name}</span>
 
                 <div className={cn(
-                    'hidden flex-row items-center gap-3 pl-4 pr-2 bg-gradient-to-r from-transparent to-slate-100 to-10% absolute right-0 group-hover:flex',
-                    conversationId === id && 'flex'
+                    'hidden flex-row items-center gap-3 pl-4 pr-2 bg-gradient-to-r from-transparent to-sidebar to-10% absolute right-0 group-hover/selector:flex',
+                    conversationId === id && 'flex to-zinc-100'
                 )}>
                     <button
                         onClick={(e) => {

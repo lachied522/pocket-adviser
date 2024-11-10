@@ -258,14 +258,14 @@ export default function EditPortfolioDialog({
                         Edit Your Portfolio
                     </DialogTitle>
                     <DialogDescription>
-                        Tell Pocket Adviser what you have in your portfolio so that it can provide personalised responses.
+                        Add, edit, or remove stocks in your portfolio.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className='flex flex-col gap-6'>
                     <div className='flex flex-col gap-2'>
                         <span className='text-lg font-medium'>Add a stock</span>
-                        <div className='h-full w-full flex flex-row items-center border border-neutral-200 rounded-lg overflow-hidden'>
+                        <div className='h-12 w-full flex flex-row items-center gap-1'>
                             <Input
                                 type='text'
                                 value={searchString}
@@ -278,12 +278,13 @@ export default function EditPortfolioDialog({
                                 //     if (e.key === 'Enter') debouncedSearch(searchString);
                                 // }}
                                 placeholder='e.g. AAPL, BHP'
-                                className='h-full py-0 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
+                                className='h-full py-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0'
                             />
+
                             <Button
                                 variant='secondary'
                                 onClick={() => debouncedSearch(searchString)}
-                                className='h-full aspect-square p-3'
+                                className='h-full aspect-square p-0'
                             >
                                 <Search size={22} color='black' />
                             </Button>

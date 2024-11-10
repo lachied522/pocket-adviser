@@ -1,3 +1,7 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Check, ExternalLink, ScrollText } from "lucide-react";
 
 import {
     Dialog,
@@ -8,149 +12,171 @@ import {
 } from "@/components/ui/dialog";
 import { H1, H3 } from "@/components/ui/typography";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
-import SubscribeButton from "./subscribe-button";
+import { createCheckoutSession, createBillingPortalSession } from "@/actions/billing/portals";
+
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+
+interface SubscribeButtonProps {
+    userId?: string | null,
+    accountType?: "FREE"|"PAID"|"ADMIN"
+}
+
+function SubscribeButton({ userId, accountType = "FREE" }: SubscribeButtonProps) {
+    const [isSessionLoading, setIsSessionLoading] = useState<boolean>(false);
+    const router = useRouter();
+
+    const onClick = async () => {
+        if (isSessionLoading) return; // prevent multiple requests
+        setIsSessionLoading(true);
+
+        if (!userId) {
+            router.push('/signup');
+            return;
+        }
+
+        if (accountType !== "PAID") {
+            const res = await createCheckoutSession(userId);
+
+            if (!(res && res.url)) {
+                // TO DO
+                return;
+            }
+
+            window.open(res.url, '_blank');
+        } else {
+            // create billing portal session and open in new tab
+            const res = await createBillingPortalSession(userId);
+
+            if (!(res && res.url)) {
+                // TO DO
+                return;
+            }
+
+            window.open(res.url, '_blank');
+        }
+
+
+        setIsSessionLoading(false);
+    }
+
+    return (
+        <>
+            {userId && accountType === "PAID"? (
+            <Button
+                size='lg'
+                disabled
+            >
+                Your current plan
+            </Button>
+            ) : (
+            <Button
+                aria-label='subscribe'
+                size='lg'
+                onClick={onClick}
+                disabled={isSessionLoading}
+            >
+                Subscribe
+            </Button> 
+            )}
+        </>
+    )
+}
 
 interface PremiumDialogProps {
     children: React.ReactNode
 }
 
 export default function PremiumDialog({ children }: PremiumDialogProps) {
+    const { state } = useGlobalContext() as GlobalState;
+
     return (
         <Dialog>
             <DialogTrigger className='p-0' asChild>
                 { children }
             </DialogTrigger>
-            <DialogContent className='max-w-2xl'>
-                <DialogHeader>
-                    <DialogTitle>
-                        Pocket Adviser Premium
-                    </DialogTitle>
-                </DialogHeader>
-                <ScrollArea className='max-h-[80vh]'>
-                    <div className='flex flex-col gap-6'>
-                        <div className='max-w-[calc(90vw-30px)] overflow-x-auto md:w-[400px] flex flex-col gap-2 p-2 sm:p-5 bg-sky-50 border-2 border-sky-600 rounded-lg'>
-                            <div className='flex flex-col items-start md:flex-row md:items-end justify-between gap-2 md:gap-10'>
-                                <div className=''>
-                                    <div>Price <span className='text-sm'>(USD)</span></div>
-                                    <div className='inline-flex items-end'>
-                                        <H1>$10</H1>
-                                        <span className='text-lg text-slate-600 ml-1 mb-0.5'>/month</span>
-                                    </div>
-                                </div>
-                                <div className='w-full flex md:justify-end'>
-                                    <SubscribeButton />
+            <DialogContent className='h-screen w-full max-w-[100vw] border-none shadow-none rounded-none overflow-auto'>
+                <div className='flex flex-col items-center gap-3 m-auto'>
+                    <H1>Upgrade your plan</H1>
+                    <div className='h-fit flex flex-col sm:flex-row items-stretch justify-center gap-3 my-12'>
+                        <div className='flex-1 max-w-sm flex flex-col gap-6 p-3 sm:p-5 bg-white border-2 border-zinc-100 rounded-lg'>
+                            <H1>Free</H1>
+                            <p>Default plan</p>
+                            <div className=''>
+                                <div>Price <span className='text-sm'>(USD)</span></div>
+                                <div className='inline-flex items-end'>
+                                    <H1>$0</H1>
+                                    <span className='text-lg text-slate-600 ml-1 mb-0.5'>/month</span>
                                 </div>
                             </div>
-
-                            <span>Includes:</span>
-                            <ul className='list-disc list-inside sm:pl-3 *:text-sm *:sm:text-base'>
-                                <li><b>Unlimited</b> chat requests</li>
-                                <li><b>Unlimited</b> portfolio reviews</li>
-                                <li><b>New!</b> Personalised newsletter</li>
-                            </ul>
-                        </div>
-
-                        <H3>Newsletter</H3>
-                        <p>
-                            Premium subscribers can opt-in to receive a personalised newsletter on a daily, weekly, or monthly basis! The newsletter includes:
-                        </p>
-                        <div className='grid grid-cols-[24px_1fr] items-start gap-x-2 sm:pl-3 *:font-medium'>
-                            <div className=''>💡</div>
-                            <div className=''>Trade Ideas</div>
-                            <div className=''>📈</div>
-                            <div className=''>Portfolio Update</div>
-                            <div className=''>📋</div>
-                            <div className=''>General Market Update</div>
-                            <div className=''>🔍</div>
-                            <div className=''>Stock Specific Updates</div>
-                        </div>
-                        
-                        <span className='text-lg font-medium'>Preview</span>
-
-                        <div className='border border-slate-50 rounded-lg relative p-2 sm:p-5'>
-                            <p>
-                                <span>Good morning Lachie,</span>
-                                <br /><br />
-                                Below is your daily newsletter from Pocket Adviser. Happy investing!
-                                <br /><br />
-                            </p>
-                            <h3 className='text-lg font-bold'>Trade Ideas</h3>
-                            <div className='max-w-[calc(90vw-30px)] overflow-x-auto'>
-                                <table className='w-full border-collapse font-medium text-sm mt-3.5'>
-                                    <thead className='bg-slate-100 border border-slate-100 text-left'>
-                                        <tr className='*:p-2'>
-                                            <td>Transaction</td>
-                                            <td>Symbol</td>
-                                            <td>Name</td>
-                                            <td>Units</td>
-                                            <td>Price</td>
-                                            <td>Value</td>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody className='bg-white border border-slate-100 text-left'>
-                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                            <td>📈 <b>Buy</b></td>
-                                            <td>SMCI</td>
-                                            <td>Super Micro Computer, Inc.</td>
-                                            <td>2</td>
-                                            <td>$899.98</td>
-                                            <td>$1,799.96</td>
-                                        </tr>
-                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                            <td>📈 <b>Buy</b></td>
-                                            <td>CVX</td>
-                                            <td>Chevron Corporation</td>
-                                            <td>9</td>
-                                            <td>$155.13</td>
-                                            <td>$1,396.17</td>
-                                        </tr>
-                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                            <td>📈 <b>Buy</b></td>
-                                            <td>SQ2.AX</td>
-                                            <td>Block, Inc.</td>
-                                            <td>15</td>
-                                            <td>$95.70</td>
-                                            <td>$1,435.50</td>
-                                        </tr>
-                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                            <td>📈 <b>Buy</b></td>
-                                            <td>CRM</td>
-                                            <td>Salesforce, Inc.</td>
-                                            <td>6</td>
-                                            <td>$252.59</td>
-                                            <td>$1,515.54</td>
-                                        </tr>
-                                        <tr className='*:border *:border-slate-100 *:text-left *:p-2'>
-                                            <td>📉 <b>Sell</b></td>
-                                            <td>Meta</td>
-                                            <td>Meta Platforms, Inc.</td>
-                                            <td>11</td>
-                                            <td>$534.69</td>
-                                            <td>$5,881.59</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <Button
+                                disabled
+                                className='w-full'
+                            >
+                                Create free account
+                            </Button>
+                            <div>
+                                <div className='mb-3'>Includes:</div>
+                                <div className='grid grid-cols-[24px_1fr] gap-x-2'>
+                                    <Check size={16} color='rgb(22 163 74)' className='mt-1' />
+                                    <div><b>Up to 12</b> chat requests / day</div>
+                                    <Check size={16} color='rgb(22 163 74)' className='mt-1' />
+                                    <div><b>1 free</b> advice request / day</div>
+                                </div>
                             </div>
-                            <p className='whitespace-pre-wrap mt-6'>
-                                <h3 className='text-lg font-bold'>Stock Market Update: Navigating Uncertainty and Opportunities 🌐📊</h3>
-                                <br />
-                                The stock market is currently navigating through a period of uncertainty and mixed signals. As of November 2023, the S&P 500 has been trading lower for three consecutive months, a trend not seen since March 2020. This decline is largely attributed to investor concerns over the Federal Reserve&apos;s interest rate policies and the broader economic outlook. The Federal Reserve recently decided to maintain the federal funds rate at 5.25% to 5.5%, a key factor influencing the market&apos;s recent performance.
-                                <br /><br />
-                                Despite the downturn, there is a sense of cautious optimism among investors. Historically, the fourth quarter has been one of the best three-month stretches for the S&P 500, and many are hopeful that the market can regain its bullish momentum. The third quarter of 2023 showed positive earnings growth for the S&P 500, the first such growth since the third quarter of 2022, providing some encouragement.
-                                <br /><br />
-                                Economic indicators present a mixed picture. U.S. gross domestic product (GDP) grew by 4.9% in the third quarter, exceeding expectations, but there are signs that economic growth may slow in the coming months. The U.S. personal savings rate has dropped, and rising credit card debt and delinquencies could signal a potential slowdown in consumer spending.
-                                <br /><br />
-                                In the technology sector, companies like NVIDIA have seen significant gains due to their involvement in artificial intelligence (AI) and other high-growth areas. However, high interest rates and tight credit markets are impacting other sectors differently, with some experiencing declines in earnings.
-                                <br /><br />
-                                Overall, while the market faces challenges, there are also opportunities for growth, particularly in sectors like technology and healthcare. Investors are advised to stay informed and consider a diversified approach to navigate the current volatility. 📈💼
-                                <br /><br />
-                                ...
-                            </p>
+                        </div>
+
+                        <div className='flex-1 max-w-sm flex flex-col gap-6 p-3 sm:p-5 bg-zinc-50 border-2 border-zinc-600 rounded-lg'>
+                            <H1>Premium</H1>
+                            <p>Unrestricted and enhanced access</p>
+                            <div className=''>
+                                <div>Price <span className='text-sm'>(USD)</span></div>
+                                <div className='inline-flex items-end'>
+                                    <H1>$10</H1>
+                                    <span className='text-lg text-slate-600 ml-1 mb-0.5'>/month</span>
+                                </div>
+                            </div>
+                            <SubscribeButton
+                                userId={state?.id}
+                                accountType={state?.accountType}
+                            />
+                            <div>
+                                <div className='mb-3'>Includes:</div>
+                                <div className='grid grid-cols-[24px_1fr] gap-x-2'>
+                                    <Check size={16} color='rgb(22 163 74)' className='mt-1' />
+                                    <div><b>Unlimited</b> chat requests</div>
+                                    <Check size={16} color='rgb(22 163 74)' className='mt-1' />
+                                    <div><b>Unlimited</b> advice requests</div>
+                                    <Check size={16} color='rgb(22 163 74)' className='mt-1' />
+                                    <div>More personalised conversations with Notes 📝</div>
+                                    <Check size={16} color='rgb(22 163 74)' className='mt-1' />
+                                    <div>Daily/weekly market updates straight to your inbox (see below)</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </ScrollArea>
+ 
+                    <div className='w-full flex flex-row justify-end'>
+                        <button
+                            onClick={async () => {
+                                if (!state) return;
+                                const res = await createBillingPortalSession(state.id);
+
+                                if (!(res && res.url)) {
+                                    // TO DO
+                                    return;
+                                }
+
+                                window.open(res.url, '_blank');
+                            }}
+                            className='flex flex-row items-center text-xs underline gap-1'
+                        >
+                            Manage my subscription
+                            <ExternalLink size={12} />
+                        </button>
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
     )

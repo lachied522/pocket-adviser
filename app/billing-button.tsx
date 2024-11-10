@@ -43,10 +43,11 @@ export default function BillingButton({ userId }: BillingButtonProps) {
             variant='ghost'
             size='sm'
             onClick={onClick}
-            className='h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+            disabled={isSessionLoading}
+            className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
         >
             <ScrollText size={18} strokeWidth={2} />
-            <span className='text-xs'>Billing</span>
+            <span className='text-xs'>Manage plan</span>
         </Button>
     )
 }

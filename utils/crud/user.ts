@@ -1,6 +1,7 @@
-import type { User } from "@prisma/client";
-
 import { getPrismaClient } from "./client";
+
+import type { User } from "@prisma/client";
+import type { UserData } from "@/types/helpers";
 
 const prisma = getPrismaClient();
 
@@ -17,7 +18,7 @@ export async function getUserById(id: string) {
 }
 
 export async function getUserDataByUserId(id: string) {
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
         where: { id },
         relationLoadStrategy: "join",
         include: {
@@ -35,6 +36,20 @@ export async function getUserDataByUserId(id: string) {
             },
         }
     });
+
+    if (!user) return null;
+
+    // omit unnecesary user data from return object
+    return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        accountType: user.accountType,
+        mailFrequency: user.mailFrequency,
+        profile: user.profile,
+        holdings: user.holdings,
+        conversations: user.conversations,
+    } satisfies UserData;
 }
 
 export async function updateUser(id: string, data: Partial<User>) {

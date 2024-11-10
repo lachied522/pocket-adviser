@@ -86,9 +86,9 @@ export default function SamplePrompts() {
             {samplePrompts.map((prompt) => (
             <Button
                 key={`sample-prompt-${prompt.input}`}
-                variant='secondary'
+                variant='outline'
                 onClick={() => onSubmit(prompt.input, 'tool' in prompt? prompt.tool: undefined)}
-                className='text-xs px-2 py-3 md:px-4 md:text-base bg-sky-600 hover:bg-sky-600 text-white hover:scale-[1.02] transition-transform duration-150'
+                className='hover:scale-[1.02] transition-transform duration-150'
             >
                 {prompt.input}
             </Button>

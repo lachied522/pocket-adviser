@@ -1,10 +1,14 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 
+import { Newspaper } from "lucide-react";
+  
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/components/utils";
+
+import { setCookie, getCookie } from "@/utils/cookies";
 
 import { getNewsAction } from "@/actions/data/news";
 
@@ -13,15 +17,16 @@ import NewsArticle from "./news-article";
 import type { StockNews } from "@/types/data";
 
 const MAX_PAGES = 3;
+const COOKIE_NAME = "news:state";
 
-interface NewsCarouselProps {
+interface NewsAreaProps {
     symbols: string[]
 }
 
-export default function NewsCarousel({ symbols }: NewsCarouselProps) {
+export default function NewsArea({ symbols = [] }: NewsAreaProps) {
     const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [isVisible, setIsVisible] = useState<boolean>(true);
+    const [isVisible, setIsVisible] = useState<boolean>(Boolean(getCookie(COOKIE_NAME)) ?? true);
     const [page, setPage] = useState<number>(0);
 
     const getNews = useCallback(
@@ -30,6 +35,13 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
         },
         [symbols]
     );
+
+    const toggleVisible = useCallback(() => {
+        setIsVisible((curr) => {
+            setCookie(COOKIE_NAME, String(!curr));
+            return !curr;
+        });
+    }, [setIsVisible]);
 
     useEffect(() => {
         (async function populatePage() {
@@ -50,29 +62,26 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
             });
             setIsLoading(false);
         })();
-    }, [page, getNews]);
+    }, []);
 
     return (
-        <div className='flex flex-col items-stretch gap-2 xl:gap-3.5'>
-            <div className='flex flex-row xl:flex-col items-center xl:items-start justify-between xl:justify-normal gap-x-1 gap-y-2'>
-                <h4 className='md:text-lg font-medium'>News</h4>
-
-                {isVisible && data.length > 0 && (
-                <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>
-                )}
-
+        <div className='flex flex-col items-start gap-1 px-3 pb-1'>
+            <div>
                 <Button
                     variant='ghost'
                     size='sm'
-                    onClick={() => setIsVisible((curr) => !curr)}
-                    className='xl:hidden'
+                    onClick={toggleVisible}
+                    className={cn('h-7 w-7', isVisible && 'bg-zinc-100')}
                 >
-                    {isVisible? "Hide": "Show"}
+                    <Newspaper size={20} />
                 </Button>
+                {/* {isVisible && data.length > 0 && (
+                <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>
+                )} */}
             </div>
 
-            <ScrollArea className={cn('hidden xl:h-[660px]', isVisible && 'block')}>
-                <div className='flex flex-row xl:flex-col items-center pb-2 xl:py-0 gap-2'>
+            <ScrollArea className={cn('w-full max-h-0 overflow-hidden transition-all duration-300 ease-in-out', isVisible && 'max-h-none')}>
+                <div className='flex flex-row items-center pb-2 gap-2'>
                     {data.map((article) => (
                     <NewsArticle
                         key={`article-${article.title}`}
@@ -103,7 +112,7 @@ export default function NewsCarousel({ symbols }: NewsCarouselProps) {
                         variant='ghost'
                         disabled={isLoading || page >= MAX_PAGES - 1}
                         onClick={() => setPage((curr) => curr + 1)}
-                        className='text-sm xl:mt-3.5'
+                        className='text-sm'
                     >
                         Get more
                     </Button>
