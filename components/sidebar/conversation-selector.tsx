@@ -52,7 +52,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
         if (isEditting && inputRef.current) {
             inputRef.current.focus();
             inputRef.current.select();
-            inputRef.current.setSelectionRange(input.length, input.length);
+            inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
         }
     }, [isEditting]);
 

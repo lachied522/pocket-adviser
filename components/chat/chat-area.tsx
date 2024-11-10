@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
 import { useScrollAnchor } from "@/hooks/useScrollAnchor";
+// import { useMessageThrottle } from "@/hooks/useMessageThrottle";
 
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
@@ -21,6 +22,7 @@ import type { Message } from "ai";
 export default function ChatArea() {
     const { input, article, messages, isLoading, error, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
     const { scrollAreaRef, anchorRef, setShouldAutoScroll } = useScrollAnchor();
+    // const throttledMessages = useMessageThrottle(messages, 200);
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 
     const onDrop = useCallback(

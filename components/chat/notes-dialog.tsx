@@ -54,13 +54,15 @@ export default function NotesDialog({ children }: NotesDialogProps) {
         setNotes((curr) => curr.filter((note) => note.id !== id));
     }, [setNotes]);
 
-    const onDeleteAll = useCallback(async () => {
-        setIsLoading(true);
-        await Promise.all(notes.map((note) => deleteNoteAction(note.id)))
-        setNotes([]);
-        setIsLoading(false);
-        setIsConfirmDeleteVisible(false);
-    }, [setNotes, setIsLoading, setIsConfirmDeleteVisible]);
+    const onDeleteAll = useCallback(
+        async () => {
+            setIsLoading(true);
+            await Promise.all(notes.map((note) => deleteNoteAction(note.id)))
+            setNotes([]);
+            setIsLoading(false);
+            setIsConfirmDeleteVisible(false);
+        },[notes, setNotes, setIsLoading, setIsConfirmDeleteVisible]
+    );
 
     return (
         <Dialog>

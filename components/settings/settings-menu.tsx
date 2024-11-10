@@ -15,36 +15,17 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
-import Container from "@/components/ui/container";
-import AboutDialog from "@/components/dialogs/about-dialog";
 import SettingsDialog from "@/components/dialogs/settings-dialog";
+import PremiumDialog from "@/components/dialogs/premium-dialog";
 import BillingButton from "./billing-button";
 
-import { getIsGuestFromCookies, removeCookies } from "@/utils/cookies";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { removeCookies } from "@/utils/cookies";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import PremiumDialog from "@/components/dialogs/premium-dialog";
 
 export default function SettingsMenu() {
     const { state } = useGlobalContext() as GlobalState;
-    const [isGuest, setIsGuest] = useState<boolean>(true);
-    const isMobile = useMediaQuery();
-
-    useEffect(() => {
-        if (state) {
-            setIsGuest(getIsGuestFromCookies());
-        }
-    }, [state, getIsGuestFromCookies]);
-
-    const onSignOut = async () => {
-        // must remove cookies before calling signout
-        removeCookies();
-        // signout
-        await signOut();
-    }
 
     return (
         <DropdownMenu>
@@ -99,7 +80,11 @@ export default function SettingsMenu() {
                     title='Logout'
                     aria-label='logout'
                     variant='ghost'
-                    onClick={onSignOut}
+                    onClick={() => {
+                        // must remove cookies before signout
+                        removeCookies();
+                        signOut();
+                    }}
                     className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
                 >
                     <LogOut size={16} strokeWidth={2} />

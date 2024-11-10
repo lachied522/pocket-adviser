@@ -29,13 +29,6 @@ export default function NewsArea({ symbols = [] }: NewsAreaProps) {
     const [isVisible, setIsVisible] = useState<boolean>(Boolean(getCookie(COOKIE_NAME)) ?? true);
     const [page, setPage] = useState<number>(0);
 
-    const getNews = useCallback(
-        async (nextPage: number) => {
-            return await getNewsAction(symbols, nextPage, 20);
-        },
-        [symbols]
-    );
-
     const toggleVisible = useCallback(() => {
         setIsVisible((curr) => {
             setCookie(COOKIE_NAME, String(!curr));
@@ -46,7 +39,7 @@ export default function NewsArea({ symbols = [] }: NewsAreaProps) {
     useEffect(() => {
         (async function populatePage() {
             setIsLoading(true);
-            const _data = await getNews(page);
+            const _data = await getNewsAction(symbols, page, 20);
             // update state, ensuring only unique articles are returned
             setData((curr) => {
                 if (curr) {
@@ -62,7 +55,7 @@ export default function NewsArea({ symbols = [] }: NewsAreaProps) {
             });
             setIsLoading(false);
         })();
-    }, []);
+    }, [page]);
 
     return (
         <div className='flex flex-col items-start gap-1 px-3 pb-1'>

@@ -172,7 +172,7 @@ export default function EditPortfolioDialog({
         [modifiedHoldings, setIsSubmitLoading, insertHoldingAndUpdateState, updateHoldingAndUpdateState, deleteHoldingAndUpdateState]
     );
 
-    const debouncedSearch = debounce(
+    const debouncedSearch = useCallback(debounce(
         async (_searchString: string) => {
             try {
                 if (_searchString.length > 0) {
@@ -189,7 +189,7 @@ export default function EditPortfolioDialog({
             }
         },
         500,
-    );
+    ), [setSearchResults, setIsSearchLoading]);
 
     const clearSearch = useCallback(
         () => {

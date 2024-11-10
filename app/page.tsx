@@ -14,9 +14,9 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import TickerTape from "@/components/tape/ticker-tape";
 import ChatArea from "@/components/chat/chat-area";
 import NewsArea from "@/components/chat/news-area";
-import SidebarOuterTrigger from "./sidebar-outer-trigger";
-import SettingsMenu from "./settings-menu";
-import Sidebar from "./app-sidebar";
+import Sidebar from "@/components/sidebar/app-sidebar";
+import SidebarOuterTrigger from "@/components/sidebar/sidebar-outer-trigger";
+import SettingsMenu from "@/components/settings/settings-menu";
 
 import type { Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
@@ -46,7 +46,7 @@ export default async function Page({
     // check if userId is in cookies
     const cookieStore = cookies();
     const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
-
+  
     // fetch user data if able
     let userData: UserData|null = null;
     if (userId) {
@@ -77,7 +77,7 @@ export default async function Page({
                 <SettingsMenu />
               </div>
 
-              <NewsArea symbols={[]} />
+              <NewsArea symbols={userData?.holdings.map((holding) => stockData[holding.stockId].symbol) || []} />
 
               <ChatArea />
             </main>

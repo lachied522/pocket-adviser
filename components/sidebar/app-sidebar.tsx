@@ -29,6 +29,7 @@ import NotesDialog from "@/components/chat/notes-dialog";
 import CheckupDialog from "@/components/chat/checkup-dialog";
 import GetAdviceDialog from "@/components/chat/get-advice-dialog";
 import PortfolioDialog from "@/components/portfolio/portfolio-dialog";
+import DisclaimerDialog from "@/components/dialogs/disclaimer-dialog";
 import ConversationSelector from "./conversation-selector";
 
 const CONVERSATIONS_PER_PAGE = 16;
@@ -40,27 +41,22 @@ export default function AppSidebar() {
     const [isAtBottom, setIsAtBottom] = useState<boolean>(false);
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    const fetchConversations = useCallback(
-        async (nextPage: number) => {
-            if (state?.id && shouldFetchMore) {
-                const _conversations = await getMoreConversationsAction(state.id, nextPage, CONVERSATIONS_PER_PAGE);
-                for (const _conversation of _conversations) {
-                    dispatch({
-                        type: 'INSERT_CONVERSATION_END',
-                        payload: _conversation,
-                    });
-                }
-                setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
-            }
-        },
-        [state?.id, shouldFetchMore, setShouldFetchMore, dispatch]
-    );
-
     useEffect(() => {
-        if (state?.conversations && isAtBottom) {
-            fetchConversations(Math.floor(state.conversations.length / CONVERSATIONS_PER_PAGE));
+        if (state?.id && state?.conversations && isAtBottom && shouldFetchMore) {
+            fetchConversations(state.id, Math.floor(state.conversations.length / CONVERSATIONS_PER_PAGE));
         }
-    }, [state?.conversations, isAtBottom]);
+
+        async function fetchConversations(userId: string, nextPage: number) {
+            const _conversations = await getMoreConversationsAction(userId, nextPage, CONVERSATIONS_PER_PAGE);
+            for (const _conversation of _conversations) {
+                dispatch({
+                    type: 'INSERT_CONVERSATION_END',
+                    payload: _conversation,
+                });
+            }
+            setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
+        }
+    }, [state?.id, state?.conversations, isAtBottom]);
 
     useEffect(() => {
         // trigger fetch for when bottomRef is in view
@@ -97,7 +93,7 @@ export default function AppSidebar() {
                                 <ProfileDialog>
                                     <Button
                                         variant='ghost'
-                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                     >
                                         <UserRound size={16} />
                                         Profile
@@ -109,7 +105,7 @@ export default function AppSidebar() {
                                 <NotesDialog>
                                     <Button
                                         variant='ghost'
-                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                     >
                                         <NotebookPen size={16} />
                                         Notes ✨
@@ -129,7 +125,7 @@ export default function AppSidebar() {
                                 <PortfolioDialog>
                                     <Button
                                         variant='ghost'
-                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                     >
                                         <BriefcaseBusiness size={16} />
                                         Portfolio
@@ -149,7 +145,7 @@ export default function AppSidebar() {
                                 <Button
                                     variant='ghost'
                                     onClick={onNewChat}
-                                    className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                                    className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                 >
                                     <MessageCirclePlus size={16} />
                                     New chat
@@ -160,7 +156,7 @@ export default function AppSidebar() {
                                 <CheckupDialog>
                                     <Button
                                         variant='ghost'
-                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                     >
                                         <SearchCheck size={16} />
                                         Portfolio review
@@ -172,7 +168,7 @@ export default function AppSidebar() {
                                 <GetAdviceDialog>
                                     <Button
                                         variant='ghost'
-                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-neutral-600'
+                                        className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                     >
                                         <ArrowUpDown size={16} className='rotate-90' />
                                         Deposit/withdraw
@@ -204,7 +200,17 @@ export default function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter />
+            <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <DisclaimerDialog>
+                            <button className='w-full text-xs text-center underline mb-3'>
+                                Disclaimer
+                            </button>
+                        </DisclaimerDialog>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarFooter>
         </Sidebar>
     )
 }
