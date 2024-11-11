@@ -87,106 +87,104 @@ export default function SignupPage() {
 
     return (
         <main className='min-h-screen flex items-center justify-center bg-slate-50'>
-            <div className='w-full max-w-lg flex flex-col gap-6 py-6'>
-                <div className='flex flex-col gap-12 p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                    <H1>Signup</H1>
+            <div className='w-full max-w-md flex flex-col gap-12 p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
+                <H1>Signup</H1>
 
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col items-stretch justify-between gap-5'>
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Name <span className='text-sm'>(optional)</span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col items-stretch justify-between gap-5'>
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Name <span className='text-sm'>(optional)</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Email
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="email"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Email
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="email"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Password
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Password
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            <FormField
-                                control={form.control}
-                                name="passwordConfirm"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Confirm Password
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="password"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                        <FormField
+                            control={form.control}
+                            name="passwordConfirm"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Confirm Password
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="password"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                            <div className='text-sm text-right'>
-                                Already have an account? <Link href='/login' className='underline text-blue-400 cursor-pointer'>Login</Link>
-                            </div>
+                        <div className='text-sm text-right'>
+                            Already have an account? <Link href='/login' className='underline text-blue-400 cursor-pointer'>Login</Link>
+                        </div>
 
-                            <Button
-                                type='submit'
-                                disabled={isLoading}
-                                className='h-10 border border-input shadow-sm'
-                            >
-                                Signup
-                            </Button>
+                        <Button
+                            type='submit'
+                            disabled={isLoading}
+                            className='h-10 border border-input shadow-sm'
+                        >
+                            Signup
+                        </Button>
 
-                            <Separator />
+                        <Separator />
 
-                            <GoogleSigninButton />
-                        </form>
-                    </Form>
-                </div>
+                        <GoogleSigninButton />
+                    </form>
+                </Form>
             </div>
         </main>
     )

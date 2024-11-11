@@ -83,8 +83,8 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                 <span className="truncate">{name}</span>
 
                 <div className={cn(
-                    'hidden flex-row items-center gap-3 pl-4 pr-2 bg-gradient-to-r from-transparent to-sidebar to-10% absolute right-0 group-hover/selector:flex',
-                    conversationId === id && 'flex to-zinc-100'
+                    'hidden flex-row items-center gap-2 pl-4 pr-2 bg-gradient-to-r from-transparent to-10% to-zinc-100 absolute right-0 group-hover/selector:flex',
+                    conversationId === id && 'flex'
                 )}>
                     <button
                         onClick={(e) => {
@@ -93,7 +93,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                         }}
                         className='bg-transparent hover:bg-transparent'
                     >
-                        <PencilLine size={isMobile? 18: 16} className='text-slate-600 hover:text-black' />
+                        <PencilLine size={isMobile? 18: 16} className='text-zinc-600 hover:text-black' />
                     </button>
 
                     <Dialog>
@@ -102,7 +102,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                                 onClick={(e) => e.stopPropagation()}
                                 className='bg-transparent hover:bg-transparent'
                             >
-                                <Trash2 size={isMobile? 18: 16} className='text-slate-600 hover:text-red-600' />
+                                <Trash2 size={isMobile? 18: 16} className='text-zinc-600 hover:text-red-600' />
                             </button>
                         </DialogTrigger>
                         <DialogContent className='max-w-lg'>

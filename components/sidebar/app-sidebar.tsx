@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { ArrowUpDown, BriefcaseBusiness, MessageCirclePlus, NotebookPen, SearchCheck, UserRound } from "lucide-react";
 
@@ -16,8 +16,6 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { getMoreConversationsAction } from "@/actions/crud/conversation";
 
@@ -183,21 +181,17 @@ export default function AppSidebar() {
 
                 <SidebarGroup>
                     <SidebarGroupContent>
-                        <SidebarMenu>
-                            <ScrollArea className='h-[calc(100%-20px)'>
-                                <div className='flex flex-col gap-3'>
-                                    {state?.conversations.map((conversation, index) => (
-                                    <SidebarMenuItem key={`conversation-${conversation.id}-${index}`}>
-                                        <ConversationSelector {...conversation} />
-                                    </SidebarMenuItem>
-                                    ))}
-
-                                    <div className='w-full h-px' ref={bottomRef} />
-                                </div>
-                            </ScrollArea>
+                        <SidebarMenu className='flex flex-col gap-3'>
+                            {state?.conversations.map((conversation, index) => (
+                            <SidebarMenuItem key={`conversation-${conversation.id}-${index}`}>
+                                <ConversationSelector {...conversation} />
+                            </SidebarMenuItem>
+                            ))}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
+
+                <div className='w-full h-px' ref={bottomRef} />
             </SidebarContent>
 
             <SidebarFooter>

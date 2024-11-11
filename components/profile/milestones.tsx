@@ -66,7 +66,7 @@ export default function Milestones({ wealthData }: MilestonesProps) {
     );
 
     return (
-        <div className='flex flex-col items-stretch gap-6'>
+        <div className='flex flex-col items-stretch gap-6 px-2'>
             <div className='flex flex-row items-center justify-between'>
                 <FormLabel className='text-lg'>Milestones</FormLabel>
 

@@ -1,10 +1,8 @@
 import { cookies } from 'next/headers';
-import { revalidatePath } from 'next/cache';
 import NextAuth, { AuthError } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
 
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
@@ -59,9 +57,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         },
       }),
       GoogleProvider({
-        allowDangerousEmailAccountLinking: true,
-      }),
-      GitHubProvider({
         allowDangerousEmailAccountLinking: true,
       }),
     ],
