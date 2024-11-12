@@ -1,5 +1,4 @@
-"use client";
-import { COOKIE_NAME_FOR_USER_ID, COOKIE_NAME_FOR_IS_GUEST } from "@/constants/cookies";
+import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 export function getCookie(name: string) {
     try {
@@ -31,20 +30,11 @@ export function getUserIdFromCookies() {
     return getCookie(COOKIE_NAME_FOR_USER_ID);
 }
 
-export function getIsGuestFromCookies() {
-    return getCookie(COOKIE_NAME_FOR_IS_GUEST) === "true";
-}
-
 export function setUserIdCookie(value: string) {
     setCookie(COOKIE_NAME_FOR_USER_ID, value);
-}
-
-export function setIsGuestCookie(value: boolean) {
-    setCookie(COOKIE_NAME_FOR_IS_GUEST, String(value));
 }
 
 export function removeCookies() {
     // remove cookies from doc
     removeCookie(COOKIE_NAME_FOR_USER_ID);
-    removeCookie(COOKIE_NAME_FOR_IS_GUEST);
 }

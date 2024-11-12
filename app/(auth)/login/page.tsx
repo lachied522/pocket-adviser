@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { H1 } from "@/components/ui/typography";
 
 import GoogleSigninButton from "../components/signin-with-google";
+import ContinueAsGuestButton from "../components/continue-as-guest";
 
 const formSchema = z.object({
     email: z.string({ required_error: "Required" })
@@ -31,6 +33,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const router = useRouter();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -48,29 +51,38 @@ export default function LoginPage() {
                 {
                     ...values,
                     callbackUrl: '/',
-                    redirect: true,
+                    redirect: false,
                 }
             );
 
-            if (response?.error) {
+            if (!response) {
+                form.setError("email", { message: "Something went wrong, please try again later" });
+                setIsLoading(false);
+                return;
+            }
+
+            if (response.error) {
                 // Auth.js cannot only provide generic error message
                 // see https://github.com/nextauthjs/next-auth/discussions/8999
+                // potential solution https://github.com/nextauthjs/next-auth/pull/9871
                 form.setError("email", { message: "Email or password incorrect" });
                 form.setError("password", { message: "Email or password incorrect" });
                 setIsLoading(false);
                 return;
             }
+
+            router.replace(response.url || '/');
         },
         [form, setIsLoading]
     );
 
     return (
         <main className='min-h-screen flex items-center justify-center bg-slate-50'>
-            <div className='w-full max-w-md flex flex-col gap-12 p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                <H1>Login</H1>
-
+            <div className='w-full max-w-md p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col items-stretch justify-between gap-5'>
+                        <H1>Login</H1>
+
                         <FormField
                             control={form.control}
                             name="email"
@@ -123,7 +135,9 @@ export default function LoginPage() {
 
                         <Separator />
 
-                        <GoogleSigninButton />
+                        <GoogleSigninButton disabled={isLoading} />
+
+                        <ContinueAsGuestButton disabled={isLoading} />
                     </form>
                 </Form>
             </div>

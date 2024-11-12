@@ -21,9 +21,12 @@ import { Separator } from "@/components/ui/separator";
 import { H1 } from "@/components/ui/typography";
 
 import GoogleSigninButton from "../components/signin-with-google";
+import ContinueAsGuestButton from "../components/continue-as-guest";
 
 const formSchema = z.object({
-    name: z.string().optional(),
+    name: z.string({ required_error: "Name is required" })
+        .min(1, "Name is required")
+        .max(64, "Name too long"),
     email: z.string({ required_error: "Email is required" })
         .min(1, "Email is required")
         .email("Invalid email"),
@@ -32,6 +35,7 @@ const formSchema = z.object({
         .min(8, "Password must be more than 8 characters")
         .max(32, "Password must be less than 32 characters"),
     passwordConfirm: z.string({ required_error: "Password is required" })
+        .min(1, "Password is required")
 })
 .refine(({ password, passwordConfirm }) => password === passwordConfirm, {
     message: "Passwords do not match",
@@ -43,6 +47,7 @@ export default function SignupPage() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            name: '',
             email: '',
             password: '',
             passwordConfirm: '',
@@ -87,18 +92,18 @@ export default function SignupPage() {
 
     return (
         <main className='min-h-screen flex items-center justify-center bg-slate-50'>
-            <div className='w-full max-w-md flex flex-col gap-12 p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
-                <H1>Signup</H1>
-
+            <div className='w-full max-w-md p-3.5 md:p-7 bg-white border border-slate-200 rounded-xl'>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col items-stretch justify-between gap-5'>
+                        <H1>Signup</H1>
+
                         <FormField
                             control={form.control}
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Name <span className='text-sm'>(optional)</span>
+                                        Name
                                     </FormLabel>
                                     <FormControl>
                                         <Input
@@ -182,7 +187,9 @@ export default function SignupPage() {
 
                         <Separator />
 
-                        <GoogleSigninButton />
+                        <GoogleSigninButton disabled={isLoading} />
+
+                        <ContinueAsGuestButton disabled={isLoading} />
                     </form>
                 </Form>
             </div>

@@ -71,8 +71,8 @@ export function ChatProvider({
         maxSteps: 3,
         sendExtraMessageFields: true,
         body: {
-            userId: state?.id,
-            accountType: state?.accountType,
+            userId: state.id,
+            accountType: state.accountType,
             conversationId,
         },
         async onFinish(message: Message) {

@@ -5,18 +5,14 @@ import {
   useCallback,
   useContext,
   useReducer,
-  useEffect,
   useMemo,
-  useRef
 } from "react";
 
-import { createUserAction, updateUserAction } from "@/actions/crud/user";
+import { updateUserAction } from "@/actions/crud/user";
 import { updateProfileAction } from "@/actions/crud/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { insertConversationAction, updateConversationAction, deleteConversationAction } from "@/actions/crud/conversation";
 import { getStockByIdAction } from "@/actions/data/stocks";
-
-import { getUserIdFromCookies, setUserIdCookie, setIsGuestCookie } from "@/utils/cookies";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
@@ -24,7 +20,7 @@ import type { Conversation, Holding, Profile, Stock, User } from "@prisma/client
 import type { UserData } from "@/types/helpers";
 
 export type GlobalState = {
-  state: UserData | null
+  state: UserData
   portfolioValue: number
   currency: 'USD'|'AUD'
   dispatch: React.Dispatch<Action>
@@ -48,7 +44,7 @@ export const useGlobalContext = () => {
 
 interface GlobalProviderProps {
   children: React.ReactNode
-  initialUserData: UserData|null
+  initialUserData: UserData
   initialStockData: { [id: number]: Stock }
   initalForexRate: number
 }
@@ -64,38 +60,7 @@ export const GlobalProvider = ({
   const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
   const [forexRate] = useState<number>(initalForexRate); // USDAUD forex rate
 
-  const createGuestUserIfNecessary = useCallback(
-    async () => {
-      // check if userId already exists in cookies to avoid unnecessary user creation
-      const _userId = getUserIdFromCookies();
-      if (_userId) {
-          console.log('user retrieved from cookies');
-          return _userId;
-      };
-    
-      const _user = await createUserAction({ guest: true });
-      console.log('guest created');
-    
-      // set cookies
-      setUserIdCookie(_user.id);
-      setIsGuestCookie(true);
-      // update state
-      dispatch({
-        type: 'SET_DATA',
-        payload: {
-            ..._user,
-            holdings: [],
-            conversations: [],
-            profile: null,
-        } satisfies UserData,
-      });
-      return _user.id;
-    },
-    [dispatch]
-  );
-
   const portfolioValue = useMemo(() => {
-    if (!state) return 0;
     return state.holdings.reduce(
       (acc, obj) => {
           const stock = stockDataMap[obj.stockId];
@@ -136,8 +101,6 @@ export const GlobalProvider = ({
 
   const updateUserAndUpdateState = useCallback(
     async (data: Partial<User>) => {
-        if (!state) return;
-
         await updateUserAction(state.id, data);
         
         // update state
@@ -154,36 +117,24 @@ export const GlobalProvider = ({
 
   const updateProfileAndUpdateState = useCallback(
     async (profile: Omit<Profile, 'userId'>) => {
-      let userId = state?.id;
-      if (!userId) {
-        userId = await createGuestUserIfNecessary() as string;
-      }
-
       const res = await updateProfileAction({
         ...profile,
-        userId,
+        userId: state.id,
       });
-      // update state
       dispatch({
         type: 'UPDATE_PROFILE',
         payload: res
       });
     },
-    [state]
+    [state.id, dispatch]
   );
 
   const insertHoldingAndUpdateState = useCallback(
     async (holding: Omit<Holding, 'id'|'userId'>) => {
-      let userId = state?.id;
-      if (!userId) {
-          userId = await createGuestUserIfNecessary() as string;
-      }
-
       const res = await insertHoldingAction({
           ...holding,
-          userId,
+          userId: state.id,
       });
-
       // update state
       dispatch({
           type: 'INSERT_HOLDING',
@@ -192,18 +143,15 @@ export const GlobalProvider = ({
 
       return res.id;
     },
-    [state, dispatch]
+    [state.id, dispatch]
   );
 
   const updateHoldingAndUpdateState = useCallback(
     async (holding: Omit<Holding, 'userId'>) => {
-      if (!state) return;
-
       const res = await updateHoldingAction({
         ...holding,
         userId: state.id,
       });
-
       // update state
       dispatch({
         type: 'UPDATE_HOLDING',
@@ -215,12 +163,8 @@ export const GlobalProvider = ({
 
   const deleteHoldingAndUpdateState = useCallback(
     async (holdingId: number) => {
-      if (!state) return;
-
       try {
         const res = await deleteHoldingAction(holdingId);
-
-        // update state
         dispatch({
           type: 'DELETE_HOLDING',
           payload: res.id
@@ -229,22 +173,15 @@ export const GlobalProvider = ({
         // TO DO: sometimes user deletes a holding that is not yet in DB, which will cause error
       }
     },
-    [state, dispatch]
+    [dispatch]
   );
 
   const insertConversationAndUpdateState = useCallback(
     async (conversation: Omit<Conversation, 'id'|'userId'|'createdAt'|'updatedAt'>) => {
-      let userId = state?.id;
-      if (!userId) {
-          userId = await createGuestUserIfNecessary() as string;
-      }
-
       const res = await insertConversationAction({
         ...conversation,
-        userId,
+        userId: state.id,
       });
-
-      // update state
       dispatch({
         type: 'INSERT_CONVERSATION_START',
         payload: {
@@ -252,19 +189,14 @@ export const GlobalProvider = ({
             name: res.name,
         }
       });
-
       return res.id;
     },
-    [state, dispatch]
+    [state.id, dispatch]
   );
 
   const updateConversationAndUpdateState = useCallback(
     async (conversation: Omit<Conversation, 'userId'>) => {
-      if (!state) return;
-
       const res = await updateConversationAction(conversation.id, conversation);
-
-      // update state
       dispatch({
         type: 'UPDATE_CONVERSATION',
         payload: {
@@ -278,17 +210,14 @@ export const GlobalProvider = ({
 
   const deleteConversationAndUpdateState = useCallback(
     async (conversationId: string) => {
-      if (!state) return;
-
       const res = await deleteConversationAction(conversationId);
-
       // update state
       dispatch({
         type: 'DELETE_CONVERSATION',
         payload: res.id,
       });
     },
-    [state, dispatch]
+    [dispatch]
   );
 
   return (

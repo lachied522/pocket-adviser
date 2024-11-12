@@ -19,7 +19,6 @@ model User {
   hashedPassword   String?
   emailVerified    DateTime?
   image            String?
-  guest            Boolean        @default(false)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   stripeCustomerId String?
@@ -163,6 +162,7 @@ model Note {
 }
 
 enum AccountType {
+  GUEST
   FREE
   PAID
   ADMIN

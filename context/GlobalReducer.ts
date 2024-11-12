@@ -32,15 +32,12 @@ export type Action = {
     payload: UserData['conversations'][number]['id']
 }
 
-export function GlobalReducer(state: UserData|null, action: Action) {
-    if (!state) {
-        if (action.type === 'SET_DATA') {
+export function GlobalReducer(state: UserData, action: Action) {
+    switch (action.type) {
+        case 'SET_DATA': {
             return action.payload;
         }
-        return null;
-    };
 
-    switch (action.type) {
         case 'SET_HOLDINGS': {
             return {
                 ...state,

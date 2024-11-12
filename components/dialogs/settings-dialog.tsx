@@ -50,8 +50,8 @@ export default function SettingsDialog({ children } : SettingsDialogProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            email: state?.email || '',
-            mailFrequency: state?.mailFrequency || "NEVER",
+            email: state.email || '',
+            mailFrequency: state.mailFrequency || "NEVER",
         },
     });
     const closeRef = useRef<HTMLButtonElement>(null);

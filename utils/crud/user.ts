@@ -5,7 +5,7 @@ import type { UserData } from "@/types/helpers";
 
 const prisma = getPrismaClient();
 
-export async function createUser(data: any) {
+export async function createUser(data: Partial<User>) {
     return await prisma.user.create({
         data
     });

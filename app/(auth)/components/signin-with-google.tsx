@@ -3,11 +3,16 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 
-export default function GoogleSigninButton() {
+interface GoogleSigninButtonProps {
+    disabled?: boolean
+}
+
+export default function GoogleSigninButton({ disabled }: GoogleSigninButtonProps) {
     return (
         <Button
             type='button'
             variant='outline'
+            disabled={disabled}
             onClick={() => {
                 signIn("google", { redirect: true, callbackUrl: '/' });
             }}

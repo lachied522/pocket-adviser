@@ -34,13 +34,13 @@ const CONVERSATIONS_PER_PAGE = 16;
 
 export default function AppSidebar() {
     const { state, dispatch } = useGlobalContext() as GlobalState;
-    const { conversationId, onNewChat } = useChatContext() as ChatState;
-    const [shouldFetchMore, setShouldFetchMore] = useState<boolean>((state?.conversations || []).length >= CONVERSATIONS_PER_PAGE);
+    const { onNewChat } = useChatContext() as ChatState;
+    const [shouldFetchMore, setShouldFetchMore] = useState<boolean>((state.conversations).length >= CONVERSATIONS_PER_PAGE);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(false);
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (state?.id && state?.conversations && isAtBottom && shouldFetchMore) {
+        if (state.conversations && isAtBottom && shouldFetchMore) {
             fetchConversations(state.id, Math.floor(state.conversations.length / CONVERSATIONS_PER_PAGE));
         }
 
@@ -54,7 +54,7 @@ export default function AppSidebar() {
             }
             setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
         }
-    }, [state?.id, state?.conversations, isAtBottom]);
+    }, [state.id, state.conversations, isAtBottom]);
 
     useEffect(() => {
         // trigger fetch for when bottomRef is in view
@@ -182,7 +182,7 @@ export default function AppSidebar() {
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu className='flex flex-col gap-3'>
-                            {state?.conversations.map((conversation, index) => (
+                            {state.conversations.map((conversation, index) => (
                             <SidebarMenuItem key={`conversation-${conversation.id}-${index}`}>
                                 <ConversationSelector {...conversation} />
                             </SidebarMenuItem>

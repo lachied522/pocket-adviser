@@ -19,8 +19,8 @@ import { createCheckoutSession, createBillingPortalSession } from "@/actions/bil
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 interface SubscribeButtonProps {
-    userId?: string | null,
-    accountType?: "FREE"|"PAID"|"ADMIN"
+    userId: string,
+    accountType?: "FREE"|"PAID"|"ADMIN"|"GUEST"
 }
 
 function SubscribeButton({ userId, accountType = "FREE" }: SubscribeButtonProps) {
@@ -31,7 +31,7 @@ function SubscribeButton({ userId, accountType = "FREE" }: SubscribeButtonProps)
         if (isSessionLoading) return; // prevent multiple requests
         setIsSessionLoading(true);
 
-        if (!userId) {
+        if (accountType === "GUEST") {
             router.push('/signup');
             return;
         }
@@ -130,6 +130,7 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                         <div className='flex-1 max-w-sm flex flex-col gap-6 p-3 sm:p-5 bg-zinc-50 border-2 border-zinc-600 rounded-lg'>
                             <H1>Premium</H1>
                             <p>Unrestricted and enhanced access</p>
+
                             <div className=''>
                                 <div>Price <span className='text-sm'>(USD)</span></div>
                                 <div className='inline-flex items-end'>
@@ -137,10 +138,12 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
                                     <span className='text-lg text-slate-600 ml-1 mb-0.5'>/month</span>
                                 </div>
                             </div>
+
                             <SubscribeButton
-                                userId={state?.id}
-                                accountType={state?.accountType}
+                                userId={state.id}
+                                accountType={state.accountType}
                             />
+
                             <div>
                                 <div className='mb-3'>Includes:</div>
                                 <div className='grid grid-cols-[24px_1fr] gap-x-2'>

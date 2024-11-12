@@ -404,7 +404,7 @@ export default function EditPortfolioDialog({
                                 type='button'
                                 variant='secondary'
                                 onClick={() => {
-                                    setModifiedHoldings(state?.holdings || []);
+                                    setModifiedHoldings(state.holdings);
                                     clearSearch();
                                 }}
                             >

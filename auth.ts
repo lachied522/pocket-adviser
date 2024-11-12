@@ -9,7 +9,7 @@ import { PrismaClient } from "@prisma/client";
 
 import bcrypt from "bcrypt";
 
-import { COOKIE_NAME_FOR_IS_GUEST, COOKIE_NAME_FOR_USER_ID } from '@/constants/cookies';
+import { COOKIE_NAME_FOR_USER_ID } from '@/constants/cookies';
 
 import type { DefaultSession } from "@auth/core/types"
 
@@ -36,9 +36,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           email: { label: "Email", type: "text" },
           password: { label: "Password", type: "password" },
         },
-        authorize: async (credentials) => {
+        authorize: async ({ email, password }) => {
+          if (!email) {
+            throw new AuthError("Email required");
+          }
+
+          if (!password) {
+            throw new AuthError("Password required");
+          }
+
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email as string }
+              where: { email: email as string },
           });
 
           if (!user) {
@@ -47,7 +55,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               throw new AuthError("User not found");
           }
 
-          const passwordsMatch = await bcrypt.compare(credentials.password as string, user.hashedPassword!);
+          const passwordsMatch = await bcrypt.compare(password as string, user.hashedPassword!);
 
           if (!passwordsMatch) {
               throw new AuthError("Passwords do not match");
@@ -67,7 +75,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const defaultExpiry = 7 * 24 * 60 * 60 * 1000; // one week
         if (user.id) {
             cookieStore.set({ name: COOKIE_NAME_FOR_USER_ID, value: user.id, maxAge: defaultExpiry });
-            cookieStore.set({ name: COOKIE_NAME_FOR_IS_GUEST, value: "false", maxAge: defaultExpiry });
         }
         return true;
       },

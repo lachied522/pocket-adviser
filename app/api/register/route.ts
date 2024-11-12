@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 
 import { PrismaClient } from "@prisma/client";
 
-import { COOKIE_NAME_FOR_USER_ID, COOKIE_NAME_FOR_IS_GUEST } from "@/constants/cookies";
+import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 const prisma = new PrismaClient();
 
@@ -31,34 +31,37 @@ export async function POST(req: Request) {
     // create hashed password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let user;
     // check if user exists as a guest
-    const isGuestCookie = cookieStore.get(COOKIE_NAME_FOR_IS_GUEST);
-    if (isGuestCookie && isGuestCookie.value === "true") {
-        // add credentials to existing user
-        const userCookie = cookieStore.get(COOKIE_NAME_FOR_USER_ID);
-        user = await prisma.user.update({
-            where: { id: userCookie!.value },
-            data: {
-                name,
-                email,
-                hashedPassword,
-                guest: false,
-            }
-        });
-
-        // set is guest cookie to false
-        cookieStore.set(COOKIE_NAME_FOR_IS_GUEST, "false");
-    } else {
-        // create brand new user
-        user = await prisma.user.create({
-            data: {
-                name,
-                email,
-                hashedPassword,
-            }
-        });
+    const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
+    if (userId) {
+        try {
+            // add credentials to existing user
+            const user = await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    name,
+                    email,
+                    hashedPassword,
+                    accountType: "FREE",
+                }
+            });
+            return NextResponse.json(user);
+        } catch (e) {
+            // something went wrong converting guest account
+            console.log("Could not convert guest user: ", e);
+        }
     }
 
+    // create brand new user
+    const user = await prisma.user.create({
+        data: {
+            name,
+            email,
+            hashedPassword,
+        }
+    });
+
+    // update cookies
+    cookieStore.set(COOKIE_NAME_FOR_USER_ID, user.id);
     return NextResponse.json(user);
 }

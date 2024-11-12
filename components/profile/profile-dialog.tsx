@@ -54,18 +54,18 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            dob: state?.profile?.dob ?? new Date(),
-            income: state?.profile?.income ?? 0,
-            percentIncomeInvested: state?.profile?.percentIncomeInvested ?? 0.10,
-            experience: state?.profile?.experience ?? 0,
-            riskToleranceQ1: state?.profile?.riskToleranceQ1 ?? 3,
-            riskToleranceQ2: state?.profile?.riskToleranceQ2 ?? 3,
-            riskToleranceQ3: state?.profile?.riskToleranceQ3 ?? 3,
-            riskToleranceQ4: state?.profile?.riskToleranceQ4 ?? 3,
-            targetYield: state?.profile?.targetYield ?? 0.01,
-            international: state?.profile?.international ?? 0.7,
-            preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> ?? {},
-            milestones: state?.profile?.milestones as any ?? [], // TO DO: type this properly
+            dob: state.profile?.dob ?? new Date(),
+            income: state.profile?.income ?? 0,
+            percentIncomeInvested: state.profile?.percentIncomeInvested ?? 0.10,
+            experience: state.profile?.experience ?? 0,
+            riskToleranceQ1: state.profile?.riskToleranceQ1 ?? 3,
+            riskToleranceQ2: state.profile?.riskToleranceQ2 ?? 3,
+            riskToleranceQ3: state.profile?.riskToleranceQ3 ?? 3,
+            riskToleranceQ4: state.profile?.riskToleranceQ4 ?? 3,
+            targetYield: state.profile?.targetYield ?? 0.01,
+            international: state.profile?.international ?? 0.7,
+            preferences: state.profile?.preferences as Record<string, 'like'|'dislike'> ?? {},
+            milestones: state.profile?.milestones as any ?? [], // TO DO: type this properly
         },
     });
     const income = form.watch("income") ?? 0;
@@ -141,18 +141,18 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
         () => {
             // reset form state to initial values
             form.reset({
-                dob: state?.profile?.dob ?? new Date(),
-                income: state?.profile?.income ?? 0,
-                percentIncomeInvested: state?.profile?.percentIncomeInvested ?? 0.10,
-                experience: state?.profile?.experience ?? 0,
-                riskToleranceQ1: state?.profile?.riskToleranceQ1 ?? 3,
-                riskToleranceQ2: state?.profile?.riskToleranceQ2 ?? 3,
-                riskToleranceQ3: state?.profile?.riskToleranceQ3 ?? 3,
-                riskToleranceQ4: state?.profile?.riskToleranceQ4 ?? 3,
-                targetYield: state?.profile?.targetYield ?? 0.01,
-                international: state?.profile?.international ?? 0.7,
-                preferences: state?.profile?.preferences as Record<string, 'like'|'dislike'> ?? {},
-                milestones: state?.profile?.milestones as any ?? [],
+                dob: state.profile?.dob ?? new Date(),
+                income: state.profile?.income ?? 0,
+                percentIncomeInvested: state.profile?.percentIncomeInvested ?? 0.10,
+                experience: state.profile?.experience ?? 0,
+                riskToleranceQ1: state.profile?.riskToleranceQ1 ?? 3,
+                riskToleranceQ2: state.profile?.riskToleranceQ2 ?? 3,
+                riskToleranceQ3: state.profile?.riskToleranceQ3 ?? 3,
+                riskToleranceQ4: state.profile?.riskToleranceQ4 ?? 3,
+                targetYield: state.profile?.targetYield ?? 0.01,
+                international: state.profile?.international ?? 0.7,
+                preferences: state.profile?.preferences as Record<string, 'like'|'dislike'> ?? {},
+                milestones: state.profile?.milestones as any ?? [],
             });
         },
         [form, state]

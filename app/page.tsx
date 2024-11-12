@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
@@ -46,11 +47,18 @@ export default async function Page({
     // check if userId is in cookies
     const cookieStore = cookies();
     const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
+
+    if (!userId) {
+      // middleware should handle this
+      redirect('/login');
+    }
   
     // fetch user data if able
-    let userData: UserData|null = null;
-    if (userId) {
-        userData = await getUserDataByUserId(userId);
+    const userData = await getUserDataByUserId(userId);
+
+    if (!userData) {
+      // middleware should handle this
+      redirect('/login');
     }
 
     // get stock data and forex rate simultaneously
