@@ -1,4 +1,3 @@
-
 import { streamText, type CoreMessage } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
@@ -14,12 +13,11 @@ import { description as searchWebDescription, parameters as searchWebParams, sea
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
 import { getSystemMessage } from './system';
+import { handleRecommendations } from './handle-recommendations';
 
-import type { AccountType } from '@prisma/client';
+export type ToolName = "getRecommendations" | "getStockAdvice" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
 
-export type ToolName = "getRecommendations" | "shouldBuyOrSellStock" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
-
-function getFinishStep(finishReason: "stop"|"tool-calls") {
+function getFinishStep(finishReason: "stop"|"tool-calls"|"error") {
     return {
         finishReason,
         usage: {
@@ -30,7 +28,7 @@ function getFinishStep(finishReason: "stop"|"tool-calls") {
     }
 }
 
-function getFinishStream(finishReason: "stop"|"tool-calls") {
+function getFinishStream(finishReason: "stop"|"tool-calls"|"error") {
     return {
         finishReason,
         usage: {
@@ -40,45 +38,17 @@ function getFinishStream(finishReason: "stop"|"tool-calls") {
     }
 }
 
-// TO DO: type this properly
-function getAutoResponseForRecommendations(args: any, data: any) {
-    if (!data) {
-        return "I'm sorry, something went wrong. Is there anything else I can help you with?";
-    } 
-
-    if (data.transactions.length === 0) {
-        return "It looks like you don't have any recommendations at this time. Is there anything else I can help you with?";
-    }
-
-    const numTransactions = data.transactions.length;
-
-    return (
-        `Here ${numTransactions > 1? "are": "is"} ${numTransactions} possible trade ${numTransactions > 1? "ideas": "idea"} for your ` +
-        `${args.action === "review"? "portfolio": "$" + args.amount.toLocaleString() + (args.action === "withdraw"? " withdrawal": " deposit")}. ` +
-        "Please note this is not formal advice. " +
-        "Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂"
-    );
-}
-
-function getAutoResponseForStockAdvice(args: any, data: any) {
-    if (!data) {
-        return "I'm sorry, something went wrong. Is there anything else I can help you with?";
-    } 
-
-    return "Please contact a financial adviser if you require advice, however feel free to ask any questions you may have. 🙂";
-}
-
 export async function* streamAIResponse({
     messages,
     toolName,
     userId,
-    accountType = "FREE",
+    accountType,
     onFinish
 }: {
     messages: CoreMessage[]
     toolName?: ToolName
-    userId?: string
-    accountType?: AccountType
+    userId: string
+    accountType: "GUEST"|"FREE"|"PAID"|"ADMIN"
     onFinish: (text: string) => void
 }) {
     const systemMessage = await getSystemMessage(userId, accountType);
@@ -92,14 +62,16 @@ export async function* streamAIResponse({
                 description: getRecommendationsDescription,
                 parameters: getRecommendationsParams,
                 execute: async function (args) {
-                    return await getRecommendations(args.amount, args.action, userId);
+                    return await getRecommendations(args, messages, userId);
                 },
             },
-            shouldBuyOrSellStock: {
+            getStockAdvice: {
                 description: getStockAdviceDescription,
                 parameters: getStockAdviceParams,
                 execute: async function (args) {
-                    return await getStockAdvice(args.symbol, args.amount, args.exchange, userId);
+                    const res = await getStockAdvice(args, userId);
+                    console.log(res);
+                    return res;
                 },
             },
             getPortfolio: {
@@ -203,31 +175,39 @@ export async function* streamAIResponse({
             case 'tool-result': {
                 switch (part.toolName) {
                     case 'getRecommendations': {
-                        yield `a:${
-                            JSON.stringify({
-                                toolCallId: part.toolCallId,
-                                result: part.result,
-                            })
-                        }\n`;
-                        // must tell client that tool part is finished
-                        yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
-                        yield `0:${JSON.stringify(getAutoResponseForRecommendations(part.args, part.result))}\n`;
-                        yield `e:${JSON.stringify(getFinishStep("stop"))}\n`;
-                        yield `d:${JSON.stringify(getFinishStream("stop"))}\n`;
-                        break;
-                    }
-                    case 'shouldBuyOrSellStock': {
-                        yield `a:${
-                            JSON.stringify({
-                                toolCallId: part.toolCallId,
-                                result: part.result,
-                            })
-                        }\n`;
-                        // must tell client that tool part is finished
-                        yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
-                        yield `0:${JSON.stringify(getAutoResponseForStockAdvice(part.args, part.result))}\n`;
-                        yield `e:${JSON.stringify(getFinishStep("stop"))}\n`;
-                        yield `d:${JSON.stringify(getFinishStream("stop"))}\n`;
+                        try {
+                            if (!part.result) {
+                                throw new Error("Something went wrong");
+                            }
+                            // yield the selected transactions
+                            yield `a:${
+                                JSON.stringify({
+                                    toolCallId: part.toolCallId,
+                                    result: part.result,
+                                })
+                            }\n`;
+                            // tell client that tool part is finished
+                            yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
+
+                            const subStream = handleRecommendations(messages, part.result);
+    
+                            for await (const subPart of subStream) {
+                                yield `0:${JSON.stringify(subPart)}\n`;
+                            }
+
+                            yield `e:${JSON.stringify(getFinishStep("stop"))}\n`;
+                            yield `d:${JSON.stringify(getFinishStream("stop"))}\n`;
+                        } catch (e) {
+                            console.error(e);
+                            yield `a:${
+                                JSON.stringify({
+                                    toolCallId: part.toolCallId,
+                                    result: "Something went wrong",
+                                })
+                            }\n`;
+                            yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
+                        }
+
                         break;
                     }
                     default: {

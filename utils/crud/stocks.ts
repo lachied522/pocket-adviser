@@ -22,3 +22,13 @@ export async function getStockBySymbol(symbol: string) {
         where: { symbol }
     });
 }
+
+export async function getStocksByIds(stockIds: number[]) {
+    return await prisma.stock.findMany({
+        where: {
+            id: {
+                in: stockIds,
+            }
+        }
+    });
+}

@@ -20,12 +20,3 @@ export type PopulatedHolding = (
     Holding & Omit<Stock, 'id'>
 )
 
-export type Recommendation = {
-    stockId: number
-    transaction: "Buy"|"Sell"
-    symbol: string
-    name: string
-    units: number
-    price: number
-    value: number
-}

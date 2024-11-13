@@ -12,8 +12,8 @@ type RequestBody = {
     messages: Message[]
     article: any
     toolName?: ToolName
-    userId?: string
-    accountType?: AccountType
+    userId: string
+    accountType: AccountType
 }
 
 export async function POST(request: NextRequest) {

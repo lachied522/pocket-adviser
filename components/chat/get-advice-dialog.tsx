@@ -61,7 +61,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     }, [portfolioValue, amount, action]);
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        const content = `I would like to ${values.action} ${formatDollar(values.amount)}. Can you give me some ideas?`;
+        const content = values.action === "deposit"? `What can I buy with ${formatDollar(values.amount)}?`: `I need to raise ${formatDollar(values.amount)}. What should I sell?`;
         // call onSubmit
         onSubmit(content, 'getRecommendations');
         // close dialog and reset form

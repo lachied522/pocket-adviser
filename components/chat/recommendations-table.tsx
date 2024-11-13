@@ -21,23 +21,25 @@ import { formatDollar } from "@/utils/formatting";
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
-import type { Recommendation } from "@/types/helpers";
-
 interface RecommendationsTableProps {
-    data: {
-        transactions: Recommendation[]
-        initialAdjUtility?: number|null
-        finalAdjUtility?: number|null
-    }
+    transactions: {
+        stockId: number
+        direction: "Buy" | "Sell"
+        symbol: string
+        name: string
+        units: number
+        price: number
+        value: number
+    }[]
 }
 
-export default function RecommendationsTable({ data }: RecommendationsTableProps) {
+export default function RecommendationsTable({ transactions }: RecommendationsTableProps) {
     const { state } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as ChatState;
 
     const total = useMemo(() => {
-        return data.transactions.reduce((acc, obj) => acc + (obj.units * obj.price), 0);
-    }, [data.transactions]);
+        return transactions.reduce((acc, obj) => acc + (obj.units * obj.price), 0);
+    }, [transactions]);
 
     return (
         <div className='max-w-[calc(90vw-10px)] sm:max-w-none w-full'>
@@ -63,25 +65,25 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.transactions.length > 0? (
+                        {transactions.length > 0? (
                         <>
-                            {data.transactions.map((obj) => (
-                            <StockDialog key={`recommendation-${obj.stockId}`} stockId={obj.stockId}>
+                            {transactions.map((transaction) => (
+                            <StockDialog key={`recommendation-${transaction.stockId}`} stockId={transaction.stockId}>
                                 <TableRow className='cursor-pointer'>
                                     <TableCell className='text-sm md:text-lg font-semibold sm:pl-3.5 py-3.5'>
-                                        {obj.units > 0? "📈  Buy": "📉  Sell"}
+                                        {transaction.units > 0? "📈  Buy": "📉  Sell"}
                                     </TableCell>
                                     <TableCell className='text-sm md:text-lg font-medium py-3.5'>
-                                        {obj.symbol}
+                                        {transaction.symbol}
                                     </TableCell>
                                     <TableCell className='text-sm md:text-lg font-medium py-3.5'>
-                                        {obj.units}
+                                        {transaction.units}
                                     </TableCell>
                                     <TableCell className='text-sm md:text-lg font-medium py-3.5'>
-                                        {formatDollar(obj.price)}
+                                        {formatDollar(transaction.price)}
                                     </TableCell>
                                     <TableCell className='text-sm md:text-lg font-medium py-3.5'>
-                                        {formatDollar(obj.price * obj.units)}
+                                        {formatDollar(transaction.price * transaction.units)}
                                     </TableCell>
                                 </TableRow>
                             </StockDialog>
@@ -111,24 +113,24 @@ export default function RecommendationsTable({ data }: RecommendationsTableProps
                     </TableBody>
                 </Table>
             </div>
-            {data && data.transactions.length > 0 && (
+            {transactions.length > 0 && (
             <div className='w-full flex flex-col sm:flex-row items-end sm:items-center justify-between p-3.5 pr-0 gap-2'>
                 <div className='grid grid-cols-[1fr_60px] place-items-end gap-x-2 gap-y-1 shrink-0'>
-                    <div className='flex flex-row items-center gap-2'>
+                    {/* <div className='flex flex-row items-center gap-2'>
                         <UtilityDialog>
                             <CircleHelp size={18} color='black' />
                         </UtilityDialog>
                         <span className='text-sm md:text-base'>Utility before</span>
                     </div>
                     <div className='text-sm md:text-base'>
-                        {data.initialAdjUtility?.toFixed(2) || 'N/A'}
+                        {initialAdjUtility?.toFixed(2) || 'N/A'}
                     </div>
                     <div className='text-sm md:text-base'>
                         Utility after
                     </div>
                     <div className='text-sm md:text-base'>
-                        {data.finalAdjUtility?.toFixed(2) || 'N/A'}
-                    </div>
+                        {finalAdjUtility?.toFixed(2) || 'N/A'}
+                    </div> */}
                 </div>
 
                 {/* <div className='w-full flex flex-row justify-end'>

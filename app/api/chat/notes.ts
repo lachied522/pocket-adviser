@@ -10,9 +10,9 @@ import type { Note } from "@prisma/client";
 async function modifyNotes(existingNotes: Note[], messages: CoreMessage[], userId: string) {
     const formattedNotes = existingNotes.map((note) => note.content);
     // only check most recent messages for new context
-    const formattedMessages = messages.filter((message) => (message.role === "assistant" || message.role === "user")).slice(-4);
+    const formattedMessages = messages.filter((message) => (message.role === "assistant" || message.role === "user")).slice(-10);
 
-    const response = await generateText({
+    return await generateText({
         model: openai('gpt-4o'),
         system: (
 `You are supervising the creation and maintenance of a set of concise, relevant notes on behalf of an investment-focused chatbot. 
@@ -30,7 +30,7 @@ You will receive a transcript of a conversation between the chatbot and the user
 If the user makes a contradictory statement to something in the notes, that note should be deleted.
 If there is no new meaningful information in the conversation, you should call the doNothing function.`
         ),
-        prompt: `Existing notes:\n\n"""${JSON.stringify(formattedNotes)}"""\n\nConversation:\n\n"""${JSON.stringify(formattedMessages)}"""\n\n`,
+        prompt: `Existing notes:\n\n"""${JSON.stringify(formattedNotes)}"""\n\nConversation:\n\n"""${JSON.stringify(formattedMessages)}"""`,
         toolChoice: "required",
         tools: {
             createNote: {

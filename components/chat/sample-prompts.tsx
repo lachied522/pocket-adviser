@@ -8,11 +8,11 @@ import { type ChatState, useChatContext } from "@/context/ChatContext";
 const SAMPLE_PROMPTS = [
     {
         input: "Should I buy shares in AAPL?",
-        tool: "shouldBuyOrSellStock",
+        tool: "getStockAdvice",
     },
     {
         input: "Should I invest in NVDA?",
-        tool: "shouldBuyOrSellStock",
+        tool: "getStockAdvice",
     },
     {
         input: "What can I invest in with $100?",

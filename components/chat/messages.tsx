@@ -129,17 +129,17 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
                 if (!toolInvocation.result) {
                     return <ToolStatusMessage msg="Error getting trade ideas" isError={true} />;
                 }
-                return <RecommendationsTable data={toolInvocation.result} />;
+                return <RecommendationsTable transactions={toolInvocation.result.transactions} />;
             } else {
                 return <LoadingMessage msg="Getting trade ideas" />;
             }
         }
-        case "shouldBuyOrSellStock": {
+        case "getStockAdvice": {
             if (state === 'result') {
                 if (!toolInvocation.result) {
                     return <ToolStatusMessage msg="Something went wrong" isError={true} />;
                 }
-                return <StockAdvice data={toolInvocation.result} />;
+                return <StockCard stockData={toolInvocation.result.stockData} />;
             } else {
                 return <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`}/>;
             }

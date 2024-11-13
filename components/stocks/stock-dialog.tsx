@@ -47,7 +47,7 @@ const prompts = (symbol: string) => [
     {
         display: `Should I buy ${symbol}?`,
         input: `Should I buy ${symbol}?`,
-        tool: "shouldBuyOrSellStock",
+        tool: "getStockAdvice",
     },
 ]
 

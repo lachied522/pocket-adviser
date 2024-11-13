@@ -77,6 +77,7 @@ export function ChatProvider({
         },
         async onFinish(message: Message) {
             try {
+                console.log("finish", message);
                 // sometimes message.content is undefined ???
                 if (message.role === "assistant" && message.content.length > 0) {
                     await syncConversation(conversationId, messages);
@@ -114,6 +115,7 @@ export function ChatProvider({
 
     const onNewChat = useCallback(
         () => {
+            console.log("new chat");
             setInitialMessages([]);
             setChatId((curr) => curr + 1); // required to reset chat state
             setConversationId(null);
