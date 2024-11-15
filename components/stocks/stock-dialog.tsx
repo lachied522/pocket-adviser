@@ -26,7 +26,6 @@ import ChangeIndicator from "./change-indicator";
 import StockChart from "./stock-chart";
 
 import type { Stock } from "@prisma/client";
-import { Bot } from "lucide-react";
 
 const prompts = (symbol: string) => [
     {
@@ -47,7 +46,6 @@ const prompts = (symbol: string) => [
     {
         display: `Should I buy ${symbol}?`,
         input: `Should I buy ${symbol}?`,
-        tool: "getStockAdvice",
     },
 ]
 

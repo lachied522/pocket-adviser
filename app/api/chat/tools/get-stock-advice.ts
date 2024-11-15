@@ -2,13 +2,12 @@ import { z } from "zod";
 
 import { getHoldingsWithStocks } from "@/utils/crud/holding";
 import { getStockBySymbol } from "@/utils/crud/stocks";
+import { getProfileByUserId } from "@/utils/crud/profile";
 
 import { getAnalystResearch } from "./get-analyst-research";
 
 import type { Holding, Profile, Stock } from "@prisma/client";
-
 import type { ResolvedPromise } from "@/types/helpers";
-import { getProfileByUserId } from "@/utils/crud/profile";
 
 export const description = "Get everything you need to determine whether the user should buy or sell a stock";
 

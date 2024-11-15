@@ -1,23 +1,24 @@
-import { generateObject, type CoreMessage } from 'ai';
+import { generateObject, streamText, type CoreMessage } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 import { z } from "zod";
 
-import { getNotesByUserID } from "@/utils/crud/notes";
+import { formatProfile } from './get-profile';
 
 import type { Holding, Profile, Stock } from "@prisma/client";
 
-export const description = "Get a list of trade ideas based on the user's current portfolio and investment profile";
+export const description = "Get a list of recommended transactions based on the user's current portfolio and investment profile";
 
 export const parameters = z.object({
     action: z.enum(["deposit", "withdraw", "review"]).default("review").describe("The user may wish to deposit or withdraw from their portfolio, or simply have it reviewed"),
     amount: z.number().optional().default(0).describe("The amount the user intends to deposit or withdraw from their portfolio, if any"),
-    // number: z.number().optional().default(10).describe("Number of potential transactions to return"), // is this necessary?
     // filters: z.record(
     //     z.enum(["marketCap", "dividendYield", "peRatio", "epsGrowth", "beta"]),
     //     z.number(),
     // ).optional().describe("Any filters to apply to the stocks to be returned")
 });
+
+const MAX_TRANSACTIONS = 3;
 
 type PartialHolding = Pick<Holding, 'stockId'|'units'>;
 
@@ -77,21 +78,6 @@ export type FormattedTransaction = {
     direction: "Buy" | "Sell"
 }
 
-function formatProfile(profile: Profile) {
-    // format profile for interpreation by AI
-    const riskScore = Object.entries(profile).reduce((sum, [key, value]) => sum + (key.startsWith("riskTolerance")? Number(value) / 5: 0), 0) / 4;
-    const riskTolerance = riskScore > 0.66? "high": riskScore > 0.33? "medium": "low";
-    return {
-        // income: formatDollar(profile.income),
-        percentIncomeInvested: profile.percentIncomeInvested,
-        targetDividendYield: profile.targetYield,
-        targetAllocationToInternational: profile.international,
-        sectorPreferences: profile.preferences,
-        livesIn: "Australia",
-        riskTolerance,
-    }
-}
-
 function formatResponse(response: ResponseObject, amount: number) {
     // format results for interpretation by AI
     const context: Stock[] = []
@@ -127,6 +113,7 @@ function formatResponse(response: ResponseObject, amount: number) {
 async function selectTransactions(
     response: ReturnType<typeof formatResponse>,
     conversation: CoreMessage[],
+    args: z.infer<typeof parameters>
 ) {
     /**
      * Further refine recommended transactions returned by the above endpoint based on user's profile, portfolio, conversation history
@@ -137,7 +124,8 @@ async function selectTransactions(
         system: (
 `You are assisting an investment-focused chatbot in selecting a subset of potential transactions for the user.
 You will receive a list of potential transactions that have been generated for the user by a portfolio optimisation algorithm. 
-Your task is to select up to 5 of the transactions from the list based on the user's profile, portfolio, and conversation history between the chatbot and the user.\n\n
+Your task is to select ${MAX_TRANSACTIONS} of the transactions from the list based on the user's profile, portfolio, and conversation history between the chatbot and the user. 
+${args.action === "review"? "Make sure to select an appropriate mix of buy and sell transactions.": ''}\n\n
 Context:\n\n"""${JSON.stringify(response.context)}"""\n\n
 User's investment profile:\n\n"""${JSON.stringify(response.profile)}"""\n\n
 User's current portfolio:\n\n"""${JSON.stringify(response.currentPortfolio)}"""`
@@ -157,20 +145,15 @@ Conversation history:\n\n"""${JSON.stringify(conversation)}"""`
 }
 
 function scaleTransactions(
-    selectedTransactions: FormattedTransaction[],
-    amount: number
+    transactions: FormattedTransaction[],
+    target: number,
 ) {
-    /**
-     * Scale selected transactions up or down to meet the intended overall amount
-     */
-    if (amount === 0) return selectedTransactions;
-    
-    const sumSelectedTransactions = selectedTransactions.reduce((sum, transaction) => sum + transaction.value, 0);
-    const scalingFactor = Math.abs(amount) / Math.abs(sumSelectedTransactions);
+    const sumSelectedTransactions = transactions.reduce((sum, transaction) => sum + transaction.value, 0);
+    const scalingFactor = Math.abs(target) / Math.abs(sumSelectedTransactions);
     if (scalingFactor < 0.95 || scalingFactor > 1.05) {
         // scale transactions up or down to meet amount
         const scaledTransactions: FormattedTransaction[] = [];
-        for (const transaction of selectedTransactions) {
+        for (const transaction of transactions) {
             const scaledUnits = Math.round(scalingFactor * transaction.units);
             scaledTransactions.push({
                 ...transaction,
@@ -184,7 +167,42 @@ function scaleTransactions(
     }
 
     // no scaling required
-    return selectedTransactions;
+    return transactions;
+}
+
+function adjustTransactions(
+    transactions: FormattedTransaction[],
+    target: number,
+    number: number = 3
+) {
+    /**
+     * Scale selected transactions up or down to meet the intended overall amount
+     */
+    if (target === 0) {
+        // need to balance sells with buys
+        // scale buys up or down to meet sells
+        const buys: FormattedTransaction[] = [];
+        const sells: FormattedTransaction[] = [];
+        for (const transaction of transactions) {
+            if (transaction.units < 0) {
+                sells.push(transaction);
+            } else {
+                buys.push(transaction);
+            }
+        }
+
+        if (buys.length === 0 || sells.length === 0) {
+            return transactions;
+        }
+
+        const sumSells = sells.slice(0, Math.floor(number / 2)).reduce((sum, transaction) => sum + transaction.value, 0);
+
+        const scaledBuys = scaleTransactions(buys.slice(0, number - Math.floor(number / 2)), Math.abs(sumSells));
+
+        return sells.concat(scaledBuys);
+    }
+    
+    return scaleTransactions(transactions.slice(0, number), target);
 }
 
 export async function getRecommendations(
@@ -192,17 +210,56 @@ export async function getRecommendations(
     messages: CoreMessage[],
     userId: string
 ) {
-    try {
-        const amount = args.action === "withdraw"? -Math.abs(args.amount): args.action === "deposit"? Math.abs(args.amount): 0;
-        const response = formatResponse(await fetchOptimalPortfolio({ amount }, userId), amount);
-        const selectedTransactions = await selectTransactions(response, messages);
-        return {
-            profile: response.profile,
-            context: response.context,
-            transactions: scaleTransactions(selectedTransactions, amount),
-        }
-    } catch (e) {
-        console.error("Error getting recommendations: ", e);
-        return null;
+    const amount = args.action === "withdraw"? -Math.abs(args.amount): args.action === "deposit"? Math.abs(args.amount): 0;
+    const response = formatResponse(await fetchOptimalPortfolio({ amount }, userId), amount);
+    const selectedTransactions = await selectTransactions(response, messages, args);
+
+    // further refine context to only stocks included in the selected transactions
+    const context = response.context.filter((stock) => selectedTransactions.find((transaction) => transaction.stockId == stock.id));
+    return {
+        profile: response.profile,
+        transactions: adjustTransactions(selectedTransactions, amount),
+        context,
+    }
+}
+
+export async function* handleRecommendations(
+    conversation: CoreMessage[],
+    result: {
+        profile: any // TO DO: type this properly
+        context: Stock[]
+        transactions: FormattedTransaction[]
+    }
+) {
+    /**
+     * Handle the streaming of the result of the getRecommendations tool.
+     * The tool result is already visible to user, so we only want LLM to explain why these were chosen.
+     */
+
+    if (result.transactions.length < 1) {
+        throw new Error("No recommendations were generated");
+    }
+
+    const system = (
+`You are assisting an investment-focused chatbot in providing a list of recommended transactions for the user.
+You will receive a list of recommended transactions that have been selected for the user based on a portfolio optimisation algorithm and the user's profile. 
+Your task is to provide the user with some context for why these transactions are appropriate for them.\n\n
+Context:\n\n"""${JSON.stringify(result.context)}"""\n\n
+User's investment profile:\n\n"""${JSON.stringify(result.profile)}"""`
+    );
+
+    const prompt = (
+`Selected transactions:\n\n"""${JSON.stringify(result.transactions)}"""\n\n
+Conversation history:\n\n"""${JSON.stringify(conversation)}"""`
+    );
+
+    const { textStream } = await streamText({
+        model: openai('gpt-4o'),
+        system,
+        prompt,
+    });
+
+    for await (const text of textStream) {
+        yield text;
     }
 }

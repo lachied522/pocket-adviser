@@ -1,8 +1,7 @@
 import { streamText, type CoreMessage } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
-import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations } from './tools/get-recommendations';
-import { description as getStockAdviceDescription, parameters as getStockAdviceParams, getStockAdvice } from './tools/get-stock-advice';
+import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations, handleRecommendations } from './tools/get-recommendations';
 import { description as getPortfolioDescription, parameters as getPortfolioParams, getPortfolio } from './tools/get-portfolio';
 import { description as getProfileDescription, parameters as getProfileParams, getProfile } from './tools/get-profile';
 import { description as getStockDescription, parameters as getStockParams, getStockInfo } from './tools/get-stock-info';
@@ -13,9 +12,8 @@ import { description as searchWebDescription, parameters as searchWebParams, sea
 import { description as readUrlDescription, parameters as readUrlParams, readUrl } from './tools/read-url';
 
 import { getSystemMessage } from './system';
-import { handleRecommendations } from './handle-recommendations';
 
-export type ToolName = "getRecommendations" | "getStockAdvice" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
+export type ToolName = "getRecommendations" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
 
 function getFinishStep(finishReason: "stop"|"tool-calls"|"error") {
     return {
@@ -63,15 +61,6 @@ export async function* streamAIResponse({
                 parameters: getRecommendationsParams,
                 execute: async function (args) {
                     return await getRecommendations(args, messages, userId);
-                },
-            },
-            getStockAdvice: {
-                description: getStockAdviceDescription,
-                parameters: getStockAdviceParams,
-                execute: async function (args) {
-                    const res = await getStockAdvice(args, userId);
-                    console.log(res);
-                    return res;
                 },
             },
             getPortfolio: {

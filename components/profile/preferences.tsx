@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
 import { cn } from "@/components/utils";
 
@@ -163,10 +164,26 @@ export default function Preferences() {
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel className='text-base'>Likes/Dislikes</FormLabel>
-                        <FormDescription className='xl:max-w-[75%] text-sm text-black'>
-                            These are any likes or dislikes you may have for the type of investments you want.
-                            Your selections will increase/decrease the likelihood that stocks with these themes will be selected for you.
-                        </FormDescription>
+
+                        <div className='grid grid-cols-1 sm:grid-cols-[1.5fr_0.5fr] items-start gap-2'>
+                            <FormDescription className='text-sm text-black'>
+                                These are any likes or dislikes you may have for the type of investments you want.
+                                Your selections will increase/decrease the likelihood that stocks with these themes will be selected for you.
+                            </FormDescription>
+
+                            <div className='flex flex-row items-center sm:justify-end gap-2 sm:px-3'>
+                                <FormControl>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => field.onChange({})}
+                                    >
+                                        Reset
+                                    </Button>
+                                </FormControl>
+                            </div>
+                        </div>
                         <FormControl>
                             <PreferencesSelector value={field.value} onChange={field.onChange} />
                         </FormControl>
