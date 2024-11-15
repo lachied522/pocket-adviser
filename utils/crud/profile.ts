@@ -11,18 +11,16 @@ export async function getProfileByUserId(userId: string) {
     });
 }
 
-export async function updateProfile(data: Profile) {
+export async function updateProfile(userId: string, data: Partial<Profile>) {
     // check if user already has profile
     const profile = await prisma.profile.findUnique({
-        where: { userId: data.userId }
+        where: { userId }
     });
 
     if (profile) {
         // update existing profile
         return await prisma.profile.update({
-            where: {
-                userId: data.userId,
-            },
+            where: { userId },
             data: {
                 ...data,
                 preferences: data.preferences ?? Prisma.JsonNull,
@@ -36,6 +34,7 @@ export async function updateProfile(data: Profile) {
             ...data,
             preferences: data.preferences ?? Prisma.JsonNull,
             milestones: data.milestones ?? Prisma.JsonNull,
+            userId,
         }
     });
 }

@@ -45,7 +45,7 @@ export function formatProfile(profile: Profile | null) {
         (milestone: any) => ({
             description: milestone.description,
             targetWealth: milestone.target,
-            timeHorizon: differenceInMonths(milestone.date, new Date()),
+            timeHorizon: `${differenceInMonths(milestone.date, new Date())} month(s)`,
         })
     ): [];
 

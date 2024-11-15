@@ -26,7 +26,7 @@ import type { FormValues } from "./form-schema";
 export default function Finance() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-6 px-2'>
+        <div className='flex flex-col gap-12 px-2'>
             <h3 className='text-lg font-medium'>Help us understand your financial situation</h3>
 
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>

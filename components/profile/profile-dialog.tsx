@@ -5,7 +5,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 
-
 import {
     Dialog,
     DialogContent,
@@ -17,7 +16,6 @@ import {
     DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/components/utils";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
@@ -164,7 +162,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                 {children}
             </DialogTrigger>
             <DialogContent className='h-screen w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-hidden'>
-                <div className='w-full max-w-6xl mx-auto overflow-hidden'>
+                <div className='h-full w-full max-w-6xl mx-auto overflow-hidden'>
                     <DialogHeader>
                         <DialogTitle>
                             Profile

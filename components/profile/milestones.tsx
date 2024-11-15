@@ -38,14 +38,14 @@ const MILESTONE_MAP = {
 } as const;
 
 interface MilestonesProps {
-    wealthData: {
+    wealthData?: {
         year: number;
         wealth: number;
         principal: number;
     }[]
 }
 
-export default function Milestones({ wealthData }: MilestonesProps) {
+export default function Milestones({ wealthData = [] }: MilestonesProps) {
     const form = useFormContext<FormValues>();
     const milestones = form.watch("milestones") || [];
 
@@ -164,8 +164,8 @@ export default function Milestones({ wealthData }: MilestonesProps) {
                         </>
                         ) : (
                         <TableRow>
-                            <TableCell colSpan={5} className='h-[240px] text-center'>
-                                No milestones yet.
+                            <TableCell colSpan={5} className='h-[240px] sm:h-[360px] text-center'>
+                                <span>No milestones yet.</span>
                             </TableCell>
                         </TableRow>
                         )}

@@ -21,7 +21,7 @@ import type { FormValues } from "./form-schema";
 export default function RiskTolerance() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-6 px-2'>
+        <div className='flex flex-col gap-12 px-2'>
             <div className='flex flex-col items-start gap-2'>
                 <h3 className='text-lg font-medium'>Help us understand your relationship with risk*</h3>
                 <p className='text-sm'>

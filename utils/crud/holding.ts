@@ -22,8 +22,13 @@ export async function getHoldingsWithStocks(userId: string) {
 }
 
 export async function insertHolding(data: Omit<Holding, 'id'>) {
-  return await prisma.holding.create({
+  return await prisma.holding.create({ data });
+}
+
+export async function bulkInsertHoldings(data: Omit<Holding, 'id'>[]) {
+  return await prisma.holding.createMany({
     data,
+    skipDuplicates: true, // ignore any duplicate ids
   });
 }
 

@@ -87,14 +87,11 @@ export const GlobalProvider = ({
         // fetch stock quote
         const data = await getStockByIdAction(stockId);
         if (!data) return;
-        // update state
         setStockDataMap((curr) => ({ ...curr, [stockId]: data }));
-        // return data
         return data;
       } catch (e) {
         console.error(e); // TO DO
       }
-
     },
     [stockDataMap, setStockDataMap]
   );
@@ -117,10 +114,7 @@ export const GlobalProvider = ({
 
   const updateProfileAndUpdateState = useCallback(
     async (profile: Omit<Profile, 'userId'>) => {
-      const res = await updateProfileAction({
-        ...profile,
-        userId: state.id,
-      });
+      const res = await updateProfileAction(state.id, profile);
       dispatch({
         type: 'UPDATE_PROFILE',
         payload: res
