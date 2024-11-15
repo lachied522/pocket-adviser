@@ -135,13 +135,17 @@ User's current portfolio:\n\n"""${JSON.stringify(response.currentPortfolio)}"""`
 Conversation history:\n\n"""${JSON.stringify(conversation)}"""`
         ),
         schema: z.object({
-            symbols: z.string().array().nonempty().max(5).describe("Symbols of selected transactions"),
+            symbols: z.string().array().nonempty().max(MAX_TRANSACTIONS).describe("Symbols of selected transactions"),
         })
     });
 
-    return object.symbols.map((symbol) => {
-        return response.recommendedTransactions.find((transaction) => transaction.symbol === symbol);
-    }).filter((obj) => obj !== undefined);
+    const selectedTransactions: FormattedTransaction[] = [];
+    for (const symbol of object.symbols) {
+        const _transaction = response.recommendedTransactions.find((transaction) => transaction.symbol === symbol);
+        if (_transaction) selectedTransactions.push(_transaction);
+    }
+
+    return selectedTransactions;
 }
 
 function scaleTransactions(
@@ -215,7 +219,7 @@ export async function getRecommendations(
     const selectedTransactions = await selectTransactions(response, messages, args);
 
     // further refine context to only stocks included in the selected transactions
-    const context = response.context.filter((stock) => selectedTransactions.find((transaction) => transaction.stockId == stock.id));
+    const context = response.context.filter((stock) => !!selectedTransactions.find((transaction) => transaction.stockId === stock.id));
     return {
         profile: response.profile,
         transactions: adjustTransactions(selectedTransactions, amount),
