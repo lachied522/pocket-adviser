@@ -91,7 +91,7 @@ export default function SearchBar({ setPopulatedHoldings }: SearchBarProps) {
                                 onClick={() => {
                                     setPopulatedHoldings((curr) => {
                                         if (curr.find((obj) => obj.stockId === stock.id)) return curr;
-                                        return [...curr, { ...stock, stockId: stock.id, units: 0 }];
+                                        return [...curr, { ...stock, stockId: stock.id, units: 1 }];
                                     });
                                     setSearchString('');
                                     setSearchResults([]);

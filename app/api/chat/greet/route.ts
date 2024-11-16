@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
@@ -5,15 +7,13 @@ import { kv } from '@vercel/kv';
 
 import { format } from 'date-fns';
 
-import { getSystemMessage } from './system';
-
-import type { UserData } from '@/types/helpers';
+import { getSystemMessage } from '../system';
 
 function todayDate() {
     return format(new Date(), 'd_MM_yyyy');
 }
 
-export async function getGreeting(user: UserData|null): Promise<string> {
+async function getGreeting(): Promise<string> {
     const key = `DEFAULT_GREETING_${todayDate()}`
     const greeting = await kv.get(key);
     if (greeting) {
@@ -29,4 +29,9 @@ export async function getGreeting(user: UserData|null): Promise<string> {
     // update kv
     kv.set(key, text, { ex: 24 * 60 * 60 });
     return text;
+}
+
+export async function GET() {
+    const message = await getGreeting();
+    return NextResponse.json({ message });
 }

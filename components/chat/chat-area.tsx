@@ -5,6 +5,7 @@ import { ArrowBigUp, OctagonAlert, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
@@ -20,7 +21,7 @@ import type { StockNews } from "@/types/data";
 import type { Message } from "ai";
 
 export default function ChatArea() {
-    const { input, article, messages, isLoading, error, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
+    const { input, article, messages, isLoading, isLoadingInitialMessages, error, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
     const { scrollAreaRef, anchorRef, setShouldAutoScroll } = useScrollAnchor();
     // const throttledMessages = useMessageThrottle(messages, 200);
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
@@ -69,7 +70,13 @@ export default function ChatArea() {
                         />
                         ))}
 
-                        {!error && messages.length === 1 && messages[0].role === 'assistant' && (
+                        {isLoadingInitialMessages && (
+                        <div className='h-48 w-full max-w-[900px] flex pt-7'>
+                            <Skeleton className='flex-1 bg-zinc-100 rounded-xl' />
+                        </div>
+                        )}
+
+                        {!isLoadingInitialMessages && !error && messages.length === 1 && messages[0].role === 'assistant' && (
                         <SamplePrompts />
                         )}
 

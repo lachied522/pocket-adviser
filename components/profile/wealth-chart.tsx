@@ -102,7 +102,7 @@ export default function WealthChart({ data, milestones, expectedReturn }: Wealth
                         stroke="hsl(200 98.0% 39.4%)"
                         fillOpacity={1}
                         fill="url(#blue)"
-                        isAnimationActive={false}
+                        isAnimationActive
                     />
                     <Area
                         type="monotone"
@@ -110,7 +110,7 @@ export default function WealthChart({ data, milestones, expectedReturn }: Wealth
                         stroke="rgb(147 51 234)"
                         fillOpacity={1}
                         fill="url(#purple)"
-                        isAnimationActive={false}
+                        isAnimationActive
                     />
                     <Area
                         type="monotone"
@@ -118,7 +118,7 @@ export default function WealthChart({ data, milestones, expectedReturn }: Wealth
                         stroke="#82ca9d"
                         fillOpacity={1}
                         fill="url(#green)"
-                        isAnimationActive={false}
+                        isAnimationActive
                     />
                     <ReferenceLine y={endingWealth} stroke="hsl(200 98.0% 39.4%)" strokeDasharray="3 3" />
                     {milestones.map((obj, i) => (

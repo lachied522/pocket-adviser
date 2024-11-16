@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { Pencil } from "lucide-react";
 
@@ -10,11 +10,8 @@ import {
     DialogTitle,
     DialogDescription,
     DialogTrigger,
-    DialogClose,
-    DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Select,
     SelectContent,
@@ -75,12 +72,21 @@ interface PortfolioDialogProps {
 }
 
 export default function PortfolioDialog({ children }: PortfolioDialogProps) {
-    const { state, portfolioValue, currency, setCurrency, getStockData } = useGlobalContext() as GlobalState;
+    const { state, calcPortfolioValue, getStockData } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as ChatState;
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
+    const [portfolioValue, setPortfolioValue] = useState<number>(0);
     const [tab, setTab] = useState<keyof typeof TABS>("overview");
+    const [currency, setCurrency] = useState<"AUD"|"USD">("AUD");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const isMobile = useMediaQuery();
+
+    // useEffect(() => {
+    //     console.log("portfolio effect run");
+    //     (async function updatePortfolioValue() {
+    //         setPortfolioValue(await calcPortfolioValue(currency));
+    //     })();
+    // }, [currency]);
 
     useEffect(() => {
         // fetch stock data for each holding and update populated holdings
@@ -113,7 +119,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
             setPopulatedHoldings(_holdings);
             setIsLoading(false);
         })();
-    }, [state, getStockData]);
+    }, [state.holdings, getStockData]);
 
     return (
         <Dialog>
@@ -131,7 +137,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className='w-full flex flex-row items-start justify-between gap-3 py-3'>
+                    <div className='w-full flex flex-row items-start justify-between gap-3 py-6'>
                         <div className='hidden md:flex flex-wrap items-center gap-2'>
                             <Button
                                 onClick={() => setTab("overview")}
@@ -155,6 +161,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                                 Dividends
                             </Button>
                         </div>
+
                         <EditPortfolioDialog>
                             <Button
                                 variant='outline'
@@ -166,7 +173,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                         </EditPortfolioDialog>
                     </div>
 
-                    <div className='hidden md:flex flex-row items-center gap-3 py-3'>
+                    {/* <div className='hidden md:flex flex-row items-center gap-3 py-3'>
                         <div className=''>
                             Market Value <span className='text-lg font-medium'>{formatDollar(portfolioValue)}</span>
                         </div>
@@ -175,11 +182,11 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                                 <SelectValue placeholder="USD" />
                             </SelectTrigger>
                             <SelectContent className='w-[80px]'>
-                                <SelectItem value="USD">USD</SelectItem>
                                 <SelectItem value="AUD">AUD</SelectItem>
+                                <SelectItem value="USD">USD</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
+                    </div> */}
 
                     <PortfolioTable
                         columns={
@@ -195,7 +202,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                                 <span className='font-medium text-lg'>Portfolio empty. Need ideas?</span>
                                 <Button
                                     onClick={() => {
-                                        onSubmit("Can you give me some ideas for my portfolio?", "getRecommendations");
+                                        onSubmit("What can I buy with $1000?", "getRecommendations");
                                         window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
                                     }}
                                 >

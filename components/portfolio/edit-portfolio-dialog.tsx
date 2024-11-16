@@ -78,7 +78,7 @@ function EditHolding({
 
     return (
         <TableRow>
-            <TableCell>
+            <TableCell className='md:w-[200px]'>
                 {stockData?.symbol.toUpperCase()}
             </TableCell>
             <TableCell>
@@ -88,7 +88,7 @@ function EditHolding({
                     placeholder='100'
                     value={holding.units}
                     onChange={onChangeUnits}
-                    className='w-[60px] sm:w-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                    className='max-w-[200px] text-sm md:text-base'
                 />
             </TableCell>
             <TableCell>
@@ -98,7 +98,7 @@ function EditHolding({
                     min={1}
                     placeholder='100'
                     value={((stockData?.previousClose || 0) * (holding.units || 0)).toFixed(2)}
-                    className='w-[60px] sm:w-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0'
+                    className='max-w-[200px] text-sm md:text-base'
                 />
             </TableCell>
             <TableCell>
@@ -360,7 +360,7 @@ export default function EditPortfolioDialog({
                             {isSearchLoading ? (
                             <div className='h-[360px] w-full flex flex-col gap-3 py-3'>
                                 {Array.from({ length: 10 }).map((_, i) => (
-                                <Skeleton key={`search-skeleton-${i}`} className='h-12 w-full bg-slate-100 shrink-0 grow-0' />
+                                <Skeleton key={`search-skeleton-${i}`} className='h-12 w-full bg-zinc-100 shrink-0 grow-0' />
                                 ))}
                             </div>
                             ) : (

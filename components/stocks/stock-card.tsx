@@ -21,7 +21,7 @@ export default function StockCard({ stockData }: StockCardProps) {
             <Card className='cursor-pointer shrink-0'>
                 <CardContent className='flex flex-col gap-3.5 p-3'>
                     <div className='grid grid-cols-[60px_1fr] gap-2'>
-                        <div className='h-12 w-12 flex items-center justify-center bg-slate-100 rounded-xl p-2 aspect-square'>
+                        <div className='h-12 w-12 flex items-center justify-center bg-zinc-100 rounded-xl p-2 aspect-square'>
                             <div className='h-8 w-8 relative'>
                                 <StockLogo
                                     symbol={stockData.symbol}

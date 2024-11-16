@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +44,8 @@ interface ProfileDialogProps {
 }
 
 export default function ProfileDialog({ children }: ProfileDialogProps) {
-    const { state, portfolioValue, updateProfileAndUpdateState } = useGlobalContext() as GlobalState;
+    const { state, calcPortfolioValue, updateProfileAndUpdateState } = useGlobalContext() as GlobalState;
+    const [startingValue, setStartingValue] = useState<number>(0);
     const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<typeof TABS[number]>(TABS[0]);
     const closeRef = useRef<HTMLButtonElement>(null);
@@ -75,6 +76,12 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
     const riskToleranceQ4 = form.watch("riskToleranceQ4") ?? 3;
     const milestones = form.watch("milestones") ?? [];
 
+    // useEffect(() => {
+    //     (async function updateStartingValue() {
+    //         setStartingValue(await calcPortfolioValue());
+    //     })();
+    // }, []);
+
     const expectedReturn = useMemo(() => {
         // use CAPM model to calculate expected return based on risk tolerance
         const riskScore = (
@@ -89,14 +96,16 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
 
     const wealthData = useMemo(() => {
         const annualContribution = percentIncomeInvested * income;
+
+        console.log(startingValue);
         
         const _data = [];
         const date = new Date();
-        let prevValue = portfolioValue;
+        let prevValue = startingValue;
         for (let t = 0; t < 100; t++) {
             date.setFullYear(new Date().getFullYear() + t);
             
-            let wealth = t > 0? prevValue * (1 + expectedReturn) + annualContribution: portfolioValue;
+            let wealth = t > 0? prevValue * (1 + expectedReturn) + annualContribution: startingValue;
             // adjust wealth for any milestones during year
             for (const obj of milestones) {
                 if (new Date(obj.date).getFullYear() === date.getFullYear()) {
@@ -107,7 +116,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
             // ensure wealth is positive
             wealth = Math.max(wealth, 0);
 
-            const principal = annualContribution * t + portfolioValue;
+            const principal = annualContribution * t + startingValue;
             const income = targetYield * wealth;
 
             _data.push({
@@ -120,7 +129,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
         }
 
         return _data;
-    }, [income, percentIncomeInvested, expectedReturn, portfolioValue, targetYield, milestones]);
+    }, [income, percentIncomeInvested, expectedReturn, startingValue, targetYield, milestones]);
 
     const onSave = useCallback(
         async (data: any) => {

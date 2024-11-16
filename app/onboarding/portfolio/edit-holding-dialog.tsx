@@ -55,7 +55,7 @@ export default function EditHoldingDialog({ children, holding, onChange }: EditH
                         <span>Units</span>
                         <Input
                             type="number"
-                            min={0}
+                            min={1}
                             value={units}
                             onChange={onChangeUnits}
                         />

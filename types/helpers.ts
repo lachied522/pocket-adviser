@@ -18,6 +18,6 @@ export type UserData = (
 )
 
 export type PopulatedHolding = (
-    Omit<Holding, 'id'|'userId'> & 
+    Omit<Holding, 'id'|'userId'> &
     Omit<Stock, 'id'>
 )

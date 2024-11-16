@@ -34,6 +34,7 @@ export type ChatState = {
     article: StockNews
     messages: Message[]
     isLoading: boolean
+    isLoadingInitialMessages: boolean
     error?: Error
     conversationId?: string
     setInput: React.Dispatch<React.SetStateAction<string>>
@@ -51,19 +52,16 @@ export const useChatContext = () => {
 
 interface ChatProviderProps {
     children: React.ReactNode
-    initialMessage?: string
 }
 
 export function ChatProvider({
   children,
-  initialMessage,
 }: ChatProviderProps) {
     const { state, insertConversationAndUpdateState } = useGlobalContext() as GlobalState;
     const [conversationId, setConversationId] = useState<string|null>(null); // id of conversation in db
     const [chatId, setChatId] = useState<number>(0); // id of conversation in chat state, used for getting resetting chat
-    const [initialMessages, setInitialMessages] = useState<Message[]>(
-        initialMessage? [{ id: generateId(), role: "assistant", content: initialMessage }]: []
-    );
+    const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+    const [isLoadingInitialMessages, setIsLoadingInitialMessages] = useState<boolean>(true);
     const [article, setArticle] = useState<StockNews|null>(null);
     const { messages, input, isLoading, error, setInput, append } = useChat({
         id: chatId.toString(),
@@ -77,7 +75,6 @@ export function ChatProvider({
         },
         async onFinish(message: Message) {
             try {
-                console.log("finish", message);
                 // sometimes message.content is undefined ???
                 if (message.role === "assistant" && message.content.length > 0) {
                     await syncConversation(conversationId, messages);
@@ -87,6 +84,15 @@ export function ChatProvider({
             }
         }
     });
+
+    useEffect(() => {
+        (async function fetchGreeting() {
+            // get initial message
+            const { message } = await fetch('/api/chat/greet').then((res) => res.json());
+            setInitialMessages([{ id: generateId(), role: "assistant", content: message }]);
+            setIsLoadingInitialMessages(false);
+        })();
+    }, []);
 
     const syncConversation = useCallback(
         async (id: string|null, _messages: Message[]) => {
@@ -162,6 +168,7 @@ export function ChatProvider({
                 article,
                 messages,
                 isLoading,
+                isLoadingInitialMessages,
                 error,
                 conversationId,
                 setInput,

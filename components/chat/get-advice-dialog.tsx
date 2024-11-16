@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 
 import { formatDollar } from "@/utils/formatting";
 
-import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+// import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 const formSchema = z.object({
@@ -43,8 +43,9 @@ interface GetAdviceDialogProps {
 }
 
 export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
-    const { portfolioValue } = useGlobalContext() as GlobalState;
+    // const { calcPortfolioValue } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as ChatState;
+    const [currentValue, setCurrentValue] = useState<number>(0);
     const closeRef = useRef<HTMLButtonElement>(null);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -57,16 +58,25 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const action = form.watch("action");
 
     const proposedValue = useMemo(() => {
-        return action === "deposit"? portfolioValue + Number(amount): Math.max(portfolioValue - Number(amount), 0);
-    }, [portfolioValue, amount, action]);
+        return action === "deposit"? currentValue + Number(amount): Math.max(currentValue - Number(amount), 0);
+    }, [currentValue, amount, action]);
 
-    const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        const content = values.action === "deposit"? `What can I buy with ${formatDollar(values.amount)}?`: `I need to raise ${formatDollar(values.amount)}. What should I sell?`;
-        // call onSubmit
-        onSubmit(content, 'getRecommendations');
-        // close dialog and reset form
-        if (closeRef.current) closeRef.current.click();
-    }
+    // useEffect(() => {
+    //     (async function getCurrenctValue() {
+    //         setCurrentValue(await calcPortfolioValue());
+    //     })();
+    // }, []);
+
+    const handleSubmit = useCallback(
+        (values: z.infer<typeof formSchema>) => {
+            const content = values.action === "deposit"? `What can I buy with ${formatDollar(values.amount)}?`: `I need to raise ${formatDollar(values.amount)}. What should I sell?`;
+            // call onSubmit
+            onSubmit(content, 'getRecommendations');
+            // close dialog and reset form
+            if (closeRef.current) closeRef.current.click();
+        },
+        [onSubmit]
+    );
 
     const onClose = () => {
         // reset form after 1 sec
@@ -86,9 +96,9 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                 </DialogHeader>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className='min-h-[360px] flex flex-col gap-6'>
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className='flex flex-col gap-6'>
                         <p>I would like to...</p>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3">
                             <Button
                                 type="button"
                                 variant={action==='deposit' ? 'default': 'secondary'}
@@ -113,13 +123,14 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             control={form.control}
                             name="amount"
                             render={({ field }) => (
-                                <FormItem>
-                                    <span className='text-lg font-medium'>Amount to deposit/withdraw</span>
+                                <FormItem className='flex flex-col gap-3'>
+                                    <span>Amount to invest/withdraw ($)</span>
                                     <FormControl>
                                         <Input
                                             type="number"
                                             min={0}
-                                            className="w-[180px] h-[36px] text-base"
+                                            step={100}
+                                            className="w-[180px] h-[36px] text-base mx-3"
                                             {...field}
                                         />
                                     </FormControl>
@@ -128,17 +139,17 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             )}
                         />
 
-                        <div className="flex flex-col gap-2 space-y-2">
+                        {/* <div className="flex flex-col gap-2 space-y-2">
                             <span className='text-lg font-medium'>Current portfolio value</span>
-                            {formatDollar(portfolioValue || 0)}
+                            {formatDollar(currentValue ?? 0)}
                         </div>
 
                         <div className="flex flex-col gap-2 space-y-2">
                             <span className='text-lg font-medium'>Proposed portfolio value</span>
-                            {formatDollar(proposedValue || 0)}
-                        </div>
+                            {formatDollar(proposedValue ?? 0)}
+                        </div> */}
 
-                        <div className='h-full flex flex-row items-end justify-between'>
+                        <div className='h-full flex flex-row items-end justify-between mt-3'>
                             <DialogClose asChild>
                                 <Button
                                     ref={closeRef}
@@ -152,7 +163,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
 
                             <Button
                                 type='submit'
-                                disabled={proposedValue === 0}
+                                // disabled={proposedValue === 0}
                             >
                                 Submit
                             </Button>

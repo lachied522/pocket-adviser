@@ -1,6 +1,6 @@
 import { getPrismaClient } from "./client";
 
-import type { User } from "@prisma/client";
+import type { User, Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
 
 const prisma = getPrismaClient();
@@ -17,13 +17,22 @@ export async function getUserById(id: string) {
     });
 }
 
-export async function getUserDataByUserId(id: string) {
+export async function updateUser(id: string, data: Partial<User>) {
+    return await prisma.user.update({
+        where: { id },
+        data,
+    })
+}
+
+export async function getDataByUserId(id: string) {
     const user = await prisma.user.findUnique({
         where: { id },
         relationLoadStrategy: "join",
         include: {
             profile: true,
-            holdings: true,
+            holdings: {
+                include: { stock: true },
+            },
             conversations: {
                 select: {
                     id: true,
@@ -37,10 +46,11 @@ export async function getUserDataByUserId(id: string) {
         }
     });
 
-    if (!user) return null;
+    if (!user) {
+        throw new Error("User not found");
+    }
 
-    // omit unnecesary user data from return object
-    return {
+    const userData: UserData = {
         id: user.id,
         name: user.name,
         email: user.email,
@@ -49,12 +59,10 @@ export async function getUserDataByUserId(id: string) {
         profile: user.profile,
         holdings: user.holdings,
         conversations: user.conversations,
-    } satisfies UserData;
-}
+    };
 
-export async function updateUser(id: string, data: Partial<User>) {
-    return await prisma.user.update({
-        where: { id },
-        data,
-    })
+    const stockData: { [id: number]: Stock } = user.holdings.reduce((acc, obj) => ({ ...acc, [obj.id]: obj }), {});
+
+    // omit unnecesary user data from return object
+    return { userData, stockData };
 }

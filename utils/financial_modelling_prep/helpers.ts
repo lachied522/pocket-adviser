@@ -59,17 +59,3 @@ export async function getAggregatedStockData(
         tags: [],
     }
 }
-
-export async function getStocksByExchange(exchange: Exchange = 'NASDAQ') {
-    return await client.getAllStocksByExchange(exchange);
-}
-
-export async function getForexRate(symbol: "AUDUSD"|"USDAUD") {
-    const res = await client.getForexPrice(symbol);
-    if (!res) {
-        // this really shouldn't happen, but we will just return 1 for now
-        return 1.0;
-    }
-    // return average of bid & ask
-    return (parseFloat(res.bid) + parseFloat(res.ask)) / 2;
-}

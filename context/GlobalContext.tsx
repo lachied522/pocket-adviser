@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useReducer,
-  useMemo,
 } from "react";
 
 import { updateUserAction } from "@/actions/crud/user";
@@ -13,6 +12,7 @@ import { updateProfileAction } from "@/actions/crud/profile";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { insertConversationAction, updateConversationAction, deleteConversationAction } from "@/actions/crud/conversation";
 import { getStockByIdAction } from "@/actions/data/stocks";
+import { getForexRateAction } from "@/actions/data/forex";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
@@ -21,11 +21,9 @@ import type { UserData } from "@/types/helpers";
 
 export type GlobalState = {
   state: UserData
-  portfolioValue: number
-  currency: 'USD'|'AUD'
   dispatch: React.Dispatch<Action>
-  setCurrency: React.Dispatch<React.SetStateAction<'USD'|'AUD'>>
   getStockData: (stockId: number) => Promise<Stock>
+  calcPortfolioValue: (currency?: 'AUD'|'USD') => Promise<number>
   updateUserAndUpdateState: (user: Partial<User>) => Promise<void>
   updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
   insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<number>
@@ -46,38 +44,16 @@ interface GlobalProviderProps {
   children: React.ReactNode
   initialUserData: UserData
   initialStockData: { [id: number]: Stock }
-  initalForexRate: number
 }
 
 export const GlobalProvider = ({
   children,
   initialUserData,
   initialStockData,
-  initalForexRate,
 }: GlobalProviderProps) => {
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
   const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
-  const [currency, setCurrency] = useState<'USD'|'AUD'>("USD");
-  const [forexRate] = useState<number>(initalForexRate); // USDAUD forex rate
-
-  const portfolioValue = useMemo(() => {
-    return state.holdings.reduce(
-      (acc, obj) => {
-          const stock = stockDataMap[obj.stockId];
-          if (stock) {
-              let multiplier = 1;
-              if (currency === "USD" && stock.exchange === "ASX") {
-                  multiplier /= forexRate;
-              } else if (currency === "AUD" && stock.exchange === "NASDAQ") {
-                  multiplier *= forexRate;
-              }
-              return acc + multiplier * (stock.previousClose || 0) * obj.units;
-          }
-          return 0;
-      },
-      0
-    )
-  }, [state, stockDataMap, currency, forexRate]);
+  const [forexMap, setForexMap] = useState<{ [currency: string ]: number }>({});
 
   const getStockData = useCallback(
     async (stockId: number) => {
@@ -94,6 +70,33 @@ export const GlobalProvider = ({
       }
     },
     [stockDataMap, setStockDataMap]
+  );
+
+  const calcPortfolioValue = useCallback(
+    async (currency: "AUD"|"USD" = "AUD") => {
+      let forexRate = 0;
+      if (currency in forexMap) {
+        forexRate = forexMap[currency];
+      } else {
+        forexRate = await getForexRateAction("AUDUSD");
+        setForexMap({
+          "AUD": forexRate,
+          "USD": 1 / forexRate // inverse to get to USDAUD rate
+        });
+      }
+      return state.holdings.reduce(
+        (acc, obj) => {
+            const stock = stockDataMap[obj.stockId];
+            if (stock) {
+                let multiplier = stock.currency !== currency? forexRate: 1;
+                return acc + multiplier * (stock.previousClose || 0) * obj.units;
+            }
+            return 0;
+        },
+        0
+      )
+    },
+    [state.holdings, stockDataMap, forexMap]
   );
 
   const updateUserAndUpdateState = useCallback(
@@ -218,10 +221,8 @@ export const GlobalProvider = ({
     <GlobalContext.Provider
       value={{
         state,
-        portfolioValue,
-        currency,
         getStockData,
-        setCurrency,
+        calcPortfolioValue,
         updateUserAndUpdateState,
         updateProfileAndUpdateState,
         insertHoldingAndUpdateState,
@@ -235,5 +236,5 @@ export const GlobalProvider = ({
     >
       {children}
     </GlobalContext.Provider>
-  );
-};
+  )
+}

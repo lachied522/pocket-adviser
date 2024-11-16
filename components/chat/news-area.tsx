@@ -2,15 +2,15 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { Newspaper } from "lucide-react";
+
+import { setCookie, getCookie } from "@/utils/cookies";
+
+import { getNewsAction } from "@/actions/data/news";
   
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/components/utils";
-
-import { setCookie, getCookie } from "@/utils/cookies";
-
-import { getNewsAction } from "@/actions/data/news";
 
 import NewsArticle from "./news-article";
 
@@ -23,7 +23,7 @@ interface NewsAreaProps {
     symbols: string[]
 }
 
-export default function NewsArea({ symbols = [] }: NewsAreaProps) {
+export default function NewsArea( { symbols }: NewsAreaProps) {
     const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(Boolean(getCookie(COOKIE_NAME)) ?? true);

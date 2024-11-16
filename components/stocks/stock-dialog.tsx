@@ -94,7 +94,7 @@ export default function StockDialog({ children, stockId, initialStockData }: Sto
                         </DialogHeader>
 
                         <div className='grid grid-cols-[60px_1fr] md:grid-cols-[120px_1fr] items-start gap-x-2 sm:gap-x-6 gap-y-2 py-6'>
-                            <div className='h-14 w-14 md:h-auto md:w-auto flex items-center justify-center bg-slate-100 rounded-xl aspect-square md:row-span-2'>
+                            <div className='h-14 w-14 md:h-auto md:w-auto flex items-center justify-center bg-zinc-100 rounded-xl aspect-square md:row-span-2'>
                                 <div className='h-10 w-10 md:h-24 md:w-24 relative'>
                                     <StockLogo
                                         symbol={stockData.symbol}
