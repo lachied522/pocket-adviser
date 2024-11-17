@@ -21,13 +21,13 @@ interface CheckupDialogProps {
 
 export default function CheckupDialog({ children }: CheckupDialogProps) {
     const { onSubmit } = useChatContext() as ChatState;
-    const { setOpenMobile } = useSidebar();
+    const { setOpenMobile: setSidebarOpen } = useSidebar();
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const handleSubmit = () => {
         onSubmit("Can you give me some trade ideas for my portfolio?", "getRecommendations");
         if (closeRef.current) closeRef.current.click();
-        setOpenMobile(false);
+        setSidebarOpen(false);
     }
 
     return (

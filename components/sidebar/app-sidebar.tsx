@@ -56,7 +56,7 @@ export default function AppSidebar() {
             }
             setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
         }
-    }, [state.id, state.conversations, isAtBottom]);
+    }, [state.id, state.conversations, isAtBottom, shouldFetchMore, dispatch, setShouldFetchMore]);
 
     useEffect(() => {
         // trigger fetch for when bottomRef is in view

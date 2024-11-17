@@ -96,7 +96,7 @@ export default function PremiumDialog({ children }: PremiumDialogProps) {
             <DialogTrigger className='p-0' asChild>
                 { children }
             </DialogTrigger>
-            <DialogContent className='h-screen w-full max-w-[100vw] border-none shadow-none rounded-none overflow-auto'>
+            <DialogContent className='h-dvh w-full max-w-[100vw] border-none shadow-none rounded-none overflow-auto'>
                 <div className='flex flex-col items-center gap-3 m-auto'>
                     <H1>Upgrade your plan</H1>
                     <div className='h-fit flex flex-col sm:flex-row items-stretch justify-center gap-3 my-12'>

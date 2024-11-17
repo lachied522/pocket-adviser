@@ -130,8 +130,8 @@ export default function EditPortfolioDialog({
     const closeRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        if (state) setModifiedHoldings(state.holdings);
-    }, [state]);
+        setModifiedHoldings(state.holdings);
+    }, [state.holdings]);
 
     const currentPage = useMemo(() => {
         return modifiedHoldings

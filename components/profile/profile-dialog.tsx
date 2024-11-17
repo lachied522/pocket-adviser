@@ -50,9 +50,9 @@ interface ProfileDialogProps {
 
 export default function ProfileDialog({ children }: ProfileDialogProps) {
     const { state, calcPortfolioValue, updateProfileAndUpdateState } = useGlobalContext() as GlobalState;
+    const [isOpen, setIsOpen]  = useState<boolean>(false);
     const [startingValue, setStartingValue] = useState<number>(0);
     const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
-    const [activeTab, setActiveTab] = useState<typeof TABS[number]>(TABS[0]);
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -82,10 +82,12 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
     const milestones = form.watch("milestones") ?? [];
 
     useEffect(() => {
-        (async function updateStartingValue() {
+        if (isOpen) updateStartingValue();
+
+        async function updateStartingValue() {
             setStartingValue(await calcPortfolioValue());
-        })();
-    }, []);
+        }
+    }, [isOpen, calcPortfolioValue]);
 
     const expectedReturn = useMemo(() => {
         // use CAPM model to calculate expected return based on risk tolerance
@@ -169,7 +171,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
     );
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={(value: boolean) => setIsOpen(value)}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
@@ -191,8 +193,6 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                         >
                             <div className='flex-1 overflow-y-scroll'>
                                 <Tabs
-                                    value={activeTab}
-                                    onValueChange={(value) => setActiveTab(value as typeof TABS[number])}
                                     defaultValue="preferences"
                                     className="w-full"
                                 >

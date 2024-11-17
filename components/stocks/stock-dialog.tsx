@@ -85,7 +85,7 @@ export default function StockDialog({ children, stockId, initialStockData }: Sto
                 <DialogTrigger asChild>
                     {children}
                 </DialogTrigger>
-                <DialogContent className='h-screen w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-auto'>
+                <DialogContent className='h-dvh w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-auto'>
                     <div className='w-full max-w-6xl mx-auto overflow-auto'>
                         <DialogHeader>
                             <DialogTitle>

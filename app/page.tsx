@@ -35,7 +35,7 @@ export default async function Page({
         <ChatProvider>
           <SidebarProvider>
             <Sidebar />
-            <main className='h-screen flex flex-col overflow-hidden'>
+            <main className='h-dvh flex flex-col overflow-hidden'>
               <div className='flex flex-row items-center overflow-hidden'>
                 <SidebarOuterTrigger />
                 <TickerTape />

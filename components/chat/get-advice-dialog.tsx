@@ -46,7 +46,8 @@ interface GetAdviceDialogProps {
 export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const { calcPortfolioValue } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatContext() as ChatState;
-    const { setOpenMobile } = useSidebar();
+    const { setOpenMobile: setSidebarOpen } = useSidebar();
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [currentValue, setCurrentValue] = useState<number>(0);
     const closeRef = useRef<HTMLButtonElement>(null);
     const form = useForm<z.infer<typeof formSchema>>({
@@ -64,10 +65,13 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     }, [currentValue, amount, action]);
 
     useEffect(() => {
-        (async function getCurrenctValue() {
+        // get current portfolio value when dialog opens
+        if (isOpen) getCurrentValue();
+
+        async function getCurrentValue() {
             setCurrentValue(await calcPortfolioValue());
-        })();
-    }, []);
+        }
+    }, [isOpen, calcPortfolioValue]);
 
     const handleSubmit = useCallback(
         (values: z.infer<typeof formSchema>) => {
@@ -75,9 +79,9 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
             onSubmit(content, 'getRecommendations');
             if (closeRef.current) closeRef.current.click();
             // close sidebar on mobile
-            setOpenMobile(false);
+            setSidebarOpen(false);
         },
-        [onSubmit]
+        [onSubmit, setSidebarOpen]
     );
 
     const onClose = () => {
@@ -86,7 +90,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     }
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={(value: boolean) => setIsOpen(value)}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
@@ -165,7 +169,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
 
                             <Button
                                 type='submit'
-                                disabled={proposedValue === 0}
+                                disabled={proposedValue === currentValue || proposedValue === 0}
                             >
                                 Submit
                             </Button>
