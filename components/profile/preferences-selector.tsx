@@ -58,7 +58,7 @@ export default function PreferencesSelector({ value, onChange }: PreferencesSele
   }
 
   return (
-      <div className="md:max-w-[1000px] flex flex-wrap text-center items-center justify-center gap-3.5 sm:gap-3 px-2 py-6 mx-auto">
+      <div className="md:max-w-[1000px] flex flex-wrap text-center items-center justify-center gap-3.5 sm:gap-3 py-6 mx-auto">
         {PREFERENCE_OPTIONS.map((name, index) => (
             <Card
                 key={`preference-option-${index}`}

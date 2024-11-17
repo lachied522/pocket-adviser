@@ -1,15 +1,11 @@
 "use client";
-import Image from "next/image";
-
 import { useFormContext } from "react-hook-form";
 
 import {
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
 } from "@/components/ui/form";
 import {
     RadioGroup,
@@ -21,10 +17,10 @@ import type { FormValues } from "./form-schema";
 export default function RiskTolerance() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-12 px-2'>
-            <div className='flex flex-col items-start gap-2'>
+        <div className='flex flex-col gap-3 sm:gap-12 sm:px-2'>
+            <div className='flex flex-col items-start gap-2 mb-3'>
                 <h3 className='text-lg font-medium'>Help us understand your relationship with risk*</h3>
-                <p className='text-sm'>
+                <p className='text-xs sm:text-sm'>
                     * Risk of an investment is defined as the probability that it will incur a financial loss. 
                     The higher the risk of an investment, the greater both the <b>potential gain</b> and <b>potential loss</b> will be.
                 </p>
@@ -43,7 +39,7 @@ export default function RiskTolerance() {
                             <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-5 px-5 py-8"
+                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -93,7 +89,7 @@ export default function RiskTolerance() {
                             <RadioGroup 
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-5 px-5 py-8"
+                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -144,7 +140,7 @@ export default function RiskTolerance() {
                             <RadioGroup 
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-5 px-5 py-8"
+                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -195,7 +191,7 @@ export default function RiskTolerance() {
                             <RadioGroup 
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-5 px-5 py-8"
+                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>

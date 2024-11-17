@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
@@ -20,12 +21,13 @@ interface CheckupDialogProps {
 
 export default function CheckupDialog({ children }: CheckupDialogProps) {
     const { onSubmit } = useChatContext() as ChatState;
+    const { setOpenMobile } = useSidebar();
     const closeRef = useRef<HTMLButtonElement>(null);
 
     const handleSubmit = () => {
         onSubmit("Can you give me some trade ideas for my portfolio?", "getRecommendations");
-        // close dialog
         if (closeRef.current) closeRef.current.click();
+        setOpenMobile(false);
     }
 
     return (

@@ -25,7 +25,7 @@ import type { FormValues } from "./form-schema";
 export default function Preferences() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-12 px-2'>
+        <div className='flex flex-col gap-3 sm:gap-12 sm:px-2'>
             <h3 className='text-lg font-medium'>Help us understand your investment preferences</h3>
 
             <FormField
@@ -36,13 +36,13 @@ export default function Preferences() {
                         <FormLabel className='text-base'>Portfolio Yield</FormLabel>
 
                         <div className='grid grid-cols-1 sm:grid-cols-[1.5fr_0.5fr] items-start gap-2'>
-                            <FormDescription className='text-sm text-black'>
+                            <FormDescription className='text-xs sm:text-sm text-black'>
                                 Use this to adjust the percent return you wish to make via dividend income. 
                                 High dividend yields come at the cost of <b>reduced capital growth</b> and may impact your overall return. 
                                 You should contact a financial adviser if you require advice.
                             </FormDescription>
 
-                            <div className='flex flex-row items-center sm:justify-end gap-2 sm:px-3'>
+                            <div className='flex flex-row items-center sm:justify-end justify-self-end gap-2 sm:px-3'>
                                 <FormControl>
                                     <Checkbox
                                         checked={!field.value}
@@ -54,8 +54,8 @@ export default function Preferences() {
                         </div>
 
                         <FormControl>
-                            <div className='flex flex-row items-center justify-center gap-5 py-5 relative'>
-                                <div className='w-5 sm:w-6' />
+                            <div className='flex flex-row items-center justify-center gap-3 sm:gap-5 py-5 relative'>
+                                <div className='w-4 sm:w-6' />
                                 <Slider
                                     min={0.001}
                                     max={0.05}
@@ -63,9 +63,9 @@ export default function Preferences() {
                                     value={[field.value ?? 0.01]}
                                     onValueChange={(value: number[]) => field.onChange(value[0])}
                                     disabled={!field.value}
-                                    className="w-[180px] sm:w-[240px] cursor-pointer"
+                                    className="w-[160px] sm:w-[240px] cursor-pointer"
                                 />
-                                <div className="w-6 font-semibold">{(100 * (field.value ?? 0.01)).toFixed(2)}%</div>
+                                <div className="w-4 sm:w-6 text-sm font-semibold">{(100 * (field.value ?? 0.01)).toFixed(2)}%</div>
                                 <div className={
                                     cn(
                                         'hidden bg-white opacity-50 absolute inset-0',
@@ -87,11 +87,11 @@ export default function Preferences() {
                         <FormLabel className='text-base'>Investment Region</FormLabel>
 
                         <div className='grid grid-cols-1 sm:grid-cols-[1.5fr_0.5fr] items-start gap-2'>
-                            <FormDescription className='text-sm text-black'>
+                            <FormDescription className='text-xs sm:text-sm text-black'>
                                 Use this to select the proportion of your portfolio you wish to be invested in each country. We currently only cover stocks in US and Australia. 🙂
                             </FormDescription>
 
-                            <div className='flex flex-row items-center sm:justify-end gap-2 sm:px-3'>
+                            <div className='flex flex-row items-center sm:justify-end justify-self-end gap-2 sm:px-3'>
                                 <FormControl>
                                     <Checkbox
                                         checked={!field.value}
@@ -104,8 +104,8 @@ export default function Preferences() {
                         
                         <div className='relative'>
                             <FormControl>
-                                <div className='flex flex-row items-center justify-center gap-5 py-5'>
-                                    <div className='h-5 sm:h-6 w-5 sm:w-6 relative'>
+                                <div className='flex flex-row items-center justify-center gap-3 sm:gap-5 py-5'>
+                                    <div className='h-4 sm:h-6 w-4 sm:w-6 relative'>
                                         <Image
                                             src="/us-flag-icon.png"
                                             alt='flag'
@@ -119,15 +119,15 @@ export default function Preferences() {
                                         value={[field.value ?? 0.5]}
                                         onValueChange={(value: number[]) => field.onChange(value[0])}
                                         disabled={!field.value}
-                                        className="w-[180px] sm:w-[240px] cursor-pointer"
+                                        className="w-[160px] sm:w-[240px] cursor-pointer"
                                     />
-                                    <div className="w-6 font-semibold">{(100 * (field.value ?? 0.5)).toFixed(0)}%</div>
+                                    <div className="w-4 sm:w-6 text-sm font-semibold">{(100 * (field.value ?? 0.5)).toFixed(0)}%</div>
                                 </div>
                             </FormControl>
 
                             <FormControl>
-                                <div className='flex flex-row items-center justify-center gap-5 py-5'>
-                                    <div className='h-5 sm:h-6 w-5 sm:w-6 relative'>
+                                <div className='flex flex-row items-center justify-center gap-3 sm:gap-5 py-5'>
+                                    <div className='h-4 sm:h-6 w-4 sm:w-6 relative'>
                                         <Image
                                             src="/aus-flag-icon.png"
                                             alt='flag'
@@ -141,9 +141,9 @@ export default function Preferences() {
                                         value={[1 - (field.value ?? 0.5)]}
                                         onValueChange={(value: number[]) => field.onChange(1 - value[0])}
                                         disabled={!field.value}
-                                        className="w-[180px] sm:w-[240px] cursor-pointer"
+                                        className="w-[160px] sm:w-[240px] cursor-pointer"
                                     />
-                                    <div className="w-6 font-semibold">{(100 - 100 * (field.value ?? 0.5)).toFixed(0)}%</div>
+                                    <div className="w-4 sm:w-6 text-sm font-semibold">{(100 - 100 * (field.value ?? 0.5)).toFixed(0)}%</div>
                                 </div>
                             </FormControl>
                             <FormMessage />
@@ -166,7 +166,7 @@ export default function Preferences() {
                         <FormLabel className='text-base'>Likes/Dislikes</FormLabel>
 
                         <div className='grid grid-cols-1 sm:grid-cols-[1.5fr_0.5fr] items-start gap-2'>
-                            <FormDescription className='text-sm text-black'>
+                            <FormDescription className='text-xs sm:text-sm text-black'>
                                 These are any likes or dislikes you may have for the type of investments you want.
                                 Your selections will increase/decrease the likelihood that stocks with these themes will be selected for you.
                             </FormDescription>

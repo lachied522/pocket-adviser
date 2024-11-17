@@ -252,7 +252,7 @@ export default function EditPortfolioDialog({
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-h-full max-w-6xl'>
+            <DialogContent className='max-h-dvh max-w-6xl overflow-auto'>
                 <DialogHeader>
                     <DialogTitle>
                         Edit Your Portfolio
@@ -294,7 +294,7 @@ export default function EditPortfolioDialog({
                     <div className='grid grid-cols-1 items-start gap-2 relative'>
                         <div className='text-lg font-medium mb-2'>Edit or remove stocks</div>
 
-                        <ScrollArea className='h-[60vh]'>
+                        <ScrollArea className='h-[300px] sm:h-[calc(100%)]'>
                             <div className='rounded-md border'>
                                 <Table>
                                     <TableHeader>
@@ -396,27 +396,25 @@ export default function EditPortfolioDialog({
                     </div>
                 </div>
 
-                <DialogFooter>
-                    <div  className='w-full flex flex-row items-end justify-between'>
-                        <DialogClose asChild>
-                            <Button
-                                ref={closeRef}
-                                type='button'
-                                variant='secondary'
-                                onClick={() => {
-                                    setModifiedHoldings(state.holdings);
-                                    clearSearch();
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                        </DialogClose>
-
-                        <Button onClick={onSubmit} disabled={isSubmitLoading}>
-                            Save
+                <div className='w-full flex flex-row items-end justify-between'>
+                    <DialogClose asChild>
+                        <Button
+                            ref={closeRef}
+                            type='button'
+                            variant='secondary'
+                            onClick={() => {
+                                setModifiedHoldings(state.holdings);
+                                clearSearch();
+                            }}
+                        >
+                            Cancel
                         </Button>
-                    </div>
-                </DialogFooter>
+                    </DialogClose>
+
+                    <Button onClick={onSubmit} disabled={isSubmitLoading}>
+                        Save
+                    </Button>
+                </div>
             </DialogContent>
         </Dialog>
     )

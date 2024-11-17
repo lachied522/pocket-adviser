@@ -13,8 +13,13 @@ import {
     DialogDescription,
     DialogTrigger,
     DialogClose,
-    DialogFooter
 } from "@/components/ui/dialog";
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger
+} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
@@ -23,16 +28,16 @@ import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import WealthChart from "./wealth-chart";
 import Preferences from "./preferences";
 import Finance from "./finance";
-import MilestonesForm from "./milestones";
+import Milestones from "./milestones";
 import RiskTolerance from "./risk-tolerance";
 
 import { formSchema } from "./form-schema";
 
 const TABS = [
-    "Preferences",
-    "Risk Tolerance",
-    "Finance",
-    "Milestones",
+    "preferences",
+    "risk-tolerance",
+    "finance",
+    "milestones",
 ] as const;
 
 // constants for forecasting wealth
@@ -76,11 +81,11 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
     const riskToleranceQ4 = form.watch("riskToleranceQ4") ?? 3;
     const milestones = form.watch("milestones") ?? [];
 
-    // useEffect(() => {
-    //     (async function updateStartingValue() {
-    //         setStartingValue(await calcPortfolioValue());
-    //     })();
-    // }, []);
+    useEffect(() => {
+        (async function updateStartingValue() {
+            setStartingValue(await calcPortfolioValue());
+        })();
+    }, []);
 
     const expectedReturn = useMemo(() => {
         // use CAPM model to calculate expected return based on risk tolerance
@@ -96,8 +101,6 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
 
     const wealthData = useMemo(() => {
         const annualContribution = percentIncomeInvested * income;
-
-        console.log(startingValue);
         
         const _data = [];
         const date = new Date();
@@ -170,7 +173,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='h-screen w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-hidden'>
+            <DialogContent className='h-dvh w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-hidden'>
                 <div className='h-full w-full max-w-6xl mx-auto overflow-hidden'>
                     <DialogHeader>
                         <DialogTitle>
@@ -186,37 +189,40 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                             onSubmit={form.handleSubmit(onSave)}
                             className='h-[calc(100%-30px)] flex flex-col'
                         >
-                            <div className='flex flex-wrap items-center justify-start gap-3 py-3'>
-                                {TABS.map((tab) => (
-                                <Button
-                                    key={`tab-${tab}`}
-                                    type='button'
-                                    variant='outline'
-                                    onClick={() => setActiveTab(tab)}
-                                    className={
-                                        cn(
-                                            'h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm sm:py-2 rounded-md',
-                                            activeTab === tab && 'border border-primary'
-                                        )
-                                    }
-                                >
-                                    {tab}
-                                </Button>
-                                ))}
-                            </div>
-                    
                             <div className='flex-1 overflow-y-scroll'>
-                                <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
-                                {activeTab === "Finance"? (
-                                <Finance />
-                                ): activeTab === "Milestones"? (
-                                <MilestonesForm wealthData={wealthData} />
-                                ): activeTab === "Risk Tolerance"? (
-                                <RiskTolerance />
-                                ): (
-                                <Preferences />
-                                )}
+                                <Tabs
+                                    value={activeTab}
+                                    onValueChange={(value) => setActiveTab(value as typeof TABS[number])}
+                                    defaultValue="preferences"
+                                    className="w-full"
+                                >
+                                    <TabsList className='h-10 my-3'>
+                                        <TabsTrigger value="preferences" className='h-8'>Preferences</TabsTrigger>
+                                        <TabsTrigger value="risk-tolerance" className='h-8'>Risk Tolerance</TabsTrigger>
+                                        <TabsTrigger value="finance" className='h-8'>Finance</TabsTrigger>
+                                        <TabsTrigger value="milestones" className='h-8'>Milestones</TabsTrigger>
+                                    </TabsList>
+
+                                    <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
+
+                                    <TabsContent value="preferences" className='sm:mt-6'>
+                                        <Preferences />
+                                    </TabsContent>
+
+                                    <TabsContent value="risk-tolerance" className='sm:mt-6'>
+                                        <RiskTolerance />
+                                    </TabsContent>
+
+                                    <TabsContent value="finance" className='sm:mt-6'>
+                                        <Finance />
+                                    </TabsContent>
+
+                                    <TabsContent value="milestones" className='sm:mt-6'>
+                                        <Milestones wealthData={wealthData} />
+                                    </TabsContent>
+                                </Tabs>
                             </div>
+
                             <div className='w-full flex flex-row justify-between py-3'>
                                 <DialogClose asChild>
                                     <Button

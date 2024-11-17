@@ -57,11 +57,16 @@ export async function getDataByUserId(id: string) {
         accountType: user.accountType,
         mailFrequency: user.mailFrequency,
         profile: user.profile,
-        holdings: user.holdings,
+        holdings: user.holdings.map((holding) => ({
+            id: holding.id,
+            units: holding.units,
+            stockId: holding.stockId,
+            userId: holding.userId,
+        })),
         conversations: user.conversations,
     };
 
-    const stockData: { [id: number]: Stock } = user.holdings.reduce((acc, obj) => ({ ...acc, [obj.id]: obj }), {});
+    const stockData: { [id: number]: Stock } = user.holdings.reduce((acc, obj) => ({ ...acc, [obj.stock.id]: obj.stock }), {});
 
     // omit unnecesary user data from return object
     return { userData, stockData };

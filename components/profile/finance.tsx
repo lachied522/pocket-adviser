@@ -26,7 +26,7 @@ import type { FormValues } from "./form-schema";
 export default function Finance() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-12 px-2'>
+        <div className='flex flex-col gap-3 sm:gap-12 sm:px-2'>
             <h3 className='text-lg font-medium'>Help us understand your financial situation</h3>
 
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
@@ -52,7 +52,7 @@ export default function Finance() {
                     name="income"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='text-base'>Income</FormLabel>
+                            <FormLabel className='text-base'>Income ($)</FormLabel>
                             <FormDescription className='text-sm text-black'>
                                 What is your approximate annual income?
                             </FormDescription>
@@ -76,7 +76,7 @@ export default function Finance() {
                     name="percentIncomeInvested"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className='text-base'>Investment Amount</FormLabel>
+                            <FormLabel className='text-base'>Investment Amount (%)</FormLabel>
                             <FormDescription className='text-sm text-black'>
                                 What proportion of your income to expect to invest?
                             </FormDescription>

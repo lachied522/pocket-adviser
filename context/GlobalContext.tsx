@@ -84,19 +84,18 @@ export const GlobalProvider = ({
           "USD": 1 / forexRate // inverse to get to USDAUD rate
         });
       }
+
       return state.holdings.reduce(
         (acc, obj) => {
             const stock = stockDataMap[obj.stockId];
-            if (stock) {
-                let multiplier = stock.currency !== currency? forexRate: 1;
-                return acc + multiplier * (stock.previousClose || 0) * obj.units;
-            }
-            return 0;
+            if (!stock) return 0;
+            let multiplier = stock.currency !== currency? forexRate: 1;
+            return acc + multiplier * (stock.previousClose || 0) * obj.units;
         },
         0
       )
     },
-    [state.holdings, stockDataMap, forexMap]
+    [state.holdings, stockDataMap, forexMap, setForexMap]
   );
 
   const updateUserAndUpdateState = useCallback(

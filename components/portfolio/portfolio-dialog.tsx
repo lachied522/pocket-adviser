@@ -82,7 +82,6 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
     const isMobile = useMediaQuery();
 
     // useEffect(() => {
-    //     console.log("portfolio effect run");
     //     (async function updatePortfolioValue() {
     //         setPortfolioValue(await calcPortfolioValue(currency));
     //     })();
@@ -91,10 +90,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
     useEffect(() => {
         // fetch stock data for each holding and update populated holdings
         (async function populateHoldings() {
-            if (!state) return;
-
             setIsLoading(true);
-
             const _holdings = await Promise.all(
                 state.holdings.map(async (holding) => {
                     const data = await getStockData(holding.stockId);
@@ -126,7 +122,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='h-screen w-full max-w-[100vw] border-none shadow-none rounded-none overflow-auto'>
+            <DialogContent className='h-dvh w-full max-w-[100vw] border-none shadow-none rounded-none overflow-auto'>
                 <div className='w-full max-w-6xl flex flex-col mx-auto'>
                     <DialogHeader>
                         <DialogTitle>

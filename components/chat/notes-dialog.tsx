@@ -69,7 +69,7 @@ export default function NotesDialog({ children }: NotesDialogProps) {
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-h-full max-w-4xl'>
+            <DialogContent className='h-dvh sm:h-auto max-w-3xl flex flex-col'>
                 <DialogHeader>
                     <DialogTitle className='flex flex-row items-center gap-2'>
                         📝 Notes
@@ -79,40 +79,40 @@ export default function NotesDialog({ children }: NotesDialogProps) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className='h-[600px]'>
-                    <div className='flex flex-col gap-2'>
-                        {isConfirmDeleteVisible? (
-                        <div className='w-full flex flex-row items-center justify-end gap-2'>
-                            <span>Are you sure?</span>
-                            <Button
-                                variant='ghost'
-                                size='sm'
-                                onClick={() => setIsConfirmDeleteVisible(false)}
-                                disabled={isLoading}
-                            >
-                                <X size={18} color='rgb(220 38 38)' />
-                            </Button>
-                            <Button
-                                variant='ghost'
-                                size='sm'
-                                onClick={onDeleteAll}
-                                disabled={isLoading}
-                            >
-                                <Check size={18} color='rgb(22 163 74)' />
-                            </Button>
-                        </div>
-                        ) : (
+                <div className='flex-1 flex flex-col gap-2'>
+                    {isConfirmDeleteVisible? (
+                    <div className='w-full flex flex-row items-center justify-end gap-2'>
+                        <span>Are you sure?</span>
                         <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => setIsConfirmDeleteVisible(true)}
+                            onClick={() => setIsConfirmDeleteVisible(false)}
                             disabled={isLoading}
-                            className='font-medium py-3 border border-neutral-600 self-end'
                         >
-                            Clear notes
+                            <X size={18} color='rgb(220 38 38)' />
                         </Button>
-                        )}
-
+                        <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={onDeleteAll}
+                            disabled={isLoading}
+                        >
+                            <Check size={18} color='rgb(22 163 74)' />
+                        </Button>
+                    </div>
+                    ) : (
+                    <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => setIsConfirmDeleteVisible(true)}
+                        disabled={isLoading}
+                        className='font-medium py-3 border border-neutral-600 self-end'
+                    >
+                        Clear notes
+                    </Button>
+                    )}
+        
+                    <ScrollArea className='h-full sm:h-[600px]'>
                         {isLoading? (
                         <div className='flex flex-col gap-2'>
                             {Array.from({ length: 5 }).map((_, index) => (
@@ -156,10 +156,10 @@ export default function NotesDialog({ children }: NotesDialogProps) {
                             </Table>
                         </div>
                         )}
-                    </div>
-                </ScrollArea>
+                    </ScrollArea>
+                </div>
 
-                <div className='h-full flex flex-row justify-end'>
+                <div className='flex flex-row justify-end'>
                     <DialogClose asChild>
                         <Button
                             type='button'

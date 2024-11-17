@@ -14,6 +14,7 @@ import {
     SidebarMenuItem,
     SidebarSeparator,
     SidebarTrigger,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 
@@ -35,6 +36,7 @@ const CONVERSATIONS_PER_PAGE = 16;
 export default function AppSidebar() {
     const { state, dispatch } = useGlobalContext() as GlobalState;
     const { onNewChat } = useChatContext() as ChatState;
+    const { setOpenMobile } = useSidebar();
     const [shouldFetchMore, setShouldFetchMore] = useState<boolean>((state.conversations).length >= CONVERSATIONS_PER_PAGE);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(false);
     const bottomRef = useRef<HTMLDivElement>(null);
@@ -142,7 +144,10 @@ export default function AppSidebar() {
                             <SidebarMenuItem>
                                 <Button
                                     variant='ghost'
-                                    onClick={onNewChat}
+                                    onClick={() => {
+                                        onNewChat();
+                                        setOpenMobile(false);
+                                    }}
                                     className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
                                 >
                                     <MessageCirclePlus size={16} />
