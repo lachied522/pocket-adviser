@@ -28,7 +28,7 @@ async function getTrendingStocks(client: FinancialModellingPrepClient) {
 const KEY = "DATA_STOCK_TAPE";
 
 type TAPE = {
-    indeces: Pick<Stock, 'name'|'symbol'|'previousClose'|'changesPercentage'>[]
+    indices: Pick<Stock, 'name'|'symbol'|'previousClose'|'changesPercentage'>[]
     stocks: Stock[]
 }
 
@@ -45,7 +45,7 @@ export async function getStockTape(): Promise<TAPE> {
     ]);
 
     res = {
-        indeces: [{
+        indices: [{
             ...spxQuote!,
             symbol: 'SPY', // override '^SPX'
         }],

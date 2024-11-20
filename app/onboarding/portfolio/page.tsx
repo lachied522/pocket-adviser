@@ -21,7 +21,10 @@ export default function PortfolioPage() {
 
     const onSubmit = useCallback(
         async () => {
-            if (!(session && session.data)) return;
+            if (!(session && session.data)) {
+                throw new Error("Session or user does not exist");
+            }
+
             setIsSubmitLoading(true);
 
             try {
@@ -32,8 +35,7 @@ export default function PortfolioPage() {
                         userId: session.data.user.id,
                     }))
                 );
-
-                router.replace('/');
+                router.replace('/?welcome=true');
             } catch (e) {
                 // TO DO:
             }
@@ -53,7 +55,7 @@ export default function PortfolioPage() {
                         type="button"
                         size="lg"
                         variant="secondary"
-                        onClick={() => router.replace('/')}
+                        onClick={() => router.replace('/?welcome=true')}
                     >
                         Skip
                     </Button>

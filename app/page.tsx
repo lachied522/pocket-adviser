@@ -13,6 +13,7 @@ import NewsArea from "@/components/chat/news-area";
 import Sidebar from "@/components/sidebar/app-sidebar";
 import SidebarOuterTrigger from "@/components/sidebar/sidebar-outer-trigger";
 import SettingsMenu from "@/components/settings/settings-menu";
+import WelcomeDialog from "@/components/dialogs/welcome-dialog";
 
 export default async function Page({
   searchParams
@@ -46,6 +47,8 @@ export default async function Page({
 
               <ChatArea />
             </main>
+
+            {searchParams?.welcome === "true" && <WelcomeDialog initialIsOpen={true} />}
           </SidebarProvider>
         </ChatProvider>
       </GlobalProvider>

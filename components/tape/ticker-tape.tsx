@@ -14,7 +14,7 @@ function StockTapeSkeleton() {
             {Array.from({length: 10}).map((_, index) => (
             <Skeleton
                 key={`skelton-${index}`}
-                className='h-[36px] w-[180px] bg-slate-50/20'
+                className='h-[24px] w-[120px] bg-zinc-100 shrink-0'
             />
             ))}
         </>
@@ -26,7 +26,7 @@ async function StockTapeBody() {
     return (
         <>
             {/* Indices are not animated */}
-            {data.indeces.map((item) => (
+            {data.indices.map((item) => (
             <TapeItem key={`trending-${item.symbol}`} data={item} />
             ))}
             
