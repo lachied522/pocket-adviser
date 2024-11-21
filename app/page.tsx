@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { cookies } from "next/headers";
+
+import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 import { getDataByUserId } from "@/utils/crud/user";
 
@@ -21,15 +23,16 @@ export default async function Page({
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
     // check if userId is in cookies
-    const session = await auth();
+    const cookieStore = cookies();
+    const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
 
-    if (!session?.user.id) {
+    if (!userId) {
       // middleware should handle this
       redirect('/login');
     }
   
     // fetch user data if able
-    const data = await getDataByUserId(session.user.id);
+    const data = await getDataByUserId(userId);
 
     return (
       <GlobalProvider initialUserData={data.userData} initialStockData={data.stockData}>
