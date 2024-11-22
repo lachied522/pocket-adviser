@@ -7,7 +7,6 @@ import { CheckCheck, OctagonAlert } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
-import StockAdvice from "./stock-advice";
 import RecommendationsTable from "./recommendations-table";
 import SearchResults from "./search-results";
 import NewsArticle from "./news-article";

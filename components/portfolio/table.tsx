@@ -65,7 +65,7 @@ export default function StockTable<TData, TValue>({
                 <Table>
                     <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id} className='bg-slate-50'>
+                        <TableRow key={headerGroup.id} className='bg-zinc-50'>
                         {headerGroup.headers.map((header) => {
                             return (
                             <TableHead key={header.id} className='py-3.5 font-medium'>
@@ -86,7 +86,8 @@ export default function StockTable<TData, TValue>({
                         table.getRowModel().rows.map((row) => (
                         <StockDialog
                             key={row.id}
-                            stockId={row.original.stockId}
+                            symbol={row.original.symbol}
+                            name={row.original.name}
                         >
                             <TableRow data-state={row.getIsSelected() && "selected"} className='cursor-pointer'>
                                 {row.getVisibleCells().map((cell) => (

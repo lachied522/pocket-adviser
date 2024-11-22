@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote, EconomicsEvent, EarningsEvent } from "@/types/data";
+import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote, EconomicsEvent, EarningsEvent, CompanyOutlook } from "@/types/data";
 
 export class FinancialModellingPrepClient {
     API_KEY = process.env.FMP_API_KEY;
@@ -13,7 +13,7 @@ export class FinancialModellingPrepClient {
     async makeAuthenticatedAPIRequest(
         endpoint: string, // endpoint without '/'
         params: URLSearchParams = new URLSearchParams(),
-        version: 3|4 = 3
+        version: 3 | 4 = 3
     ) {
         if (!this.API_KEY) {
             throw new Error('API key is undefined.');
@@ -144,5 +144,11 @@ export class FinancialModellingPrepClient {
         const data = await this.makeAuthenticatedAPIRequest('economic_calendar', params) as EconomicsEvent[]|null;
         if (!(data && data.length)) return [];
         return data;
+    }
+
+    async getCompanyOutlook(symbol: string): Promise<CompanyOutlook | null> {
+        // see https://site.financialmodelingprep.com/developer/docs#company-outlook-company-information
+        const params = new URLSearchParams({ symbol });
+        return await this.makeAuthenticatedAPIRequest("company-outlook", params, 4);
     }
 }

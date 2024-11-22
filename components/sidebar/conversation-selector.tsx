@@ -62,7 +62,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                 if (!isLoading) onSelectConversation(id);
             }}
             className={cn(
-                'sm:h-10 max-w-[200px] w-full flex flex-row items-center justify-start text-sm font-medium px-4 py-3 rounded-md cursor-pointer select-none group/selector relative hover:bg-zinc-100',
+                'sm:h-10 max-w-[200px] w-full flex flex-row items-center justify-start text-sm font-medium p-2 rounded-md cursor-pointer select-none group/selector relative hover:bg-zinc-100',
                 conversationId === id && 'bg-zinc-100'
             )}
         >

@@ -5,7 +5,7 @@ import debounce from "lodash.debounce";
 
 import { AlertTriangle, Search } from "lucide-react";
 
-import { searchStocksAction } from "@/actions/data/stocks";
+import { searchStocksAction } from "@/actions/crud/stocks";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";

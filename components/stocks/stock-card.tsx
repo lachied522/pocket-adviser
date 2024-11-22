@@ -17,7 +17,7 @@ interface StockCardProps {
 
 export default function StockCard({ stockData }: StockCardProps) {
     return (
-        <StockDialog initialStockData={stockData}>
+        <StockDialog symbol={stockData.symbol} name={stockData.name}>
             <Card className='cursor-pointer shrink-0'>
                 <CardContent className='flex flex-col gap-3.5 p-3'>
                     <div className='grid grid-cols-[60px_1fr] gap-2'>

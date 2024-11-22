@@ -9,9 +9,9 @@ import {
 
 import { updateUserAction } from "@/actions/crud/user";
 import { updateProfileAction } from "@/actions/crud/profile";
+import { getStockByIdAction } from "@/actions/crud/stocks";
 import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { insertConversationAction, updateConversationAction, deleteConversationAction } from "@/actions/crud/conversation";
-import { getStockByIdAction } from "@/actions/data/stocks";
 import { getForexRateAction } from "@/actions/data/forex";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";

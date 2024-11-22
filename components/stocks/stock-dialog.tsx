@@ -1,31 +1,42 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+
+import { MessageCircleQuestion } from "lucide-react";
 
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger
+} from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/components/utils";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
-import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import { type ChatState, useChatContext } from "@/context/ChatContext";
 
-import StockLogo from "./stock-logo";
-import ChangeIndicator from "./change-indicator";
-import StockChart from "./stock-chart";
+import { getStockBySymbolAction } from "@/actions/data/stocks";
 
-import type { Stock } from "@prisma/client";
+import ChangeIndicator from "./change-indicator";
+import StockLogo from "./stock-logo";
+import Overview from "./overview";
+import Statistics from "./statistics";
+import Income from "./income";
+import BalanceSheet from "./balance-sheet";
+import Cashflow from "./cashflow";
+
+import type { CompanyOutlook } from "@/types/data";
 
 const prompts = (symbol: string) => [
     {
@@ -49,155 +60,234 @@ const prompts = (symbol: string) => [
     },
 ]
 
-type StockWithoutId = Omit<Stock, 'id'> & { id?: number }
-
 interface StockModalProps {
     children: React.ReactNode
-    initialStockData?: StockWithoutId|null // data can be passed from parent or fetched by id
-    stockId?: any
+    symbol: string
+    name: string
 }
 
-export default function StockDialog({ children, stockId, initialStockData }: StockModalProps) {
-    const { getStockData } = useGlobalContext() as GlobalState;
+export default function StockDialog({ children, symbol, name }: StockModalProps) {
     const { onSubmit } = useChatContext() as ChatState;
-    const [stockData, setStockData] = useState<StockWithoutId|null|undefined>(initialStockData);
-    const closeRef = useRef<HTMLButtonElement>(null);
-    const isMobile = useMediaQuery();
+    const [stockData, setStockData] = useState<CompanyOutlook | null>(null);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [error, setError] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (initialStockData) return; // data already populated
-        if (typeof stockId !== "number") return;
-        (async function getData() {
-            const _data = await getStockData(stockId);
-            if (_data) setStockData(_data);
-        })();
-    }, [initialStockData, stockId, getStockData]);
+        if (isOpen) fetchStockData();
 
-    const onButtonPress = (input: string, tool?: string) => {
-        onSubmit(input, tool);
-        if (closeRef.current) closeRef.current.click();
-    }
+        async function fetchStockData() {
+            try {
+                setStockData(await getStockBySymbolAction(symbol));
+            } catch (e) {
+                setError(true);
+            }
+            setIsLoading(false);
+        }
+    }, [isOpen, symbol]);
 
     return (
-        <>
-            {stockData? (
-            <Dialog>
-                <DialogTrigger asChild>
-                    {children}
-                </DialogTrigger>
-                <DialogContent className='h-dvh w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-auto'>
-                    <div className='w-full max-w-6xl mx-auto overflow-auto'>
-                        <DialogHeader>
-                            <DialogTitle>
-                                {stockData.name}
-                            </DialogTitle>
-                        </DialogHeader>
+        <Dialog open={isOpen} onOpenChange={(value: boolean) => setIsOpen(value)}>
+            <DialogTrigger asChild>
+                {children}
+            </DialogTrigger>
+            <DialogContent className='h-dvh w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none p-3 sm:p-6'>
+                <div className='h-full w-full max-w-6xl flex flex-col mx-auto overflow-hidden'>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {name}
+                        </DialogTitle>
+                    </DialogHeader>
 
+                    {(isLoading || stockData) && (
+                    <>
                         <div className='grid grid-cols-[60px_1fr] md:grid-cols-[120px_1fr] items-start gap-x-2 sm:gap-x-6 gap-y-2 py-6'>
                             <div className='h-14 w-14 md:h-auto md:w-auto flex items-center justify-center bg-zinc-100 rounded-xl aspect-square md:row-span-2'>
-                                <div className='h-10 w-10 md:h-24 md:w-24 relative'>
+                                <div className='h-10 w-10 md:h-24 md:w-24 flex relative'>
+                                    {!stockData || isLoading ? (
+                                    <Skeleton className='flex-1' />
+                                    ) : (
                                     <StockLogo
-                                        symbol={stockData.symbol}
+                                        symbol={stockData.profile.symbol}
                                         fill
                                     />
+                                    )}
                                 </div>
                             </div>
-
-                            <div className='flex flex-col items-start gap-2'>
-                                <div className='flex flex-row items-center gap-2'>
-                                    <span>{stockData.symbol.toUpperCase()}</span>
-                                    <Image
-                                        src={stockData.exchange==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
-                                        alt='flag'
-                                        height={16}
-                                        width={16}
-                                    />
+                            
+                            <div className='md:col-span-1 grid grid-rows-1 grid-cols-2 md:grid-cols-4 grid-flow-col-dense gap-3 divide-x'>
+                                {!stockData || isLoading ? (
+                                <div className='flex flex-col items-start gap-1'>
+                                    <Skeleton className='h-6 w-[120px]' />
+                                    <Skeleton className='h-8 w-[180px]' />
                                 </div>
-                                <div className='flex flex-row items-center gap-2'>
-                                    <div className='inline'>
-                                        <span className='font-medium text-base md:text-lg mr-0.5'>{stockData.previousClose? formatDollar(stockData.previousClose): 'N/A'}</span>
-                                        <span className='font-medium text-sm'>{stockData.previousClose? stockData.currency: ''}</span>
+                                ) : (
+                                <div className='flex flex-col items-start'>
+                                    <div className='flex flex-row items-center gap-2'>
+                                        <span>{stockData.profile.symbol.toUpperCase()}</span>
+                                        <Image
+                                            src={stockData.profile.exchange==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+                                            alt='flag'
+                                            height={16}
+                                            width={16}
+                                        />
                                     </div>
-                                    <ChangeIndicator
-                                        change={stockData.changesPercentage}
-                                        withIcon={false}
-                                        size={isMobile? 'sm': 'lg'}
-                                    />
+
+                                    <div className='flex flex-row items-center gap-2'>
+                                        <div className='inline'>
+                                            <span className='font-medium text-sm md:text-base mr-0.5'>
+                                                {formatDollar(stockData.profile.price)}
+                                            </span>
+                                            <span className='font-medium text-sm'>
+                                                {stockData.profile.currency}
+                                            </span>
+                                        </div>
+
+                                        <ChangeIndicator
+                                            change={100 * stockData.profile.changes / stockData.profile.price}
+                                            withIcon={false}
+                                            size='sm'
+                                        />
+                                    </div>
+                                </div>)}
+                                
+                                {!stockData || isLoading ? (
+                                <Skeleton className='hidden md:block' />
+                                ) : (
+                                <div className='hidden md:flex flex-col items-center'>
+                                    <span className='font-medium text-base md:text-lg'>{formatMarketCap(stockData.profile.mktCap)}</span>
+                                    <span className='text-slate-600 text-xs md:text-sm'>Market Cap.</span>
                                 </div>
+                                )}
+
+                                {!stockData || isLoading ? (
+                                <Skeleton className='hidden md:block' />
+                                ) : (
+                                <div className='hidden md:flex flex-col items-center'>
+                                    <span className='font-medium text-base md:text-lg line-clamp-1'>{stockData.profile.sector}</span>
+                                    <span className='text-slate-600 text-xs md:text-sm'>Sector</span>
+                                </div>
+                                )}
+
+                                {!stockData || isLoading ? (
+                                <Skeleton />
+                                ) : (
+                                <div className='flex flex-col items-center'>
+                                    <span className={cn(
+                                        'font-medium text-base md:text-lg line-clamp-1',
+                                        stockData.rating[0].ratingRecommendation.includes("Sell") && 'text-red-400',
+                                        stockData.rating[0].ratingRecommendation.includes("Buy") && 'text-green-400',
+                                    )}>
+                                        {stockData.rating[0].ratingRecommendation}
+                                    </span>
+                                    <span className='text-slate-600 text-xs md:text-sm'>Analyst Rating</span>
+                                </div>
+                                )}
                             </div>
 
-                            <div className='col-span-2 md:col-span-1 grid grid-rows-1 grid-cols-4 sm:grid-cols-6 grid-flow-col-dense divide-x'>
-                                <div className=''>
-                                    <div className='flex flex-col'>
-                                        <span className='font-medium text-base md:text-lg'>{formatMarketCap(stockData.marketCap)}</span>
-                                        <span className='text-slate-600 text-xs md:text-sm'>Market Cap.</span>
-                                    </div>
+                            <div className='col-span-2 md:col-auto flex flex-row items-center justify-between gap-1 md:gap-2 md:px-2 overflow-x-auto'>
+                                <div className='hidden md:flex shrink-0'>
+                                    <MessageCircleQuestion />
                                 </div>
-
-                                <div className='w-full flex items-center justify-center'>
-                                    <div className='flex flex-col'>
-                                        <span className='font-medium text-base md:text-lg line-clamp-1'>{stockData.sector}</span>
-                                        <span className='text-slate-600 text-xs md:text-sm'>Sector</span>
-                                    </div>
-                                </div>
-
-                                <div className='w-full flex items-center justify-center'>
-                                    <div className='flex flex-col'>
-                                        <span className='font-medium text-base md:text-lg'>{formatDollar(stockData.dividendAmount || 0)}</span>
-                                        <span className='text-slate-600 text-xs md:text-sm'>Div. Amount</span>
-                                    </div>
-                                </div>
-
-                                <div className='w-full flex items-center justify-center'>
-                                    <div className='flex flex-col'>
-                                        <span className='font-medium text-base md:text-lg'>{(100 * (stockData.dividendYield || 0)).toFixed(2)}%</span>
-                                        <span className='text-slate-600 text-xs md:text-sm'>Div. Yield</span>
-                                    </div>
-                                </div>
-
-                                <div className='w-full hidden sm:flex items-center justify-center'>
-                                    <div className='flex flex-col'>
-                                        <span className='font-medium text-base md:text-lg'>{stockData.pe ?? 'N/A'}</span>
-                                        <span className='text-slate-600 text-xs md:text-sm'>PE Ratio</span>
-                                    </div>
-                                </div>
-
-                                <div className='w-full hidden sm:flex items-center justify-center'>
-                                    <div className='flex flex-col'>
-                                        <span className='font-medium text-base md:text-lg'>{stockData.epsGrowth? (100 * stockData.epsGrowth).toFixed(2) + '%': 'N/A'}</span>
-                                        <span className='text-slate-600 text-xs md:text-sm'>EPS Growth</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='h-[360px] md:h-[520px] col-span-2 mt-6'>
-                                <StockChart stockData={stockData} />
-                            </div>
-                        </div>
-
-                        <p className='text-sm sm:text-base'>{stockData.description || 'Company information not available'}</p>
-
-                        <div className='flex flex-col sm:flex-row items-center justify-center gap-1 md:gap-2 py-6'>
-                            {/* <Bot size={20} /> */}
-                            <div className='flex-1 w-full flex flex-wrap justify-center gap-1 md:gap-2 order-2 sm:order-none'>
-                                {prompts(stockData.symbol).map((obj, index) => (
-                                <Button
-                                    key={`prompt-${stockData.symbol}-${index}`}
-                                    onClick={() => onButtonPress(obj.input, obj.tool)}
-                                    className='hover:scale-[1.02] transition-transform duration-150'
-                                >
-                                    <span className='text-xs md:text-sm'>{obj.display}</span>
-                                </Button>
+                                {!stockData || isLoading ? (
+                                <>
+                                {Array.from({ length: 4 }).map((_, index) => (
+                                <Skeleton
+                                    key={`prompt-skeleton-${index}`}
+                                    className='h-9 w-[180px] shrink-0'
+                                />
                                 ))}
+                                </>
+                                ) : (
+                                <>
+                                    {prompts(stockData.profile.symbol).map((obj, index) => (
+                                    <Button
+                                        key={`prompt-${stockData.profile.symbol}-${index}`}
+                                        variant='outline'
+                                        onClick={() => {
+                                            onSubmit(obj.input, obj.tool);
+                                            setIsOpen(false);
+                                        }}
+                                        className='hover:scale-[1.02] transition-transform duration-150'
+                                    >
+                                        <span className='text-xs md:text-sm'>{obj.display}</span>
+                                    </Button>
+                                    ))}
+                                </>
+                                )}
                             </div>
                         </div>
-                        <DialogClose ref={closeRef} className='hidden' />
+
+                        <div className='flex-1 flex overflow-x-auto sm:overflow-hidden'>
+                            <Tabs
+                                defaultValue="overview"
+                                className="flex-1"
+                            >
+                                <TabsList className='w-full justify-between bg-transparent border-b border-zinc-200'>
+                                    <TabsTrigger value="overview" className='' disabled={!stockData || isLoading}>
+                                        Overview
+                                    </TabsTrigger>
+                                    <TabsTrigger value="statistics" className='' disabled={!stockData || isLoading}>
+                                        Statistics
+                                    </TabsTrigger>
+                                    <TabsTrigger value="income" className='' disabled={!stockData || isLoading}>
+                                        Income
+                                    </TabsTrigger>
+                                    <TabsTrigger value="balance-sheet" className='' disabled={!stockData || isLoading}>
+                                        Balance Sheet
+                                    </TabsTrigger>
+                                    <TabsTrigger value="cashflow" className='' disabled={!stockData || isLoading}>
+                                        Cashflow
+                                    </TabsTrigger>
+                                </TabsList>
+
+                                <ScrollArea className='max-h-full h-full pr-3'>
+                                    <TabsContent value="overview" className=''>
+                                        {isLoading ? (
+                                        <div className='flex flex-col gap-6 pt-6'>
+                                            <Skeleton className='h-[360px] md:h-[520px] w-full'/>
+                                
+                                            <Skeleton className='h-[360px] w-full'/>
+                                        </div>
+                                        ) : (
+                                        <Overview stockData={stockData!} />
+                                        )}
+                                    </TabsContent>
+                                    
+                                    <TabsContent value="statistics" className=''>
+                                        <Statistics stockData={stockData!} />
+                                    </TabsContent>
+
+                                    <TabsContent value="income" className=''>
+                                        <Income stockData={stockData!} />
+                                    </TabsContent>
+
+                                    <TabsContent value="balance-sheet" className=''>
+                                        <BalanceSheet stockData={stockData!} />
+                                    </TabsContent>
+
+                                    <TabsContent value="cashflow" className=''>
+                                        <Cashflow stockData={stockData!} />
+                                    </TabsContent>
+                                </ScrollArea>
+                            </Tabs>
+                        </div>
+                    </>
+                    )}
+
+                    {error && (
+                    <div className='w-full text-center my-auto'>
+                        <span>Something went wrong fetching data for {symbol}</span>
                     </div>
-                </DialogContent>
-            </Dialog>
-            ) : (
-            <>{children}</>
-            )}
-        </>
+                    )}
+
+                    {(!isLoading && !stockData && !error) && (
+                    <div className='w-full text-center my-auto'>
+                        <span>Could not find data on {symbol}</span>
+                    </div>
+                    )}
+                </div>
+            </DialogContent>
+        </Dialog>
     )
 }

@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useRef, memo } from 'react';
 
-import type { Stock } from '@prisma/client';
-
 function formatSymbol(symbol: string, exchange:'ASX'|'NASDAQ'|'NYSE') {
     // tradingview symbols are prefixed with exchange, e.g. ASX:BHP or NASDAQ:AAPL
     switch (exchange) {
@@ -26,7 +24,12 @@ function formatSymbol(symbol: string, exchange:'ASX'|'NASDAQ'|'NYSE') {
     return symbol;
 }
 
-function StockChart({ stockData }: { stockData: Omit<Stock, 'id'> }) {
+interface StockChartProps {
+    symbol: string
+    exchange: string
+}
+
+function StockChart({ symbol, exchange }: StockChartProps) {
     // see https://www.tradingview.com/widget-docs/widgets/charts/mini-chart/
     let mountedRef = useRef<boolean>(false); // useEffect triggers twice in dev mode
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -40,7 +43,7 @@ function StockChart({ stockData }: { stockData: Omit<Stock, 'id'> }) {
             script.innerHTML = `
                 {
                     "autosize": true,
-                    "symbol": "${formatSymbol(stockData.symbol, stockData.exchange as 'ASX'|'NASDAQ'|'NYSE')}",
+                    "symbol": "${formatSymbol(symbol, exchange as 'ASX'|'NASDAQ'|'NYSE')}",
                     "interval": "D",
                     "timezone": "Etc/UTC",
                     "theme": "light",
@@ -57,7 +60,7 @@ function StockChart({ stockData }: { stockData: Omit<Stock, 'id'> }) {
             if (!mountedRef.current && containerRef.current) containerRef.current.appendChild(script);
             mountedRef.current = true;
         },
-        [stockData]
+        [symbol, exchange]
     );
 
     return (

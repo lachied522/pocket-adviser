@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { searchStocksAction } from "@/actions/data/stocks";
+import { searchStocksAction } from "@/actions/crud/stocks";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
