@@ -17,29 +17,75 @@ import type { FormValues } from "./form-schema";
 export default function RiskTolerance() {
     const form = useFormContext<FormValues>();
     return (
-        <div className='flex flex-col gap-3 sm:gap-12 sm:px-2'>
-            <div className='flex flex-col items-start gap-2 mb-3'>
-                <h3 className='text-lg font-medium'>Help us understand your relationship with risk*</h3>
-                <p className='text-xs sm:text-sm'>
-                    * Risk of an investment is defined as the probability that it will incur a financial loss. 
-                    The higher the risk of an investment, the greater both the <b>potential gain</b> and <b>potential loss</b> will be.
-                </p>
-            </div>
+        <div className='flex flex-col gap-6 sm:gap-12 px-2'>
+            <p className='text-xs sm:text-sm'>
+                <span className='font-medium'>Note.</span> Risk of an investment is defined as the probability that it will incur a financial loss. 
+                The higher the risk of an investment, the greater both the <b>potential gain</b> and <b>potential loss</b> will be.
+            </p>
 
             <FormField
                 control={form.control}
-                name="riskToleranceQ1"
+                name="experience"
                 render={({field}) => (
-                    <FormItem>
+                    <FormItem className='grid grid-cols-1 md:grid-cols-[0.3fr_0.7fr] items-center gap-6 md:gap-12 md:pr-3'>
                         <FormLabel className='text-base'>
-                            <span className='mr-2'>1.</span> Which of the following best describes
-                            your association with financial risk?
+                            How many years experience do you have investing in stocks?
                         </FormLabel>
                         <FormControl>
                             <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
+                                className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
+                            >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="1" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">0</FormLabel>
+                                </FormItem>
+                                <FormItem  className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="2" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">1-2</FormLabel>
+                                </FormItem>
+                                <FormItem  className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="3" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">3-4</FormLabel>
+                                </FormItem>
+                                <FormItem  className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="4" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">5-6</FormLabel>
+                                </FormItem>
+                                <FormItem  className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="5" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">7+</FormLabel>
+                                </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
+                name="riskToleranceQ1"
+                render={({field}) => (
+                    <FormItem className='grid grid-cols-1 md:grid-cols-[0.3fr_0.7fr] items-center gap-6 md:gap-12 md:pr-3'>
+                        <FormLabel className='text-base'>
+                            Which of the following best describes your association with financial risk?
+                        </FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={String(field.value)}
+                                className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -81,15 +127,15 @@ export default function RiskTolerance() {
                 control={form.control}
                 name="riskToleranceQ2"
                 render={({field}) => (
-                    <FormItem>
+                    <FormItem className='grid grid-cols-1 md:grid-cols-[0.3fr_0.7fr] items-center gap-6 md:gap-12 md:pr-3'>
                         <FormLabel className='text-base'>
-                            <span className='mr-2'>2.</span> What is your willingness to take on financial risk?
+                            What is your willingness to take on financial risk?
                         </FormLabel>
                         <FormControl>
                             <RadioGroup 
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
+                                className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -131,16 +177,15 @@ export default function RiskTolerance() {
                 control={form.control}
                 name="riskToleranceQ3"
                 render={({field}) => (
-                    <FormItem>
+                    <FormItem className='grid grid-cols-1 md:grid-cols-[0.3fr_0.7fr] items-center gap-6 md:gap-12 md:pr-3'>
                         <FormLabel className='text-base'>
-                            <span className='mr-2'>3.</span> What range of returns do you expect to
-                            receive from your portfolio?
+                            What range of returns do you expect to receive from your portfolio?
                         </FormLabel>
                         <FormControl>
                             <RadioGroup 
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
+                                className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -182,16 +227,16 @@ export default function RiskTolerance() {
                 control={form.control}
                 name="riskToleranceQ4"
                 render={({field}) => (
-                    <FormItem>
+                    <FormItem className='grid grid-cols-1 md:grid-cols-[0.3fr_0.7fr] items-center gap-6 md:gap-12 md:pr-3'>
                         <FormLabel className='text-base'>
-                            <span className='mr-2'>4.</span> How much could the <strong>total value</strong> of all your
+                            How much could the <strong>total value</strong> of all your
                             portfolio fall before you begin to feel uncomfortable?
                         </FormLabel>
                         <FormControl>
                             <RadioGroup 
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
-                                className="flex flex-wrap justify-center gap-3 px-5 py-8"
+                                className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>

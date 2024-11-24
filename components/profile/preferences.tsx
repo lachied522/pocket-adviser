@@ -21,12 +21,31 @@ import { cn } from "@/components/utils";
 import PreferencesSelector from "./preferences-selector";
 
 import type { FormValues } from "./form-schema";
+import ObjectiveSelector from "./objective-selector";
 
 export default function Preferences() {
     const form = useFormContext<FormValues>();
+
     return (
         <div className='flex flex-col gap-3 sm:gap-12 sm:px-2'>
-            <h3 className='text-lg font-medium'>Help us understand your investment preferences</h3>
+            <FormField
+                control={form.control}
+                name="objective"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel className='text-base'>Primary Objective</FormLabel>
+
+                        <FormDescription className='text-xs sm:text-sm text-black'>
+                            This is the main thing you wish to achieve by investing.
+                        </FormDescription>
+
+                        <FormControl>
+                            <ObjectiveSelector value={field.value} onChange={field.onChange} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
             <FormField
                 control={form.control}
@@ -60,12 +79,12 @@ export default function Preferences() {
                                     min={0.001}
                                     max={0.05}
                                     step={0.001}
-                                    value={[field.value ?? 0.01]}
+                                    value={[field.value ?? 0]}
                                     onValueChange={(value: number[]) => field.onChange(value[0])}
                                     disabled={!field.value}
                                     className="w-[160px] sm:w-[240px] cursor-pointer"
                                 />
-                                <div className="w-4 sm:w-6 text-sm font-semibold">{(100 * (field.value ?? 0.01)).toFixed(2)}%</div>
+                                <div className="w-4 sm:w-6 text-sm font-semibold">{field.value? (100 * field.value).toFixed(2): "N/A"}%</div>
                                 <div className={
                                     cn(
                                         'hidden bg-white opacity-50 absolute inset-0',
@@ -116,12 +135,12 @@ export default function Preferences() {
                                         min={0}
                                         max={1}
                                         step={0.01}
-                                        value={[field.value ?? 0.5]}
+                                        value={[field.value ?? 0]}
                                         onValueChange={(value: number[]) => field.onChange(value[0])}
                                         disabled={!field.value}
                                         className="w-[160px] sm:w-[240px] cursor-pointer"
                                     />
-                                    <div className="w-4 sm:w-6 text-sm font-semibold">{(100 * (field.value ?? 0.5)).toFixed(0)}%</div>
+                                    <div className="w-4 sm:w-6 text-sm font-semibold">{field.value? (100 * field.value).toFixed(0): "N/A"}%</div>
                                 </div>
                             </FormControl>
 
@@ -138,12 +157,12 @@ export default function Preferences() {
                                         min={0}
                                         max={1}
                                         step={0.01}
-                                        value={[1 - (field.value ?? 0.5)]}
+                                        value={[1 - (field.value ?? 1)]}
                                         onValueChange={(value: number[]) => field.onChange(1 - value[0])}
                                         disabled={!field.value}
                                         className="w-[160px] sm:w-[240px] cursor-pointer"
                                     />
-                                    <div className="w-4 sm:w-6 text-sm font-semibold">{(100 - 100 * (field.value ?? 0.5)).toFixed(0)}%</div>
+                                    <div className="w-4 sm:w-6 text-sm font-semibold">{field.value? (100 * (1 - field.value)).toFixed(0): "N/A"}%</div>
                                 </div>
                             </FormControl>
                             <FormMessage />

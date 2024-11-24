@@ -24,6 +24,21 @@ export async function updateUser(id: string, data: Partial<User>) {
     })
 }
 
+export async function getProfileByUserId(userId: string) {
+    return await prisma.profile.findUnique({
+        where: { userId }
+    });
+}
+
+export async function getHoldingsByUserId(userId: string) {
+    return await prisma.holding.findMany({
+        where: { userId },
+        include: {
+            stock: true,
+        }
+    });
+}
+
 export async function getDataByUserId(id: string) {
     const user = await prisma.user.findUnique({
         where: { id },

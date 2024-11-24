@@ -1,9 +1,22 @@
 "use client";
 import { useState, useMemo } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from 'recharts';
-import { Circle } from 'lucide-react';
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    ReferenceLine,
+} from 'recharts';
 
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import {
+    type ChartConfig,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+    ChartLegend,
+    ChartLegendContent,
+} from "@/components/ui/chart";
 
 function formatValue(value: number) {
     const million = 1e6;
@@ -24,19 +37,17 @@ function upperCase(value: string) {
     return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-white rounded-lg border border-neutral-600 p-3">
-                <p className="text-sky-600">Wealth {`${formatValue(payload[0].value)}`}</p>
-                <p className="text-fuchsia-600">Income {`${formatValue(payload[1].value)}`}</p>
-                <p className="text-green-600">Principal {`${formatValue(payload[2].value)}`}</p>
-            </div>
-        );
+const chartConfig = {
+    wealth: {
+        label: "Wealth",
+    },
+    principal: {
+        label: "Principal",
+    },
+    income: {
+        label: "Income",
     }
-  
-    return null;
-}
+} satisfies ChartConfig;
 
 interface WealthChartProps {
     data: {
@@ -54,27 +65,27 @@ interface WealthChartProps {
 
 export default function WealthChart({ data, milestones, expectedReturn }: WealthChartProps) {
     const [maxTicks, setMaxTicks] = useState<number>(20);
-    const isMobile = useMediaQuery();
 
     const endingWealth = useMemo(() => {
         return data[data.length - 1].wealth;
     }, [data]);
 
     return (
-        <div className='hidden sm:flex flex-col mb-6'>
-            <div className='w-full flex flex-col sm:flex-row items-start sm:items-center justify-between'>
-                <h3 className='text-lg font-medium'>
-                    Your projected wealth
+        <div className='hidden sm:flex flex-col gap-3 mb-6'>
+            <div className='w-full flex flex-col sm:flex-row items-start sm:items-center justify-between mt-6'>
+                <h3 className='font-medium'>
+                    Projected Wealth
                 </h3>
-                <span className='text-xs mr-3'>*based on expected return of {(100 * expectedReturn).toFixed(2)}% p.a.</span>
+                {/* <span className='text-xs mr-3'>*based on expected return of {(100 * expectedReturn).toFixed(2)}% p.a.</span> */}
             </div>
 
-            <ResponsiveContainer width='98%' height={isMobile? 250: 400}>
+            <ChartContainer config={chartConfig} className="h-[300px] md:h-[400px] w-full">
                 <AreaChart
                     width={730}
                     height={250}
                     data={data.slice(0, maxTicks)}
                     margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    accessibilityLayer
                 >
                     <defs>
                         <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
@@ -131,24 +142,10 @@ export default function WealthChart({ data, milestones, expectedReturn }: Wealth
                             strokeDasharray="3 3"
                         />
                     ))}
-                    <Tooltip content={<CustomTooltip />} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
                 </AreaChart>
-            </ResponsiveContainer>
-
-            <div className='flex flex-row items-center justify-center gap-3 mt-3'>
-                <div className='flex flex-row items-center gap-1'>
-                    <Circle size={8} color='rgb(2 132 199)' fill='rgb(2 132 199)' opacity={0.5} />
-                    <span className='text-sky-600 opacity-75'>Wealth</span>
-                </div>
-                <div className='flex flex-row items-center gap-1'>
-                    <Circle size={8} color='rgb(192 38 211)' fill='rgb(192 38 211)' opacity={0.5} />
-                    <span className='text-fuchsia-600 opacity-75'>Income</span>
-                </div>
-                <div className='flex flex-row items-center gap-1'>
-                    <Circle size={8} color='rgb(22 163 74)' fill='rgb(22 163 74)' opacity={0.5} />
-                    <span className='text-green-600 opacity-75'>Principal</span>
-                </div>
-            </div>
+            </ChartContainer>
         </div>
     )
 }

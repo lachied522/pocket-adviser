@@ -87,7 +87,7 @@ export default function DataTable({ populatedHoldings, setPopulatedHoldings }: D
     });
 
     return (
-        <div className='flex-1 rounded-md border'>
+        <div className='rounded-md border'>
             <Table>
                 <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -119,7 +119,7 @@ export default function DataTable({ populatedHoldings, setPopulatedHoldings }: D
                         ))}
 
                         <TableCell className='w-[80px]'>
-                          <div className='flex flex-row items-center justify-end gap-3'>
+                          <div className='flex flex-row items-center justify-end gap-1'>
                             <EditHoldingDialog
                               holding={row.original}
                               onChange={(holding: PopulatedHolding) => {

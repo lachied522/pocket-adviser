@@ -73,12 +73,13 @@ export default function DatePicker({
                 >
                     <CalendarIcon size={16} className="text-blue-800 mr-2"/>
                     {value? (
-                        <div className='line-clamp-1 truncate'>{format(value, "MMM do, Y")}</div>
+                        <div className='line-clamp-1 truncate'>{format(value, "MMM do, y")}</div>
                     ) : (
                         <span>Select date</span>
                     )}
                 </Button>
             </PopoverTrigger>
+
             <PopoverContent className="flex w-auto flex-col items-start gap-2 px-3 py-2">
                 <span className='text-sm'>Pick a date:</span>
                 <div className="flex flex-row items-center gap-2">

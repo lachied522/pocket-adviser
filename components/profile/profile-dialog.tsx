@@ -21,7 +21,7 @@ import {
     TabsTrigger
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/components/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
@@ -59,9 +59,12 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             dob: state.profile?.dob ?? new Date(),
+            objective: state.profile?.objective ?? "RETIREMENT",
+            employmentStatus: state.profile?.employmentStatus ?? "CASUAL",
             income: state.profile?.income ?? 0,
             percentIncomeInvested: state.profile?.percentIncomeInvested ?? 0.10,
-            experience: state.profile?.experience ?? 0,
+            percentAssetsInvested: state.profile?.percentAssetsInvested ?? 0.10,
+            experience: state.profile?.experience ?? 1,
             riskToleranceQ1: state.profile?.riskToleranceQ1 ?? 3,
             riskToleranceQ2: state.profile?.riskToleranceQ2 ?? 3,
             riskToleranceQ3: state.profile?.riskToleranceQ3 ?? 3,
@@ -154,9 +157,12 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
             // reset form state to initial values
             form.reset({
                 dob: state.profile?.dob ?? new Date(),
+                objective: state.profile?.objective ?? "RETIREMENT",
+                employmentStatus: state.profile?.employmentStatus ?? "CASUAL",
                 income: state.profile?.income ?? 0,
                 percentIncomeInvested: state.profile?.percentIncomeInvested ?? 0.10,
-                experience: state.profile?.experience ?? 0,
+                percentAssetsInvested: state.profile?.percentAssetsInvested ?? 0.10,
+                experience: state.profile?.experience ?? 1,
                 riskToleranceQ1: state.profile?.riskToleranceQ1 ?? 3,
                 riskToleranceQ2: state.profile?.riskToleranceQ2 ?? 3,
                 riskToleranceQ3: state.profile?.riskToleranceQ3 ?? 3,
@@ -192,34 +198,36 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                             className='h-[calc(100%-30px)] flex flex-col'
                         >
                             <div className='flex-1 overflow-y-scroll'>
+                                <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
+
                                 <Tabs
                                     defaultValue="preferences"
-                                    className="w-full"
+                                    className="flex-1"
                                 >
-                                    <TabsList className='h-10 my-3'>
-                                        <TabsTrigger value="preferences" className='h-8'>Preferences</TabsTrigger>
-                                        <TabsTrigger value="risk-tolerance" className='h-8'>Risk Tolerance</TabsTrigger>
-                                        <TabsTrigger value="finance" className='h-8'>Finance</TabsTrigger>
-                                        <TabsTrigger value="milestones" className='h-8'>Milestones</TabsTrigger>
+                                    <TabsList className='w-full justify-start gap-3 bg-transparent border-b border-zinc-200'>
+                                        <TabsTrigger value="preferences" className=''>Preferences</TabsTrigger>
+                                        <TabsTrigger value="risk-tolerance" className=''>Risk Tolerance</TabsTrigger>
+                                        <TabsTrigger value="finance" className=''>Finance</TabsTrigger>
+                                        <TabsTrigger value="milestones" className=''>Milestones</TabsTrigger>
                                     </TabsList>
 
-                                    <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
+                                    <ScrollArea className='max-h-full h-full pr-3'>
+                                        <TabsContent value="preferences" className='sm:mt-6'>
+                                            <Preferences />
+                                        </TabsContent>
 
-                                    <TabsContent value="preferences" className='sm:mt-6'>
-                                        <Preferences />
-                                    </TabsContent>
+                                        <TabsContent value="risk-tolerance" className='sm:mt-6'>
+                                            <RiskTolerance />
+                                        </TabsContent>
 
-                                    <TabsContent value="risk-tolerance" className='sm:mt-6'>
-                                        <RiskTolerance />
-                                    </TabsContent>
+                                        <TabsContent value="finance" className='sm:mt-6'>
+                                            <Finance />
+                                        </TabsContent>
 
-                                    <TabsContent value="finance" className='sm:mt-6'>
-                                        <Finance />
-                                    </TabsContent>
-
-                                    <TabsContent value="milestones" className='sm:mt-6'>
-                                        <Milestones wealthData={wealthData} />
-                                    </TabsContent>
+                                        <TabsContent value="milestones" className='sm:mt-6'>
+                                            <Milestones wealthData={wealthData} />
+                                        </TabsContent>
+                                    </ScrollArea>
                                 </Tabs>
                             </div>
 

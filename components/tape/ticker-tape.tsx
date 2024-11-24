@@ -141,9 +141,9 @@ async function StockTapeBody() {
             <div className='flex flex-row items-center overflow-hidden'>
                 {/* Display 2x stock tape */}
                 {Array.from({ length: 2 }).map((_, index) => (
-                <AnimationWrapper key={`stock-tape-${index}`} className='flex flex-row items-center'>
+                <AnimationWrapper key={`tape-${index}`} className='flex flex-row items-center'>
                     {data.stocks.map((quote) => (
-                    <StockDialog name={quote.name} symbol={quote.symbol}>
+                    <StockDialog key={`tape-item-${quote.symbol}-${index}`} name={quote.name} symbol={quote.symbol}>
                         <button className='shrink-0 hover:scale-[1.05]'>
                             <TapeItem symbol={quote.symbol} change={quote.change} exchange={quote.exchange} />
                         </button>
