@@ -18,9 +18,9 @@ import SettingsMenu from "@/components/settings/settings-menu";
 import WelcomeDialog from "@/components/dialogs/welcome-dialog";
 
 export default async function Page({
-  searchParams
+    searchParams
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined }
+    searchParams?: { [key: string]: string | string[] | undefined }
 }) {
     // check if userId is in cookies
     const cookieStore = cookies();
@@ -36,14 +36,14 @@ export default async function Page({
 
     return (
       <GlobalProvider initialUserData={data.userData} initialStockData={data.stockData}>
-        <ChatProvider>
+        <ChatProvider initialQuery={typeof searchParams?.query === "string"? searchParams.query: undefined}>
           <SidebarProvider>
             <Sidebar />
             <main className='h-dvh flex flex-col overflow-hidden'>
               <div className='flex flex-row items-center overflow-hidden'>
                 <SidebarOuterTrigger />
                 <TickerTape />
-                <SettingsMenu />
+                <SettingsMenu userId={userId} accountType={data.userData.accountType} />
               </div>
 
               <NewsArea symbols={Object.values(data.stockData).map((stock) => stock.symbol)}/>

@@ -23,32 +23,6 @@ export async function updateConversationAction(conversationId: string, conversat
     return await updateConversation(conversationId, conversation);
 }
 
-// export async function appendMessagesAction(conversationId: string, messages: Message[]) {
-//     const res = await getConversationAction(conversationId);
-//     if (!res) {
-//         throw new Error("Conversation not found");
-//     }
-//     return await updateConversation(
-//         conversationId,
-//         {
-//             messages: [
-//                 ...res.messages,
-//                 // convert to JSON-compatible array
-//                 ...messages.map(
-//                     (message) => ({
-//                         id: message.id,
-//                         role: message.role,
-//                         content: message.content,
-//                         data: message.data,
-//                         createdAt: message.createdAt?.toISOString(),
-//                         toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
-//                     })
-//                 )
-//             ]
-//         }
-//     );
-// }
-
 export async function deleteConversationAction(conversationId: string) {
     return await deleteConversation(conversationId);
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 
-import { ArrowUpDown, BriefcaseBusiness, MessageCirclePlus, NotebookPen, SearchCheck, UserRound } from "lucide-react";
+import { ArrowUpDown, BriefcaseBusiness, GraduationCap, MessageCirclePlus, NotebookPen, SearchCheck, UserRound } from "lucide-react";
 
 import {
     Sidebar,
@@ -30,6 +30,7 @@ import GetAdviceDialog from "@/components/chat/get-advice-dialog";
 import PortfolioDialog from "@/components/portfolio/portfolio-dialog";
 import DisclaimerDialog from "@/components/dialogs/disclaimer-dialog";
 import ConversationSelector from "./conversation-selector";
+import Link from "next/link";
 
 const CONVERSATIONS_PER_PAGE = 16;
 

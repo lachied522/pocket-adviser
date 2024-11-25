@@ -67,7 +67,6 @@ interface StockModalProps {
 }
 
 export default function StockDialog({ children, symbol, name }: StockModalProps) {
-    const { onSubmit } = useChatContext() as ChatState;
     const [stockData, setStockData] = useState<CompanyOutlook | null>(null);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
@@ -205,7 +204,7 @@ export default function StockDialog({ children, symbol, name }: StockModalProps)
                                         key={`prompt-${stockData.profile.symbol}-${index}`}
                                         variant='outline'
                                         onClick={() => {
-                                            onSubmit(obj.input, obj.tool);
+                                            // onSubmit(obj.input, obj.tool);
                                             setIsOpen(false);
                                         }}
                                         className='hover:scale-[1.02] transition-transform duration-150'

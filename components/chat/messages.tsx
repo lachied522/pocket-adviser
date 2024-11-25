@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Markdown from 'react-markdown'
+import Markdown from "react-markdown";
 
 import { CheckCheck, OctagonAlert } from "lucide-react";
 

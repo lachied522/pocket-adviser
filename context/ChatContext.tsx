@@ -19,14 +19,16 @@ import type { Conversation } from "@prisma/client";
 
 function convertToSafeMessages(messages: Message[]) {
     // convert to JSON-compatible array
-    return [...messages.map((message) => ({
-        id: message.id,
-        role: message.role,
-        content: message.content,
-        data: message.data,
-        createdAt: message.createdAt instanceof Date? message.createdAt.toISOString(): message.createdAt,
-        toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
-    }))] satisfies Conversation["messages"]
+    return [
+        ...messages.map((message) => ({
+            id: message.id,
+            role: message.role,
+            content: message.content,
+            data: message.data,
+            createdAt: message.createdAt instanceof Date? message.createdAt.toISOString(): message.createdAt,
+            toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
+        })
+    )] satisfies Conversation["messages"]
 }
 
 export type ChatState = {
@@ -52,18 +54,22 @@ export const useChatContext = () => {
 
 interface ChatProviderProps {
     children: React.ReactNode
+    initialQuery?: string
 }
 
 export function ChatProvider({
-  children,
+    children,
+    initialQuery
 }: ChatProviderProps) {
     const { state, insertConversationAndUpdateState } = useGlobalContext() as GlobalState;
     const [conversationId, setConversationId] = useState<string|null>(null); // id of conversation in db
     const [chatId, setChatId] = useState<number>(0); // id of conversation in chat state, used for getting resetting chat
-    const [initialMessages, setInitialMessages] = useState<Message[]>([]);
-    const [isLoadingInitialMessages, setIsLoadingInitialMessages] = useState<boolean>(true);
+    const [initialMessages, setInitialMessages] = useState<Message[]>(
+        initialQuery? [{ id: generateId(), role: "user", content: initialQuery }]: []
+    );
+    const [isLoadingInitialMessages, setIsLoadingInitialMessages] = useState<boolean>(false);
     const [article, setArticle] = useState<StockNews|null>(null);
-    const { messages, input, isLoading, error, setInput, append } = useChat({
+    const { messages, input, isLoading, error, setInput, append, reload } = useChat({
         id: chatId.toString(),
         initialMessages,
         maxSteps: 3,
@@ -75,24 +81,33 @@ export function ChatProvider({
         },
         async onFinish(message: Message) {
             try {
-                // sometimes message.content is undefined ???
                 if (message.role === "assistant" && message.content.length > 0) {
-                    await syncConversation(conversationId, messages);
+                    await syncConversation(conversationId, [...messages, message]);
                 }
             } catch (e) {
-                // pass
+                console.error(e);
             }
         }
     });
 
     useEffect(() => {
-        (async function fetchGreeting() {
-            // get initial message
-            const { message } = await fetch('/api/chat/greet').then((res) => res.json());
-            setInitialMessages([{ id: generateId(), role: "assistant", content: message }]);
-            setIsLoadingInitialMessages(false);
-        })();
-    }, []);
+        if (initialQuery) {
+            reload();
+        } else {
+            setIsLoadingInitialMessages(true);
+            fetchGreeting()
+            .then(() => setIsLoadingInitialMessages(false));
+        }
+
+        async function fetchGreeting() {
+            try {
+                const { message } = await fetch('/api/chat/greet').then((res) => res.json());
+                setInitialMessages([{ id: generateId(), role: "assistant", content: message }]);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+    }, [initialQuery]);
 
     const syncConversation = useCallback(
         async (id: string|null, _messages: Message[]) => {
