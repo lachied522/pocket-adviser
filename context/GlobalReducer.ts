@@ -19,14 +19,14 @@ export type Action = {
     type: 'UPDATE_PROFILE'
     payload: UserData['profile']
 } | {
-    type: 'INSERT_CONVERSATION_START'
+    type: 'INSERT_CONVERSATION'
     payload: UserData['conversations'][number]
 } | {
-    type: 'INSERT_CONVERSATION_END'
-    payload: UserData['conversations'][number]
-} | {
-    type: 'UPDATE_CONVERSATION'
-    payload: UserData['conversations'][number]
+    type: 'UPDATE_CONVERSATION_NAME'
+    payload: {
+        id: string,
+        name: string,
+    }
 } | {
     type: 'DELETE_CONVERSATION'
     payload: UserData['conversations'][number]['id']
@@ -85,28 +85,25 @@ export function GlobalReducer(state: UserData, action: Action) {
             }
         }
 
-        case 'INSERT_CONVERSATION_START': {
+        case 'INSERT_CONVERSATION': {
             return {
                 ...state,
-                conversations: [action.payload, ...state.conversations]
+                conversations: [
+                    action.payload,
+                    // eliminate duplicate ids
+                    ...state.conversations.filter((conversation) => conversation.id !== action.payload.id)
+                ]
             }
         }
 
-        case 'INSERT_CONVERSATION_END': {
-            return {
-                ...state,
-                conversations: [...state.conversations, action.payload]
-            }
-        }
-
-        case 'UPDATE_CONVERSATION': {
+        case 'UPDATE_CONVERSATION_NAME': {
             return {
                 ...state,
                 conversations: state.conversations.map((conversation) => {
                     if (conversation.id === action.payload.id) {
                         return {
                             ...conversation,
-                            ...action.payload,
+                            name: action.payload.name,
                         }
                     }
                     return conversation;

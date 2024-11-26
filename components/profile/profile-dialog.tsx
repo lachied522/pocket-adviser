@@ -182,7 +182,7 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                 {children}
             </DialogTrigger>
             <DialogContent className='h-dvh w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none overflow-hidden'>
-                <div className='h-full w-full max-w-6xl mx-auto overflow-hidden'>
+                <div className='w-full max-w-6xl mx-auto'>
                     <DialogHeader>
                         <DialogTitle>
                             Profile
@@ -191,20 +191,22 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                             Tell Pocket Adviser about yourself.
                         </DialogDescription>
                     </DialogHeader>
+                </div>
 
-                    <FormProvider {...form}>
-                        <form
-                            onSubmit={form.handleSubmit(onSave)}
-                            className='h-[calc(100%-30px)] flex flex-col'
-                        >
-                            <div className='flex-1 overflow-y-scroll'>
+                <FormProvider {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(onSave)}
+                        className='flex-1 flex flex-col overflow-hidden'
+                    >
+                        <div className='flex-1 overflow-y-auto'>
+                            <div className='max-w-6xl mx-auto'>
                                 <WealthChart data={wealthData} milestones={milestones} expectedReturn={expectedReturn} />
 
                                 <Tabs
                                     defaultValue="preferences"
                                     className="flex-1"
                                 >
-                                    <TabsList className='w-full justify-start gap-3 bg-transparent border-b border-zinc-200'>
+                                    <TabsList className='w-full justify-between gap-3 bg-transparent border-b border-zinc-200'>
                                         <TabsTrigger value="preferences" className=''>Preferences</TabsTrigger>
                                         <TabsTrigger value="risk-tolerance" className=''>Risk Tolerance</TabsTrigger>
                                         <TabsTrigger value="finance" className=''>Finance</TabsTrigger>
@@ -230,30 +232,30 @@ export default function ProfileDialog({ children }: ProfileDialogProps) {
                                     </ScrollArea>
                                 </Tabs>
                             </div>
+                        </div>
 
-                            <div className='w-full flex flex-row justify-between py-3'>
-                                <DialogClose asChild>
-                                    <Button
-                                        ref={closeRef}
-                                        onClick={onCancel}
-                                        type='button'
-                                        variant='secondary'
-                                    >
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
+                        <div className='w-full max-w-6xl flex flex-row justify-between mx-auto'>
+                            <DialogClose asChild>
                                 <Button
+                                    ref={closeRef}
+                                    onClick={onCancel}
                                     type='button'
-                                    disabled={isSubmitLoading}
-                                    onClick={form.handleSubmit(onSave)}
-                                    className='h-10 flex flex-row items-center gap-2'
+                                    variant='secondary'
                                 >
-                                    Save
+                                    Cancel
                                 </Button>
-                            </div>
-                        </form>
-                    </FormProvider>
-                </div>
+                            </DialogClose>
+                            <Button
+                                type='button'
+                                disabled={isSubmitLoading}
+                                onClick={form.handleSubmit(onSave)}
+                                className='h-10 flex flex-row items-center gap-2'
+                            >
+                                Save
+                            </Button>
+                        </div>
+                    </form>
+                </FormProvider>
             </DialogContent>
         </Dialog>
     )

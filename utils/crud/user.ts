@@ -52,6 +52,7 @@ export async function getDataByUserId(id: string) {
                 select: {
                     id: true,
                     name: true,
+                    updatedAt: true,
                 },
                 take: 10,
                 orderBy: {

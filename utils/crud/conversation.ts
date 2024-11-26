@@ -24,7 +24,8 @@ export async function getConversationsByUserId(userId: string, page: number = 0,
         where: { userId },
         select: {
             id: true,
-            name: true
+            name: true,
+            updatedAt: true,
         },
         orderBy: {
             updatedAt: 'desc',

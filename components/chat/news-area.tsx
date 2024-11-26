@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import { Newspaper } from "lucide-react";
 
@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/components/utils";
 
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import NewsArticle from "./news-article";
 
 import type { StockNews } from "@/types/data";
@@ -19,14 +20,11 @@ import type { StockNews } from "@/types/data";
 const MAX_PAGES = 3;
 const COOKIE_NAME = "news:state";
 
-interface NewsAreaProps {
-    symbols: string[]
-}
-
-export default function NewsArea( { symbols }: NewsAreaProps) {
+export default function NewsArea() {
+    const { state, getStockData } = useGlobalContext() as GlobalState;
     const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [isVisible, setIsVisible] = useState<boolean>(Boolean(getCookie(COOKIE_NAME)) ?? true);
+    const [isVisible, setIsVisible] = useState<boolean>(getCookie(COOKIE_NAME) === "true");
     const [page, setPage] = useState<number>(0);
 
     const toggleVisible = useCallback(() => {
@@ -37,8 +35,16 @@ export default function NewsArea( { symbols }: NewsAreaProps) {
     }, [setIsVisible]);
 
     useEffect(() => {
-        (async function populatePage() {
+        if (isVisible) populatePage();
+
+        async function populatePage() {
             setIsLoading(true);
+            const symbols = await Promise.all(
+                state.holdings.map(
+                    (holding) => getStockData(holding.stockId)
+                    .then((stockData) => stockData.symbol)
+                )
+            );
             const _data = await getNewsAction(symbols, page, 20);
             // update state, ensuring only unique articles are returned
             setData((curr) => {
@@ -54,8 +60,8 @@ export default function NewsArea( { symbols }: NewsAreaProps) {
                 return _data;
             });
             setIsLoading(false);
-        })();
-    }, [page]);
+        }
+    }, [state.holdings, isVisible, page, getStockData]);
 
     return (
         <div className='flex flex-col items-start gap-1 px-3 pb-1'>
@@ -87,10 +93,9 @@ export default function NewsArea( { symbols }: NewsAreaProps) {
                     {isLoading && (
                     <>
                         {Array.from({length: 12}).map((_, index) => (
-                        <Skeleton
-                            key={`news-skelton-${index}`}
-                            className='h-24 xl:h-32 w-36 xl:w-44 shrink-0 grow-0'
-                        />
+                        <div key={`news-skelton-${index}`} className='h-24 xl:h-32 w-36 xl:w-44 flex shrink-0 grow-0 p-1'>
+                            <Skeleton className='flex-1 rounded-md' />
+                        </div>
                         ))}
                     </>
                     )}

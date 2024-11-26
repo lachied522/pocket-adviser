@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -29,8 +29,9 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 import { formatDollar } from "@/utils/formatting";
 
+import { useChatNavigation } from "@/hooks/useChatNavigation";
+
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 const formSchema = z.object({
     action: z.enum(["deposit", "withdraw"]),
@@ -45,11 +46,10 @@ interface GetAdviceDialogProps {
 
 export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const { calcPortfolioValue } = useGlobalContext() as GlobalState;
-    const { onSubmit } = useChatContext() as ChatState;
+    const { onSubmit } = useChatNavigation();
     const { setOpenMobile: setSidebarOpen } = useSidebar();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [currentValue, setCurrentValue] = useState<number>(0);
-    const closeRef = useRef<HTMLButtonElement>(null);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -76,12 +76,12 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const handleSubmit = useCallback(
         (values: z.infer<typeof formSchema>) => {
             const content = values.action === "deposit"? `What can I buy with ${formatDollar(values.amount)}?`: `I need to raise ${formatDollar(values.amount)}. What should I sell?`;
-            onSubmit(content, 'getRecommendations');
-            if (closeRef.current) closeRef.current.click();
+            onSubmit(content, { toolName: "getRecommendations" });
+            setIsOpen(false);
             // close sidebar on mobile
             setSidebarOpen(false);
         },
-        [onSubmit, setSidebarOpen]
+        [onSubmit, setIsOpen, setSidebarOpen]
     );
 
     const onClose = () => {
@@ -158,7 +158,6 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                         <div className='h-full flex flex-row items-end justify-between mt-3'>
                             <DialogClose asChild>
                                 <Button
-                                    ref={closeRef}
                                     type='button'
                                     variant='secondary'
                                     onClick={onClose}

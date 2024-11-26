@@ -13,7 +13,7 @@ export type UserData = (
     {
         profile: Profile | null
         holdings: Holding[]
-        conversations: Pick<Conversation, 'id'|'name'>[]
+        conversations: Pick<Conversation, 'id'|'name'|'updatedAt'>[]
     }
 )
 

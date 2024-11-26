@@ -3,6 +3,11 @@ import { useState, useCallback, useRef, useEffect } from "react";
 
 import { PencilLine, Trash2 } from "lucide-react";
 
+import { updateConversationAction, deleteConversationAction } from "@/actions/crud/conversation";
+
+import { useChatNavigation } from "@/hooks/useChatNavigation";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
 import {
     Dialog,
     DialogClose,
@@ -12,23 +17,24 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
+
 import { cn } from "@/components/utils";
 
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 interface ConversationSelectorProps {
     id: string
     name: string
+    isActive: boolean
 }
 
-export default function ConversationSelector({ id, name }: ConversationSelectorProps) {
-    const { updateConversationAndUpdateState, deleteConversationAndUpdateState } = useGlobalContext() as GlobalState;
-    const { isLoading, conversationId, onSelectConversation, onNewChat } = useChatContext() as ChatState;
+export default function ConversationSelector({ id, name, isActive }: ConversationSelectorProps) {
+    const { updateConversationName, deleteConversation } = useGlobalContext() as GlobalState;
+    const { onNavigateConversation } = useChatNavigation();
     const [isEditting, setIsEditting] = useState<boolean>(false);
     const [input, setInput] = useState<string>(name);
+    const { setOpenMobile } = useSidebar();
     const isMobile = useMediaQuery();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,16 +42,18 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
         async (value: string) => {
             setIsEditting(false);
             if (value !== name && value.length > 0) {
-                await updateConversationAndUpdateState({
-                    id,
-                    name: value.slice(0, 100),
-                });
+                try {
+                    const res = await updateConversationAction(id, { name: value.slice(0, 100) });
+                    updateConversationName(res);
+                } catch (e) {
+                    console.error(e);
+                }
             } else {
                 // cannot have empty name
                 setInput(name);
             }
         },
-        [id, name, updateConversationAndUpdateState, setIsEditting, setInput]
+        [id, name, updateConversationName, setIsEditting, setInput]
     );
 
     useEffect(() => {
@@ -59,11 +67,12 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
     return (
         <div
             onClick={() => {
-                if (!isLoading) onSelectConversation(id);
+                onNavigateConversation(id);
+                setOpenMobile(false);
             }}
             className={cn(
-                'sm:h-10 max-w-[200px] w-full flex flex-row items-center justify-start text-sm font-medium p-2 rounded-md cursor-pointer select-none group/selector relative hover:bg-zinc-100',
-                conversationId === id && 'bg-zinc-100'
+                'sm:h-10 max-w-[200px] w-full flex flex-row items-center justify-start text-xs p-2 rounded-md cursor-pointer select-none group/selector relative hover:bg-zinc-100',
+                isActive && 'bg-zinc-100'
             )}
         >
             {isEditting? (
@@ -76,7 +85,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                     if (e.key === 'Enter') onSubmit(input);
                 }}
                 onBlur={() => onSubmit(input)}
-                className='w-[calc(100%-10px)] max-w-full bg-zinc-50 border'
+                className='w-[calc(100%-10px)] max-w-full bg-zinc-50 border text-xs'
             />
             ) : (
             <>
@@ -84,7 +93,7 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
 
                 <div className={cn(
                     'hidden flex-row items-center gap-2 pl-4 pr-2 bg-gradient-to-r from-transparent to-10% to-zinc-100 absolute right-0 group-hover/selector:flex',
-                    conversationId === id && 'flex'
+                    isActive && 'flex'
                 )}>
                     <button
                         onClick={(e) => {
@@ -128,9 +137,15 @@ export default function ConversationSelector({ id, name }: ConversationSelectorP
                                     <Button
                                         type='button'
                                         variant='destructive'
-                                        onClick={() => {
-                                            deleteConversationAndUpdateState(id);
-                                            if (conversationId === id) onNewChat(); // switch to new chat
+                                        onClick={async (e) => {
+                                            e.stopPropagation();
+                                            try {
+                                                await deleteConversationAction(id)
+                                                deleteConversation(id);
+                                                onNavigateConversation(); // navigate to new chat
+                                            } catch (e) {
+                                                console.error(e);
+                                            }
                                         }}
                                     >
                                         Delete

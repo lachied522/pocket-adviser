@@ -120,7 +120,7 @@ export async function* streamAIResponse({
                 },
             },
         },
-        onFinish({ text }) {
+        onFinish({ text, responseMessages }) {
             onFinish(text);
         },
     });

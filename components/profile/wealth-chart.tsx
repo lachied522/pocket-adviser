@@ -72,7 +72,7 @@ export default function WealthChart({ data, milestones, expectedReturn }: Wealth
 
     return (
         <div className='hidden sm:flex flex-col gap-3 mb-6'>
-            <div className='w-full flex flex-col sm:flex-row items-start sm:items-center justify-between mt-6'>
+            <div className='w-full flex flex-col sm:flex-row items-start sm:items-center justify-between'>
                 <h3 className='font-medium'>
                     Projected Wealth
                 </h3>

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { type ChatState, useChatContext } from "@/context/ChatContext";
+import { type ChatState, useChatContext } from "@/components/chat/context";
 
 const SAMPLE_PROMPTS = [
     {

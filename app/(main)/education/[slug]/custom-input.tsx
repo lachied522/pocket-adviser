@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { ArrowBigUp } from "lucide-react";
 
-import { useAskAI } from "@/hooks/useAskAI";
+import { useChatNavigation } from "@/hooks/useChatNavigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ export default function CustomInput(props: JSX.IntrinsicElements["input"] & Extr
     // @ts-ignore
     const [value, setValue] = useState<string>(props.defaultvalue);
     const [isLoadingRedirect, setIsLoadingRedirect] = useState<boolean>(false);
-    const { onSubmit } = useAskAI();
+    const { onSubmit } = useChatNavigation();
     return (
         <div className='flex flex-row items-center gap-1'>
             <Input

@@ -118,8 +118,25 @@ export default function Income({ stockData }: { stockData: CompanyOutlook }) {
     );
 
     return (
-        <div className='flex flex-col gap-6'>
-            <div className='w-full flex flex-row justify-end gap-2 py-3'>
+        <div className='flex flex-col gap-3'>
+            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                <BarChart accessibilityLayer data={formattedData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                        dataKey="formattedDate"
+                        tickLine={false}
+                        tickMargin={10}
+                        axisLine={false}
+                    />
+                    <YAxis tickFormatter={formatValue} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
+                    <Bar dataKey="netIncome" fill="var(--color-netIncome)" radius={4} />
+                    <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
+                </BarChart>
+            </ChartContainer>
+
+            <div className='w-full flex flex-row justify-end gap-2'>
                 <Button
                     variant='outline'
                     size='sm'
@@ -138,23 +155,6 @@ export default function Income({ stockData }: { stockData: CompanyOutlook }) {
                     Quarterly
                 </Button>
             </div>
-
-            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                <BarChart accessibilityLayer data={formattedData}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                        dataKey="formattedDate"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                    />
-                    <YAxis tickFormatter={formatValue} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <ChartLegend content={<ChartLegendContent />} />
-                    <Bar dataKey="netIncome" fill="var(--color-netIncome)" radius={4} />
-                    <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
-                </BarChart>
-            </ChartContainer>
 
             <div className='flex-1 rounded-md border mb-12'>
                 <Table>

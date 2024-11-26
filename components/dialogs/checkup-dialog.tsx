@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useState, useCallback } from "react";
 
 import {
     Dialog,
@@ -13,25 +13,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 
-import { type ChatState, useChatContext } from "@/context/ChatContext";
+import { useChatNavigation } from "@/hooks/useChatNavigation";
 
 interface CheckupDialogProps {
     children: React.ReactNode
 }
 
 export default function CheckupDialog({ children }: CheckupDialogProps) {
-    const { onSubmit } = useChatContext() as ChatState;
+    const { onSubmit } = useChatNavigation();
     const { setOpenMobile: setSidebarOpen } = useSidebar();
-    const closeRef = useRef<HTMLButtonElement>(null);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    const handleSubmit = () => {
-        onSubmit("Can you give me some trade ideas for my portfolio?", "getRecommendations");
-        if (closeRef.current) closeRef.current.click();
-        setSidebarOpen(false);
-    }
+    const handleSubmit = useCallback(
+        () => {
+            onSubmit("Can you give me some trade ideas for my portfolio?", { toolName: "getRecommendations" });
+            setIsOpen(false);
+            setSidebarOpen(false);
+        },
+        [onSubmit, setIsOpen, setSidebarOpen]
+    );
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={(value: boolean) => setIsOpen(value)}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
@@ -47,7 +50,6 @@ export default function CheckupDialog({ children }: CheckupDialogProps) {
                 <div className='h-full flex flex-row items-end justify-between'>
                     <DialogClose asChild>
                         <Button
-                            ref={closeRef}
                             type='button'
                             variant='secondary'
                         >

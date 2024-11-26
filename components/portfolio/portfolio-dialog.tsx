@@ -23,10 +23,10 @@ import { cn } from "@/components/utils";
 
 import { formatDollar } from "@/utils/formatting";
 
+import { useChatNavigation } from "@/hooks/useChatNavigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type ChatState, useChatContext } from "@/context/ChatContext";
 
 import { columns } from "./columns";
 import PortfolioTable from "./table";
@@ -73,12 +73,13 @@ interface PortfolioDialogProps {
 
 export default function PortfolioDialog({ children }: PortfolioDialogProps) {
     const { state, calcPortfolioValue, getStockData } = useGlobalContext() as GlobalState;
-    const { onSubmit } = useChatContext() as ChatState;
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [populatedHoldings, setPopulatedHoldings] = useState<PopulatedHolding[]>([]);
     const [portfolioValue, setPortfolioValue] = useState<number>(0);
     const [tab, setTab] = useState<keyof typeof TABS>("overview");
     const [currency, setCurrency] = useState<"AUD"|"USD">("AUD");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { onSubmit } = useChatNavigation();
     const isMobile = useMediaQuery();
 
     // useEffect(() => {
@@ -118,7 +119,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
     }, [state.holdings, getStockData]);
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={(value: boolean) => setIsOpen(value)}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
@@ -198,8 +199,8 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                                 <span className='font-medium text-lg'>Portfolio empty. Need ideas?</span>
                                 <Button
                                     onClick={() => {
-                                        onSubmit("What can I buy with $1000?", "getRecommendations");
-                                        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                                        onSubmit("What can I buy with $1000?", { toolName: "getRecommendations" });
+                                        setIsOpen(false);
                                     }}
                                 >
                                     Get started

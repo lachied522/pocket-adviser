@@ -1,3 +1,4 @@
+"use client";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
@@ -19,15 +20,10 @@ import BillingButton from "./billing-button";
 
 import { removeCookies } from "@/utils/cookies";
 
-import type { AccountType } from "@prisma/client";
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
-interface SettingsMenuProps {
-    userId: string
-    accountType: AccountType
-}
-
-export default function SettingsMenu({ userId, accountType }: SettingsMenuProps) {
-
+export default function SettingsMenu() {
+    const { state } = useGlobalContext() as GlobalState;
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
@@ -48,7 +44,7 @@ export default function SettingsMenu({ userId, accountType }: SettingsMenuProps)
                 </AboutDialog> */}
 
                 {/* <DropdownMenuSeparator className='my-1' /> */}
-                {accountType === "GUEST" ? (
+                {state.accountType === "GUEST" ? (
                 <>
                     <div className='text-sm p-2'>
                         Logged in as: Guest
@@ -79,7 +75,7 @@ export default function SettingsMenu({ userId, accountType }: SettingsMenuProps)
                         </Button>
                     </PremiumDialog>
 
-                    <BillingButton userId={userId} />
+                    <BillingButton />
 
                     <DropdownMenuSeparator className='' />
 

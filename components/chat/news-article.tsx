@@ -39,7 +39,7 @@ export default function NewsArticle({
                 onDragStart={onDragStart}
                 className={cn("flex flex-col items-center justify-start", animateOnHover && "p-1")}
             >
-                <div className={cn("h-24 xl:h-28 w-36 xl:w-44 rounded-xl relative overflow-hidden cursor-pointer", animateOnHover && "hover:scale-[1.05]")}>
+                <div className={cn("h-24 xl:h-28 w-36 xl:w-44 rounded-lg relative overflow-hidden cursor-pointer", animateOnHover && "hover:scale-[1.05]")}>
                     {/** 
                      * Use regular img tag here.
                      * Next JS Image results in error for source not being configured even though it is??

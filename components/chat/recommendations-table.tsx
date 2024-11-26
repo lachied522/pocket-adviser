@@ -19,7 +19,7 @@ import UtilityDialog from "@/components/dialogs/utility-dialog";
 import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type ChatState, useChatContext } from "@/context/ChatContext";
+import { type ChatState, useChatContext } from "@/components/chat/context";
 
 interface RecommendationsTableProps {
     transactions: {

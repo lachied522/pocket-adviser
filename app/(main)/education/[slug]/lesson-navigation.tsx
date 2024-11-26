@@ -3,12 +3,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import { getAllLessons, type Lesson } from "./helpers";
+import { getAllLessons } from "./helpers";
 
 interface LessonNavigationProps {
     slug: string
 }
-
 
 export default function LessonNavigation({ slug }: LessonNavigationProps) {
     const lessons = getAllLessons();

@@ -84,19 +84,19 @@ export default function StockTable<TData, TValue>({
                     <TableBody>
                     {table.getRowModel().rows.length ? (
                         table.getRowModel().rows.map((row) => (
-                        <StockDialog
-                            key={row.id}
-                            symbol={row.original.symbol}
-                            name={row.original.name}
-                        >
-                            <TableRow data-state={row.getIsSelected() && "selected"} className='cursor-pointer'>
+                        // <StockDialog
+                        //     key={row.id}
+                        //     symbol={row.original.symbol}
+                        //     name={row.original.name}
+                        // >
+                            <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                                 {row.getVisibleCells().map((cell) => (
                                 <TableCell key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                                 ))}
                             </TableRow>
-                        </StockDialog>
+                        // </StockDialog>
                         ))
                     ) : (
                         <TableRow className="">
