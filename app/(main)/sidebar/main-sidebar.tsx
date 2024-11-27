@@ -138,8 +138,8 @@ export default function AppSidebar({ lessons }: AppSidebarProps) {
                     ))}
                 </SidebarContent>
                 ) : (
-                <SidebarContent>
-                                        <SidebarGroup>
+                <SidebarContent className='overflow-hidden'>
+                    <SidebarGroup>
                         <SidebarGroupContent>
                             <SidebarMenu>
                                 <SidebarMenuItem>

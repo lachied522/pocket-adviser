@@ -186,7 +186,7 @@ export default function StockDialog({ children, symbol, name }: StockModalProps)
                             )}
                         </div>
 
-                        <div className='col-span-2 md:col-auto flex flex-row items-center justify-between gap-1 md:gap-2 md:px-2 overflow-x-auto'>
+                        <div className='col-span-2 md:col-auto flex flex-row items-center justify-between gap-1 md:gap-2 pb-1 md:px-2 overflow-x-auto'>
                             {!stockData || isLoading ? (
                             <>
                             {Array.from({ length: 4 }).map((_, index) => (
@@ -206,7 +206,6 @@ export default function StockDialog({ children, symbol, name }: StockModalProps)
                                         onSubmit(obj.input, { toolName: obj.tool });
                                         setIsOpen(false);
                                     }}
-                                    className='hover:scale-[1.02] transition-transform duration-150'
                                 >
                                     <span className='text-xs md:text-sm'>{obj.display}</span>
                                 </Button>

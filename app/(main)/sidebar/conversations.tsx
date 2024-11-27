@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
+import { getMoreConversationsAction } from "@/actions/crud/conversation";
+
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -10,65 +12,63 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { getMoreConversationsAction } from "@/actions/crud/conversation";
-
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import ConversationSelector from "./conversation-selector";
 
-const CONVERSATIONS_PER_PAGE = 25;
+const CONVERSATIONS_PER_PAGE = 20;
 
 export default function Conversations() {
     const { state, dispatch } = useGlobalContext() as GlobalState;
-    const [shouldFetchMore, setShouldFetchMore] = useState<boolean>((state.conversations).length >= CONVERSATIONS_PER_PAGE);
+    const [shouldFetchMore, setShouldFetchMore] = useState<boolean>(state.conversations.length <= CONVERSATIONS_PER_PAGE);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(false);
     const pathname = usePathname();
-    const bottomRef = useRef<HTMLDivElement>(null);
+    const scrollAreaRef = useRef<HTMLUListElement>(null);
 
     useEffect(() => {
         if (state.conversations && isAtBottom && shouldFetchMore) {
-            fetchConversations(state.id, Math.floor(state.conversations.length / CONVERSATIONS_PER_PAGE));
+            fetchConversations();
         }
 
-        async function fetchConversations(userId: string, nextPage: number) {
-            const _conversations = await getMoreConversationsAction(userId, nextPage, CONVERSATIONS_PER_PAGE);
+        async function fetchConversations() {
+            const _conversations = await getMoreConversationsAction(
+                state.id,
+                Math.floor(state.conversations.length / CONVERSATIONS_PER_PAGE),
+                CONVERSATIONS_PER_PAGE
+            );
+
+            setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
+
             for (const _conversation of _conversations) {
                 dispatch({
-                    type: 'INSERT_CONVERSATION_END',
+                    type: 'INSERT_CONVERSATION',
                     payload: _conversation,
                 });
             }
-            setShouldFetchMore(_conversations.length >= CONVERSATIONS_PER_PAGE);
         }
     }, [state.id, state.conversations, isAtBottom, shouldFetchMore, dispatch, setShouldFetchMore]);
 
     useEffect(() => {
-        // trigger fetch for when bottomRef is in view
-        let observer = new IntersectionObserver(
-            entries => {
-                entries.forEach(entry => {
-                    setIsAtBottom(entry.isIntersecting);
-                })
-            },
-            {
-                rootMargin: '0px 0px -100px 0px'
+        if (scrollAreaRef.current) {
+            const handleScroll = (event: Event) => {
+                const target = event.target as HTMLDivElement;
+                const offset = 50;
+                setIsAtBottom(target.scrollTop + target.clientHeight >= target.scrollHeight - offset);
             }
-        );
+            
+            scrollAreaRef.current.addEventListener('scroll', handleScroll);
 
-        if (bottomRef.current) {
-            observer.observe(bottomRef.current);
-        }
-
-        return () => {
-            observer.disconnect();
+            return () => {
+                scrollAreaRef.current?.removeEventListener('scroll', handleScroll);
+            }
         }
     }, []);
 
     return (
-        <SidebarGroup>
+        <SidebarGroup className='overflow-hidden'>
             <SidebarGroupLabel>Conversations</SidebarGroupLabel>
-            <SidebarGroupContent>
-                <SidebarMenu className='flex flex-col gap-3'>
+            <SidebarGroupContent className='flex overflow-hidden'>
+                <SidebarMenu ref={scrollAreaRef} className='overflow-y-auto'>
                     {state.conversations.length > 1 ? (
                     <>
                         {state.conversations
@@ -78,8 +78,6 @@ export default function Conversations() {
                             <ConversationSelector isActive={pathname.includes(conversation.id)} {...conversation} />
                         </SidebarMenuItem>
                         ))}
-
-                        <div className='w-full h-px' ref={bottomRef} />
                     </>
                     ) : (
                     <SidebarMenuItem className='text-center p-2'>
