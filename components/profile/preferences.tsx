@@ -64,7 +64,7 @@ export default function Preferences() {
                             <div className='flex flex-row items-center sm:justify-end justify-self-end gap-2 sm:px-3'>
                                 <FormControl>
                                     <Checkbox
-                                        checked={!field.value}
+                                        checked={field.value === null}
                                         onCheckedChange={(checked: boolean) => field.onChange(checked? null: 0.01)}
                                     />
                                 </FormControl>
@@ -113,7 +113,7 @@ export default function Preferences() {
                             <div className='flex flex-row items-center sm:justify-end justify-self-end gap-2 sm:px-3'>
                                 <FormControl>
                                     <Checkbox
-                                        checked={!field.value}
+                                        checked={field.value === null}
                                         onCheckedChange={(checked: boolean) => field.onChange(checked? null: 0.50)}
                                     />
                                 </FormControl>
@@ -137,10 +137,10 @@ export default function Preferences() {
                                         step={0.01}
                                         value={[field.value ?? 0]}
                                         onValueChange={(value: number[]) => field.onChange(value[0])}
-                                        disabled={!field.value}
+                                        disabled={field.value === null}
                                         className="w-[160px] sm:w-[240px] cursor-pointer"
                                     />
-                                    <div className="w-4 sm:w-6 text-sm font-semibold">{field.value? (100 * field.value).toFixed(0): "N/A"}%</div>
+                                    <div className="w-4 sm:w-6 text-sm font-semibold">{field.value !== null? (100 * field.value).toFixed(0): "N/A"}%</div>
                                 </div>
                             </FormControl>
 
@@ -159,17 +159,17 @@ export default function Preferences() {
                                         step={0.01}
                                         value={[1 - (field.value ?? 1)]}
                                         onValueChange={(value: number[]) => field.onChange(1 - value[0])}
-                                        disabled={!field.value}
+                                        disabled={field.value === null}
                                         className="w-[160px] sm:w-[240px] cursor-pointer"
                                     />
-                                    <div className="w-4 sm:w-6 text-sm font-semibold">{field.value? (100 * (1 - field.value)).toFixed(0): "N/A"}%</div>
+                                    <div className="w-4 sm:w-6 text-sm font-semibold">{field.value !== null? (100 * (1 - field.value)).toFixed(0): "N/A"}%</div>
                                 </div>
                             </FormControl>
                             <FormMessage />
                             <div className={
                                 cn(
                                     'hidden bg-white opacity-50 absolute inset-0',
-                                    !field.value && 'block'
+                                    field.value === null && 'block'
                                 )
                             } />
                         </div>
