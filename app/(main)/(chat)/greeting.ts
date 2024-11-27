@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
@@ -7,7 +5,7 @@ import { kv } from '@vercel/kv';
 
 import { format } from 'date-fns';
 
-import { getSystemMessage } from '../system';
+import { getSystemMessage } from '../../api/chat/system';
 
 const BASE_GREETING = `
 Hello! I'm here to help you navigate the stock market and make informed investment decisions. I can provide insights into market events, assist with portfolio management, and offer guidance on potential investment opportunities.
@@ -36,11 +34,5 @@ export async function getGreeting(): Promise<string> {
         // update kv
         kv.set(key, marketUpdate, { ex: 24 * 60 * 60 });
     }
-
     return `${BASE_GREETING}\n\n${marketUpdate}`;
-}
-
-export async function GET() {
-    const message = await getGreeting();
-    return NextResponse.json({ message });
 }

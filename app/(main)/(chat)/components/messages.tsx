@@ -10,7 +10,7 @@ import { cn } from "@/components/utils";
 import RecommendationsTable from "./recommendations-table";
 import SearchResults from "./search-results";
 import NewsArticle from "./news-article";
-import StockCard from "../stocks/stock-card";
+import StockCard from "./stock-card";
 
 import type { Message, ToolInvocation } from "ai";
 import type { StockNews } from "@/types/data";
@@ -131,16 +131,6 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
                 return <RecommendationsTable transactions={toolInvocation.result.transactions} />;
             } else {
                 return <LoadingMessage msg="Getting trade ideas" />;
-            }
-        }
-        case "getStockAdvice": {
-            if (state === 'result') {
-                if (!toolInvocation.result) {
-                    return <ToolStatusMessage msg="Something went wrong" isError={true} />;
-                }
-                return <StockCard stockData={toolInvocation.result.stockData} />;
-            } else {
-                return <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`}/>;
             }
         }
         case "getStockInfo": {

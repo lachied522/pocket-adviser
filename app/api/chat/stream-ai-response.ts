@@ -1,4 +1,11 @@
-import { streamText, type CoreMessage } from 'ai';
+import { 
+    type ToolCallPart,
+    type ToolResultPart,
+    type CoreMessage,
+    type FinishReason,
+    type LanguageModelUsage,
+    streamText,
+} from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 import { description as getRecommendationsDescription, parameters as getRecommendationsParams, getRecommendations, handleRecommendations } from './tools/get-recommendations';
@@ -47,7 +54,21 @@ export async function* streamAIResponse({
     toolName?: ToolName
     userId: string
     accountType: "GUEST"|"FREE"|"PAID"|"ADMIN"
-    onFinish: (text: string) => void
+    onFinish: ({
+        text,
+        finishReason,
+        // usage,
+        // responseMessages,
+        toolCalls,
+        toolResults,
+    } : {
+        text: string
+        // usage: LanguageModelUsage
+        finishReason: FinishReason
+        // responseMessages: CoreMessage[]
+        toolCalls: ToolCallPart[]
+        toolResults: ToolResultPart[]
+    }) => void
 }) {
     const systemMessage = await getSystemMessage(userId, accountType);
     const response = await streamText({
@@ -120,16 +141,18 @@ export async function* streamAIResponse({
                 },
             },
         },
-        onFinish({ text, responseMessages }) {
-            onFinish(text);
-        },
     });
 
+    let finishedText = '';
+    let finishReason: FinishReason = "stop";
+    let toolCalls: ToolCallPart[] = [];
+    let toolResults: ToolResultPart[] = [];
     // see https://sdk.vercel.ai/docs/ai-sdk-ui/stream-protocol
     for await (const part of response.fullStream) {
         switch (part.type) {
             case 'text-delta': {
                 yield `0:${JSON.stringify(part.textDelta)}\n`;
+                finishedText += part.textDelta;
                 break;
             }
             case 'tool-call': {
@@ -140,6 +163,7 @@ export async function* streamAIResponse({
                         args: part.args,
                     })
                 }\n`;
+                toolCalls.push(part);
                 break;
             }
             case 'tool-call-streaming-start': {
@@ -152,13 +176,7 @@ export async function* streamAIResponse({
                 break;
             }
             case 'tool-call-delta': {
-                yield `c:${
-                    JSON.stringify({
-                        toolCallId: part.toolCallId,
-                        toolName: part.toolName,
-                        argsTextDelta: part.argsTextDelta,
-                    })
-                }\n`;
+                yield `c:${JSON.stringify(part)}\n`;
                 break;
             }
             case 'tool-result': {
@@ -169,19 +187,19 @@ export async function* streamAIResponse({
                                 throw new Error("Something went wrong");
                             }
                             // yield the selected transactions
-                            yield `a:${
-                                JSON.stringify({
-                                    toolCallId: part.toolCallId,
-                                    result: part.result,
-                                })
-                            }\n`;
+                            yield `a:${JSON.stringify(part)}\n`;
+                            toolResults.push(part);
                             // tell client that tool part is finished
                             yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
 
-                            const subStream = handleRecommendations(messages, part.result);
-    
+                            const subStream = handleRecommendations({
+                                conversation: messages, 
+                                result: part.result,
+                            });
+
                             for await (const subPart of subStream) {
                                 yield `0:${JSON.stringify(subPart)}\n`;
+                                finishedText += subPart;
                             }
 
                             yield `e:${JSON.stringify(getFinishStep("stop"))}\n`;
@@ -200,12 +218,8 @@ export async function* streamAIResponse({
                         break;
                     }
                     default: {
-                        yield `a:${
-                            JSON.stringify({
-                                toolCallId: part.toolCallId,
-                                result: part.result,
-                            })
-                        }\n`;
+                        yield `a:${JSON.stringify(part)}\n`;
+                        toolResults.push(part);
                     }
                 }
                 break;
@@ -221,8 +235,16 @@ export async function* streamAIResponse({
                         usage: part.usage,
                     })
                 }\n`;
+                finishReason = part.finishReason;
                 break;
             }
         }
     }
+
+    onFinish({
+        text: finishedText,
+        toolCalls,
+        toolResults,
+        finishReason,
+    });
 }

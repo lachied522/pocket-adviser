@@ -1,9 +1,9 @@
-import { generateId, type Message } from 'ai';
+import type { Message } from 'ai';
 
 import { getConversationById } from '@/utils/crud/conversation';
 
-import { ChatProvider } from '@/components/chat/context';
-import ChatArea from "@/components/chat/chat-area";
+import { ChatProvider } from '../../components/context';
+import ChatArea from "../../components/chat-area";
 
 export default async function MainPage({
     params,
@@ -38,6 +38,7 @@ export default async function MainPage({
         initialConversationId={conversationId}
         conversationHistory={conversationHistory}
         initialUserMessage={initialUserMessage}
+        initialToolName={typeof searchParams?.toolName === "string"? searchParams.toolName: undefined}
       >
         <ChatArea />
       </ChatProvider>

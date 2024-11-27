@@ -19,6 +19,9 @@ export function useChatNavigation() {
             const conversationId = extractConversationIdFromPathname(pathname);
             url += conversationId? `c/${conversationId}`: '';
             url += `?query=${encodeURIComponent(query)}`;
+            if (options) {
+                if (options.toolName) url += `&toolName=${encodeURIComponent(options.toolName)}`;
+            }
             if (conversationId) router.replace(url)
             else router.push(url);
         },

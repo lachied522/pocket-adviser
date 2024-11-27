@@ -19,7 +19,7 @@ import UtilityDialog from "@/components/dialogs/utility-dialog";
 import { formatDollar } from "@/utils/formatting";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type ChatState, useChatContext } from "@/components/chat/context";
+import { type ChatState, useChatContext } from "@/app/(main)/(chat)/components/context";
 
 interface RecommendationsTableProps {
     transactions: {
@@ -68,7 +68,7 @@ export default function RecommendationsTable({ transactions }: RecommendationsTa
                         {transactions.length > 0? (
                         <>
                             {transactions.map((transaction) => (
-                            <StockDialog key={`recommendation-${transaction.stockId}`} stockId={transaction.stockId}>
+                            <StockDialog key={`recommendation-${transaction.stockId}`} symbol={transaction.symbol} name={transaction.name}>
                                 <TableRow className='cursor-pointer'>
                                     <TableCell className='text-sm md:text-lg font-semibold sm:pl-3.5 py-3.5'>
                                         {transaction.units > 0? "📈  Buy": "📉  Sell"}

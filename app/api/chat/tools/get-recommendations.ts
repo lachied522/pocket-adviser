@@ -1,4 +1,12 @@
-import { generateObject, streamText, type CoreMessage } from 'ai';
+import {
+    type CoreMessage,
+    type ToolCallPart,
+    type ToolResultPart,
+    type FinishReason,
+    type LanguageModelUsage,
+    generateObject,
+    streamText,
+} from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 import { z } from "zod";
@@ -227,27 +235,27 @@ export async function getRecommendations(
     }
 }
 
-export async function* handleRecommendations(
+export async function* handleRecommendations({
+    conversation,
+    result,
+} : {
     conversation: CoreMessage[],
     result: {
         profile: any // TO DO: type this properly
         context: Stock[]
         transactions: FormattedTransaction[]
     }
-) {
-    /**
-     * Handle the streaming of the result of the getRecommendations tool.
-     * The tool result is already visible to user, so we only want LLM to explain why these were chosen.
-     */
-
+}) {
     if (result.transactions.length < 1) {
         throw new Error("No recommendations were generated");
     }
 
     const system = (
-`You are assisting an investment-focused chatbot in providing a list of recommended transactions for the user.
+`You are assisting an investment-focused chatbot in providing a list of recommended transactions for the user. 
 You will receive a list of recommended transactions that have been selected for the user based on a portfolio optimisation algorithm and the user's profile. 
-Your task is to provide the user with some context for why these transactions are appropriate for them.\n\n
+Your task is to provide the user with some context for why these transactions are appropriate for them. 
+Your response should start with "The above transactions are likely appropriate for you for the following reasons:". 
+You should conclude with a precise summary of how these transactions help the user achieve their goals.\n\n
 Context:\n\n"""${JSON.stringify(result.context)}"""\n\n
 User's investment profile:\n\n"""${JSON.stringify(result.profile)}"""`
     );

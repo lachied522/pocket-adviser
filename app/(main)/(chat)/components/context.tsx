@@ -36,13 +36,15 @@ interface ChatProviderProps {
     initialConversationId?: string
     conversationHistory?: Message[]
     initialUserMessage?: string
+    initialToolName?: string
 }
 
 export function ChatProvider({
     children,
     initialConversationId,
     conversationHistory,
-    initialUserMessage
+    initialUserMessage,
+    initialToolName,
 }: ChatProviderProps) {
     const { state, insertConversation } = useGlobalContext() as GlobalState;
     const [conversationId, setConversationId] = useState<string | undefined>(initialConversationId); // id of conversation in db
@@ -79,13 +81,13 @@ export function ChatProvider({
         // trigger chat submission if initial user message exists
         if (initialUserMessage && !isLoading) {
             // want to check that this message is not already in conversation history
-            append({ id: generateId(), role: "user", content: initialUserMessage });
+            onSubmit(initialUserMessage, initialToolName);
         }
     }, [initialUserMessage]);
 
     const onSubmit = useCallback(
         async (content: string, toolName?: string) => {
-            if (isLoading) return;
+            if (isLoading || content.length < 1) return;
             const message = {
                 id: generateId(),
                 role: "user" as const,

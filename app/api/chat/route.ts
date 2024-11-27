@@ -1,9 +1,14 @@
 "use server";
 import type { NextRequest } from 'next/server';
-import { convertToCoreMessages, generateId, type Message } from 'ai';
-import { generateText } from 'ai';
-import { MockLanguageModelV1 } from 'ai/test';
-
+import {
+    type Message,
+    type ToolCallPart,
+    type ToolResultPart,
+    type FinishReason,
+    type LanguageModelUsage,
+    convertToCoreMessages,
+    generateId,
+} from 'ai';
 
 import type { AccountType, Conversation } from '@prisma/client';
 
@@ -12,45 +17,88 @@ import { checkRateLimits } from './ratelimit';
 import { updateNotes } from './notes';
 
 import { insertConversation, updateConversation } from "@/utils/crud/conversation";
-import { headers } from 'next/headers';
+
+function convertTextToMessage(content: string) {
+    return { id: generateId(), role: "assistant" as const, content } satisfies Message;
+}
+
+function convertToolCallsToMessages({
+    toolCalls,
+    toolResults,
+} : {
+    toolCalls: ToolCallPart[]
+    toolResults: ToolResultPart[]
+}) {
+    // see https://github.com/vercel/ai-chatbot/blob/00b125378c998d19ef60b73fe576df0fe5a0e9d4/lib/utils.ts
+    const messages: Message[] = [];
+
+    for (const toolCall of toolCalls) {
+        const resultPart = toolResults.find((toolResult) => toolResult.toolCallId === toolCall.toolCallId);
+
+        if (resultPart) {
+            messages.push({
+                id: generateId(),
+                role: "assistant" as const,
+                content: '',
+                toolInvocations: [
+                    {
+                        ...toolCall,
+                        result: resultPart?.result,
+                        state: "result"
+                    },
+                ]
+            });
+        }
+    }
+
+    return messages;
+}
 
 function convertToSafeMessages(messages: Message[]) {
     // convert to JSON-compatible array
     return [
         ...messages.map((message) => ({
-            id: message.id,
+            id: generateId(),
             role: message.role,
             content: message.content,
             data: message.data,
             createdAt: message.createdAt instanceof Date? message.createdAt.toISOString(): message.createdAt,
             toolInvocations: message.toolInvocations?.map((toolInvocation) => ({ ...toolInvocation })),
         })
-    )] satisfies Conversation["messages"]
+    )] satisfies Conversation["messages"];
 }
 
-async function saveMessagesToConversation({
+async function createNewConversation({
     userId,
     messages,
-    conversationId,
 } : {
     userId: string
     messages: Message[]
-    conversationId?: string
 }) {
     try {
-        if (!conversationId) {
-            // create new conversation record
-            const name = messages.filter((message) => message.role === "user")?.[0].content?.slice(0, 50) ?? "New conversation";
-            const res = await insertConversation({
-                userId,
-                name,
-                messages: convertToSafeMessages(messages),
-            });
-            return {
-                id: res.id,
-                name: res.name,
-            }
+        const name = messages.filter((message) => message.role === "user")?.[0].content?.slice(0, 50) ?? "New conversation";
+        const res = await insertConversation({
+            userId,
+            name,
+            messages: convertToSafeMessages(messages),
+        });
+        return {
+            id: res.id,
+            name: res.name,
         }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function saveConversation({
+    conversationId,
+    messages,
+} : {
+    conversationId: string
+    messages: Message[]
+}) {
+    try {
         // update existing conversation
         await updateConversation(
             conversationId,
@@ -60,7 +108,6 @@ async function saveMessagesToConversation({
         console.error(e);
     }
 }
-
 
 type RequestBody = {
     messages: Message[]
@@ -95,80 +142,79 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const { text } = await generateText({
-        model: new MockLanguageModelV1({
-          doGenerate: async () => ({
-            rawCall: { rawPrompt: null, rawSettings: {} },
-            finishReason: 'stop',
-            usage: { promptTokens: 10, completionTokens: 20 },
-            text: `Hello, world!`,
-          }),
-        }),
-        prompt: 'Hello, test!',
-    });
+    let newConversationId: string;
+    let extraHeaders: { [key: string]: string } = {};
+    if (!conversationId) {
+        const res = await createNewConversation({ userId, messages });
+        if (res) {
+            newConversationId = res.id;
+            extraHeaders = {
+                "X-Conversation-Id": res.id,
+                "X-Conversation-Name": res.name,
+            }
+        }
+    }
 
-    console.log("id", conversationId);
+    const coreMessages = convertToCoreMessages(messages);
 
-    const insertedConversation = await saveMessagesToConversation({
+    if (article) {
+        coreMessages[coreMessages.length - 1].content += `\n\nArticle:${JSON.stringify(article)}`;
+    }
+
+    const response = streamAIResponse({
+        messages: coreMessages,
+        toolName,
         userId,
-        conversationId,
-        messages: [...messages, { id: generateId(), role: "assistant", content: text }]
+        accountType,
+        onFinish: ({
+            text,
+            finishReason,
+            toolCalls,
+            toolResults,
+        } : {
+            text: string
+            finishReason: FinishReason
+            toolCalls: ToolCallPart[]
+            toolResults: ToolResultPart[]
+        }) => {
+            if (finishReason !== "error") {
+                const _messages = [
+                    ...messages,
+                    ...(toolCalls.length > 0? convertToolCallsToMessages({ toolCalls, toolResults }): []),
+                    ...(text.length > 0? [convertTextToMessage(text)]: []),
+                ];
+
+                saveConversation({
+                    conversationId: conversationId || newConversationId,
+                    messages: _messages,
+                });
+    
+                if (_messages.length > 3 && text.length > 0 && userId && accountType === "PAID") {
+                    updateNotes(convertToCoreMessages(_messages), userId);
+                }
+            }
+        }
     });
 
     const stream = new ReadableStream({
         async start(controller) {
             const encoder = new TextEncoder();
 
-            if (insertedConversation) controller.enqueue(encoder.encode(`2:${JSON.stringify([insertedConversation])}\n`));
-            controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`));
+            for await (const content of response) {
+                const queue = encoder.encode(content);
+                controller.enqueue(queue);
+            }
 
             controller.close();
         }
     });
-
-    // const coreMessages = convertToCoreMessages(messages);
-
-    // if (article) {
-    //     coreMessages[coreMessages.length - 1].content =
-    //     coreMessages[coreMessages.length - 1].content +
-    //     `\n\nArticle:${JSON.stringify(article)}`;
-    // }
-
-    // const response = streamAIResponse({
-    //     messages: coreMessages,
-    //     toolName,
-    //     userId,
-    //     accountType,
-    //     onFinish: (text: string) => {
-    //         if (messages.length > 3 && text.length > 0 && userId && accountType === "PAID") {
-    //             const _messages = convertToCoreMessages([...messages, { role: "assistant", content: text }]);
-    //             updateNotes(_messages, userId);
-    //         }
-    //     }
-    // });
-
-    // const stream = new ReadableStream({
-    //     async start(controller) {
-    //         const encoder = new TextEncoder();
-
-    //         for await (const content of response) {
-    //             const queue = encoder.encode(content);
-    //             controller.enqueue(queue);
-    //         }
-
-    //         controller.close();
-    //     }
-    // });
 
     return new Response(
         stream,
         {
             headers: {
                 "Content-Type": "text/plain; charset=utf-8",
-                ...(insertedConversation ? {
-                    "X-Conversation-Id": insertedConversation.id,
-                    "X-Conversation-Name": insertedConversation.name,
-                }: {})
+                ...extraHeaders,
             },
             status: 200
         }

@@ -4,14 +4,13 @@ import { useCallback, useState } from "react";
 import { ArrowBigUp, OctagonAlert, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
 import { useScrollAnchor } from "@/hooks/useScrollAnchor";
 // import { useMessageThrottle } from "@/hooks/useMessageThrottle";
 
-import { type ChatState, useChatContext } from "@/components/chat/context";
+import { type ChatState, useChatContext } from "./context";
 
 import SamplePrompts from "./sample-prompts";
 import { ChatMessage } from "./messages";

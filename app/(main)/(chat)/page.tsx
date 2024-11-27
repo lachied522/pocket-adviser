@@ -1,9 +1,10 @@
 import { generateId, type Message } from 'ai';
 
-import { getGreeting } from "@/app/api/chat/greet/route";
+import { getGreeting } from "./greeting";
 
-import { ChatProvider } from "@/components/chat/context";
-import ChatArea from "@/components/chat/chat-area";
+import { ChatProvider } from "./components/context";
+import ChatArea from "./components/chat-area";
+
 import WelcomeDialog from "@/components/dialogs/welcome-dialog";
 
 export default async function MainPage({
@@ -24,6 +25,7 @@ export default async function MainPage({
       <ChatProvider
         conversationHistory={conversationHistory}
         initialUserMessage={initialUserMessage}
+        initialToolName={typeof searchParams?.toolName === "string"? searchParams.toolName: undefined}
       >
         <ChatArea />
         {searchParams?.welcome === "true" && <WelcomeDialog initialIsOpen={true} />}
