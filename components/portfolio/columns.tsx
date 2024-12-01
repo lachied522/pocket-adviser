@@ -127,12 +127,12 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
     )
   },
   {
-    accessorKey: "changesPercentage",
+    accessorKey: "change",
     header: ({ column }) => (
       <HeaderCell column={column} title={"Change"} />
     ),
     cell: ({ row }) => (
-      <div className='text-sm lg:text-base font-medium py-5'>{formatPercent(row.getValue('changesPercentage'))}</div>
+      <div className='text-sm lg:text-base font-medium py-5'>{formatPercent(row.getValue('change'))}</div>
     )
   },
   {

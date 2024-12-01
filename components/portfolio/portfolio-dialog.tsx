@@ -42,7 +42,7 @@ const TABS = {
         "marketCap",
         "units",
         "previousClose",
-        "changesPercentage",
+        "change",
         "value",
     ],
     earnings: [
@@ -52,7 +52,7 @@ const TABS = {
         "units",
         "sector",
         "eps",
-        "pe",
+        "peRatio",
         "epsGrowth",
     ],
     dividends: [
@@ -102,7 +102,7 @@ export default function PortfolioDialog({ children }: PortfolioDialogProps) {
                     // add EPS column
                     // NOTE: only pe ratio is stored in DB
                     // TODO: store eps in db instead of pe
-                    const eps = (data.pe && data.previousClose)? Math.round(100 * data.previousClose / data.pe) / 100: NaN;
+                    const eps = (data.peRatio && data.previousClose)? Math.round(100 * data.previousClose / data.peRatio) / 100: NaN;
                     return {
                         ...data,
                         ...holding,

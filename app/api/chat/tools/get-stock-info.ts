@@ -1,9 +1,8 @@
 import { z } from "zod";
 
-import { getStockBySymbol } from "@/utils/crud/stocks";
 import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
-import type { Stock } from "@prisma/client";
+import type { ResolvedPromise } from "@/types/helpers";
 
 export const description = "Get financial information about a stock, including company description, price, price change, PE, EPS Growth, etc.";
 
@@ -12,51 +11,42 @@ export const parameters = z.object({
     exchange: z.enum(["ASX", "NASDAQ", "NYSE"]).default("NASDAQ").describe("Exchange that stock trades on"),
 });
 
-function format(stock: Stock) {
-    return {
-        ...stock,
-        marketCap: Number(stock.marketCap) // remove BigInt type
-    }
-}
+export type StockInfoResponse = ResolvedPromise<ReturnType<typeof getStockInfo>>;
 
 export async function getStockInfo(symbol: string, exchange: "ASX"|"NASDAQ"|"NYSE") {
-    try {
-        // add '.AX' if exchange is ASX
-        if (exchange === 'ASX' && !symbol.endsWith('.AX')) {
-            symbol = `${symbol}.AX`;
-        }
+    // add '.AX' if exchange is ASX
+    if (exchange === 'ASX' && !symbol.endsWith('.AX')) {
+        symbol = `${symbol}.AX`;
+    }
 
-        let stock = await getStockBySymbol(symbol);
-        if (!stock) {
-            // stock not in DB, try fetching directly from API
-            const data = await new FinancialModellingPrepClient().getCompanyProfile(symbol);
-            if (!data) {
-                // stock not found
-                return null;
-            }
-            // format data to 'stock' type
-            stock = {
-                ...data,
-                id: -1,
-                name: data.companyName,
-                previousClose: data.price,
-                marketCap: data.mktCap,
-                exchange: data.exchangeShortName,
-                changesPercentage: data.changes,
-                priceTarget: null,
-                dividendAmount: null,
-                dividendYield: null,
-                pe: null,
-                epsGrowth: null,
-                tags: [],
-            }            
-        }
+    const data = await new FinancialModellingPrepClient().getCompanyOutlook(symbol);
 
-        if (!stock) return null;
-
-        return format(stock);
-    } catch (e) {
-        console.log(e);
-        return null;
+    if (!data) {
+        throw new Error("Stock not found");
+    }
+    
+    // format data for interpretation by LLM
+    return {
+        symbol: data.profile.symbol,
+        name: data.profile.companyName,
+        exchange: data.profile.exchangeShortName,
+        sector: data.profile.sector,
+        industry: data.profile.industry,
+        country: data.profile.country,
+        description: data.profile.description,
+        previousClose: data.profile.price,
+        change: data.profile.changes,
+        changePercent: (100 * (data.profile.changes / data.profile.price)).toFixed(2),
+        marketCap: Number(data.profile.mktCap),
+        dividendYield: data.ratios[0].dividendYielPercentageTTM.toFixed(2),
+        peRatio: data.ratios[0].peRatioTTM.toFixed(2),
+        pegRatio: data.ratios[0].pegRatioTTM.toFixed(2),
+        profitMargin: data.ratios[0].netProfitMarginTTM.toFixed(2),
+        debtToEquityRatio: data.ratios[0].debtEquityRatioTTM.toFixed(2),
+        eps: data.financialsAnnual.income[0].eps,
+        epsGrowthAnnual: (
+            100 * (data.financialsAnnual.income[0].eps / data.financialsAnnual.income[data.financialsAnnual.income.length - 1].eps - 1)
+        ).toFixed(2),
+        analystRating: data.rating[0].ratingRecommendation,
     }
 }

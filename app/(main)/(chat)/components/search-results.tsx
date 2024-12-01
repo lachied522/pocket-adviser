@@ -19,9 +19,7 @@ export default function SearchResults({
 }: {
     data: WebSearchResponse
 }) {
-
     if (!(data && data.results)) return null;
-
     return (
         <div className="ml-3">
             <p className='text-sm'>Search results for <span className='font-medium text-black'>{`"${data.query}"`}</span></p>

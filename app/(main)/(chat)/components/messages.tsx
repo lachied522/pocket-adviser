@@ -138,7 +138,7 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
                 if (!toolInvocation.result) {
                     return <ToolStatusMessage msg={`Error getting info on ${args.symbol.toUpperCase()}`} isError={true} />;
                 }
-                return <StockCard stockData={toolInvocation.result} />;
+                return <StockCard {...toolInvocation.result} />;
             } else {
                 return <LoadingMessage msg={`Getting info on ${args.symbol.toUpperCase()}`} />;
             }

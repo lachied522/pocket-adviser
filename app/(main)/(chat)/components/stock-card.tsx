@@ -9,58 +9,62 @@ import ChangeIndicator from "@/components/stocks/change-indicator";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
-import type { Stock } from "@prisma/client";
+import type { StockInfoResponse } from "@/app/api/chat/tools/get-stock-info";
 
-interface StockCardProps {
-    stockData: Omit<Stock, 'id'> & { id?: number }
-}
+interface StockCardProps extends StockInfoResponse {};
 
-export default function StockCard({ stockData }: StockCardProps) {
+export default function StockCard({
+    symbol,
+    name,
+    exchange,
+    previousClose,
+    changePercent,
+    marketCap
+}: StockCardProps) {
     return (
-        <StockDialog symbol={stockData.symbol} name={stockData.name}>
+        <StockDialog symbol={symbol} name={name}>
             <Card className='cursor-pointer shrink-0'>
                 <CardContent className='flex flex-col gap-3.5 p-3'>
                     <div className='grid grid-cols-[60px_1fr] gap-2'>
                         <div className='h-12 w-12 flex items-center justify-center bg-zinc-100 rounded-xl p-2 aspect-square'>
                             <div className='h-8 w-8 relative'>
                                 <StockLogo
-                                    symbol={stockData.symbol}
+                                    symbol={symbol}
                                     fill
                                 />
                             </div>
                         </div>
 
                         <div className='flex flex-col'>
-                            <div className='max-w-[180px] md:text-lg font-medium truncate'>{stockData.name}</div>
+                            <div className='max-w-[180px] md:text-lg font-medium truncate'>{name}</div>
                             <div className='flex flex-row items-center gap-2'>
-                                <span className='text-sm md:text-base'>{stockData.symbol}</span>
+                                <span className='text-sm md:text-base'>{symbol}</span>
                                 <Image
-                                    src={stockData.exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+                                    src={exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
                                     alt='flag'
                                     height={16}
                                     width={16}
                                 />
-                               <span>{stockData.exchange}</span>
+                               <span>{exchange}</span>
                             </div>
                         </div>
                     </div>
 
                     <div className='w-full flex flex-row justify-between gap-3.5'>
                         <div className='flex flex-col'>
-                            <span className='font-medium text-lg mr-1'>{formatMarketCap(stockData.marketCap)}</span>
+                            <span className='font-medium text-lg mr-1'>{formatMarketCap(marketCap)}</span>
                             <span className='text-slate-600 text-sm'>Market Cap.</span>
                         </div>
 
                         <div className='flex flex-col'>
                             <div className='inline'>
-                                <span className='font-medium text-lg mr-1'>{stockData.previousClose? formatDollar(stockData.previousClose): 'N/A'}</span>
-                                <span className='font-medium text-sm'>{stockData.previousClose? stockData.currency: ''}</span>
+                                <span className='font-medium text-lg mr-1'>{previousClose? formatDollar(previousClose): 'N/A'}</span>
                             </div>
                             <span className='text-slate-600 text-sm'>Prev. Close</span>
                         </div>
 
                         <div className='flex flex-col'>
-                            <ChangeIndicator change={stockData.changesPercentage} withIcon={false} />
+                            <ChangeIndicator change={changePercent} withIcon={false} />
                             <span className='text-slate-600 text-sm'>Change</span>
                         </div>
                     </div>
