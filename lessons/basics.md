@@ -20,8 +20,6 @@ However, going public doesn't come without its downsides. Once they decide to go
 
 The IPO and any secondary offerings are the only times investors buy shares directly from the company. This is called the **primary market**. In these cases, the money from investors goes straight to the company's balance sheet. Every other time you buy shares, you are buying them from another investor. This is called the **secondary market**.
 
-<input defaultValue="What&apos;s the difference between the primary and secondary market?" />
-
 If the company does not make or lose money from the secondary market, why should it care about its share price? Companies like to reward their shareholders for investing in them. If shareholders feel rewarded, investing in the company is more appealing and the company can potentially raise more through future secondary offerings. Additionally, managers' compensation is usually tied to the performance of the company's stock, whether through bonuses or stock-based compensation. If not for their compensation, managers want the stock to perform well because it is one of the yardsticks used to assess their competence and they could potentially be fired because of it.
 
 ## Stocks versus Bonds
@@ -45,10 +43,8 @@ For this reason debt securities, like bonds, are less risky than stocks. You are
 Investors have many asset classes to choose from to invest in, including government and corporate bonds, real estate, private equity, and venture capital. Each of these options involves a different level of **risk**. Risk is defined as [the degree of uncertainty in the expected return of an investment](https://www.investor.gov/introduction-investing/investing-basics/what-risk). For example, government bonds are considered among the safest investments because it is virtually guaranteed that you will receive the return promised (governments can always print more money if they run out). On the other end of the spectrum is venture capital, which involves investing in startups and smaller companies. This involves a higher level of **risk** because these businesses are unproven and unprofitable, and there is a high degree of uncertainty about whether they ever will be.
 
 Humans are generally risk averse, meaning we prefer to make choices where we can be certain about the outcome. To see what I mean imagine you are presented with two options where the expected return is identical.
-
-Option A - flip a coin and receive $1100 if it lands on tails and lose $1000 if not.
-
-Option B - receive $50 right now.
+- Option A - flip a coin and receive $1100 if it lands on tails and lose $1000 if not.
+- Option B - receive $50 right now.
 
 Even though the expected outcome is the same, the certainty of the $50 in Option B seems more attractive that in Option A due to the possibility of losing $1000. If you don't feel this way, what if each of the values were multiplied by 100 or 1000?
 
@@ -104,9 +100,7 @@ The S&P 500 is commonly used as a benchmark to compare the performance of other 
 ## Capital Asset Pricing Model (CAPM)
 Beta provides a standardised way of measuring risk by comparing it to the market portfolio. This allows us to approximately measure the expected return of an investment based on its relationship to the market portfolio. We can calculate expected return mathematically with the following formula, called the capital asset pricing model formula (don't be alarmed by this formula, it will only be used to inform some of the concepts for the rest of this section).
 
-```
-E(R) = R_f + {\beta_i}
-```
+> E(R) = R<sub>f</sub> + β<sub>i</sub>
 
 In this formula, the risk-free rate is the expected return of a zero-risk investment. In practice, there is no zero-risk investment, however the [three-month US Treasury bill](https://fred.stlouisfed.org/series/DTB3) is often considered the closest to a zero-risk investment.
 

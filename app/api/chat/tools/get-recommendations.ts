@@ -1,9 +1,5 @@
 import {
     type CoreMessage,
-    type ToolCallPart,
-    type ToolResultPart,
-    type FinishReason,
-    type LanguageModelUsage,
     generateObject,
     streamText,
 } from 'ai';
@@ -14,6 +10,7 @@ import { z } from "zod";
 import { formatProfile } from './get-profile';
 
 import type { Holding, Profile, Stock } from "@prisma/client";
+import type { ResolvedPromise } from '@/types/helpers';
 
 export const description = "Get a list of recommended transactions based on the user's current portfolio and investment profile";
 
@@ -26,57 +23,9 @@ export const parameters = z.object({
     // ).optional().describe("Any filters to apply to the stocks to be returned")
 });
 
-const MAX_TRANSACTIONS = 3;
+export type GetRecommendationsResponse = ResolvedPromise<ReturnType<typeof getRecommendations>>;
 
-type PartialHolding = Pick<Holding, 'stockId'|'units'>;
-
-type ResponseObject = {
-    profile: Profile
-    current_portfolio: PartialHolding[]
-    optimal_portfolio: PartialHolding[]
-    transactions: PartialHolding[]
-    context: Stock[]
-}
-
-async function fetchOptimalPortfolio(
-    body: {
-        amount: number,
-    },
-    userId: string
-) {
-    const url = new URL(`${process.env.BACKEND_URL}/optimal-portfolio`);
-    const params = new URLSearchParams();
-    if (userId) {
-        params.set("userId", userId);
-    }
-    url.search = params.toString();
-
-    // use an abort controller to impose a 58s limit (slightly less than 60s max streaming time)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 58000);
-    const response = await fetch(
-        url,
-        {
-            method: "POST",
-            signal: controller.signal,
-            body: JSON.stringify(body),
-            headers: {
-                "Content-Type": "application/json",
-            }
-        }
-    );
-
-    // Clear the timeout if the request completes in time
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-        throw new Error(await response.json());
-    }
-
-    return await response.json() as ResponseObject;
-}
-
-export type FormattedTransaction = {
+type FormattedTransaction = {
     stockId: number
     symbol: string
     name: string
@@ -86,46 +35,176 @@ export type FormattedTransaction = {
     direction: "Buy" | "Sell"
 }
 
-function formatResponse(response: ResponseObject, amount: number) {
-    // format results for interpretation by AI
-    const context: Stock[] = []
-    const recommendedTransactions: FormattedTransaction[] = [];
-    for (const transaction of response.transactions) {
-        // if amount is non-zero, we only want transaction in direction of the deposit/withdrawal
-        if (amount !== 0 && Math.sign(transaction.units) !== Math.sign(amount)) continue;
-        const data = response.context.find((stock) => stock.id === transaction.stockId);
-        if (data) {
-            recommendedTransactions.push({
-                symbol: data.symbol,
-                name: data.name,
-                units: transaction.units,
-                price: data.previousClose ?? 0,
-                value: transaction.units * (data.previousClose ?? 0),
-                direction: transaction.units > 0? "Buy" as const: "Sell" as const,
-                stockId: transaction.stockId,
-            });
-            context.push(data);
+type PartialHolding = Pick<Holding, 'stockId'|'units'>;
+
+type OptimalPortfolioResponse = {
+    profile: Profile
+    current_portfolio: PartialHolding[]
+    optimal_portfolio: PartialHolding[]
+    transactions: PartialHolding[]
+    stock_data: Stock[]
+}
+
+type Statistics = {
+    expected_return: number
+    standard_deviation: number
+    sharpe_ratio: number
+    treynor_ratio: number
+    beta: number
+    dividend_yield: number
+    sector_allocations: { [sector: string]: number }
+}
+
+type PortfolioStatisticsResponse = {
+    proposed_portfolio: Statistics
+    current_portfolio: Statistics
+}
+
+async function makePostRequestToBackend(
+    endpoint: string,
+    body: object,
+    userId: string,
+    timeout?: number
+) {
+    const url = new URL(`${process.env.BACKEND_URL}/${endpoint}`);
+    const params = new URLSearchParams();
+    if (userId) {
+        params.set("userId", userId);
+    }
+    url.search = params.toString();
+
+    let signal: AbortSignal | null = null;
+    let timeoutId: NodeJS.Timeout | null = null;
+    if (timeout) {
+        const controller = new AbortController();
+        timeoutId = setTimeout(() => controller.abort(), 58000);
+    }
+
+    const response = await fetch(
+        url,
+        {
+            method: "POST",
+            signal,
+            body: JSON.stringify(body),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+    );
+
+    // Clear the timeout if the request completes in time
+    if (timeoutId) clearTimeout(timeoutId);
+
+    
+    if (!response.ok) {
+        throw new Error(await response.json());
+    }
+
+    return await response.json();
+}
+
+async function fetchOptimalPortfolio(
+    body: {
+        amount: number,
+    },
+    userId: string
+) {
+    function formatResponse(response: OptimalPortfolioResponse) {
+        // format results for interpretation by AI
+        const stockData: Stock[] = []
+        const recommendedTransactions: FormattedTransaction[] = [];
+        for (const transaction of response.transactions) {
+            const data = response.stock_data.find((stock) => stock.id === transaction.stockId);
+            if (data) {
+                recommendedTransactions.push({
+                    symbol: data.symbol,
+                    name: data.name,
+                    units: transaction.units,
+                    price: data.previousClose ?? 0,
+                    value: transaction.units * (data.previousClose ?? 0),
+                    direction: transaction.units > 0? "Buy" as const: "Sell" as const,
+                    stockId: transaction.stockId,
+                });
+                stockData.push(data);
+            }
+        }
+    
+        // sort transactions by value
+        recommendedTransactions.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+        return {
+            profile: formatProfile(response.profile),
+            currentPortfolio: response.current_portfolio,
+            recommendedTransactions,
+            stockData,
         }
     }
 
-    // sort transactions by value
-    recommendedTransactions.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    const response = await makePostRequestToBackend("optimal-portfolio", body, userId) as OptimalPortfolioResponse;
+
+    return formatResponse(response);
+}
+
+async function fetchPortfolioStatistics(
+    body: {
+        transactions: PartialHolding[]
+    },
+    userId: string
+) {
+    function formatStatistics(statistics: Statistics) {
+        const sectorAllocations: { [sector: string]: string } = {};
+    
+        for (const sector in statistics.sector_allocations) {
+            sectorAllocations[sector] = statistics.sector_allocations[sector].toFixed(2);
+        }
+    
+        return {
+            expectedReturn: statistics.expected_return,
+            standardDeviation: statistics.standard_deviation,
+            sharpeRatio: statistics.sharpe_ratio,
+            treynorRatio: statistics.treynor_ratio,
+            beta: statistics.beta,
+            dividendYield: statistics.dividend_yield,
+            sectorAllocations,
+        }
+    }
+
+    const statistics = await makePostRequestToBackend("portfolio-statistics", body, userId) as PortfolioStatisticsResponse;
     return {
-        profile: formatProfile(response.profile),
-        currentPortfolio: response.current_portfolio,
-        recommendedTransactions,
-        context,
+        currentPortfolio: formatStatistics(statistics.current_portfolio),
+        proposedPortfolio: formatStatistics(statistics.proposed_portfolio),
+    }
+}
+
+function filterResponse(
+    response: ResolvedPromise<ReturnType<typeof fetchOptimalPortfolio>>,
+    args: z.infer<typeof parameters>,
+) {
+    // if amount is non-zero, we only want transaction in direction of the deposit/withdrawal
+    const filteredTransactions: FormattedTransaction[] = [];
+
+    for (const transaction of response.recommendedTransactions) {
+        if (args.amount !== 0 && Math.sign(transaction.units) !== Math.sign(args.amount)) continue;
+        filteredTransactions.push(transaction)
+    }
+
+    return {
+        ...response,
+        recommendedTransactions: filteredTransactions,
+        stockData: response.stockData.filter(
+            (stock) => !!filteredTransactions.find((transaction) => transaction.stockId === stock.id)
+        ),
     }
 }
 
 async function selectTransactions(
-    response: ReturnType<typeof formatResponse>,
+    response: ResolvedPromise<ReturnType<typeof fetchOptimalPortfolio>>,
     conversation: CoreMessage[],
     args: z.infer<typeof parameters>
 ) {
     /**
      * Further refine recommended transactions returned by the above endpoint based on user's profile, portfolio, conversation history
      */
+    const MAX_TRANSACTIONS = 3; // TO DO: add this as a function argument
 
     const { object } = await generateObject({
         model: openai('gpt-4o'),
@@ -134,7 +213,7 @@ async function selectTransactions(
 You will receive a list of potential transactions that have been generated for the user by a portfolio optimisation algorithm. 
 Your task is to select ${MAX_TRANSACTIONS} of the transactions from the list based on the user's profile, portfolio, and conversation history between the chatbot and the user. 
 ${args.action === "review"? "Make sure to select an appropriate mix of buy and sell transactions.": ''}\n\n
-Context:\n\n"""${JSON.stringify(response.context)}"""\n\n
+Stock data:\n\n"""${JSON.stringify(response.stockData)}"""\n\n
 User's investment profile:\n\n"""${JSON.stringify(response.profile)}"""\n\n
 User's current portfolio:\n\n"""${JSON.stringify(response.currentPortfolio)}"""`
         ),
@@ -223,15 +302,24 @@ export async function getRecommendations(
     userId: string
 ) {
     const amount = args.action === "withdraw"? -Math.abs(args.amount): args.action === "deposit"? Math.abs(args.amount): 0;
-    const response = formatResponse(await fetchOptimalPortfolio({ amount }, userId), amount);
+    const response = filterResponse(await fetchOptimalPortfolio({ amount }, userId), args);
+
+    // LLM will refine recommended transactions
     const selectedTransactions = await selectTransactions(response, messages, args);
 
-    // further refine context to only stocks included in the selected transactions
-    const context = response.context.filter((stock) => !!selectedTransactions.find((transaction) => transaction.stockId === stock.id));
+    // adjust selected transactions for intended investment amount
+    const adjustedTransactions = adjustTransactions(selectedTransactions, amount);
+
+    const statistics = await fetchPortfolioStatistics({ transactions: adjustedTransactions }, userId);
+
     return {
         profile: response.profile,
-        transactions: adjustTransactions(selectedTransactions, amount),
-        context,
+        transactions: adjustedTransactions,
+        statistics,
+        // only return data for stocks included in the selected transactions
+        stockData: response.stockData.filter(
+            (stock) => !!selectedTransactions.find((transaction) => transaction.stockId === stock.id)
+        ),
     }
 }
 
@@ -239,12 +327,8 @@ export async function* handleRecommendations({
     conversation,
     result,
 } : {
-    conversation: CoreMessage[],
-    result: {
-        profile: any // TO DO: type this properly
-        context: Stock[]
-        transactions: FormattedTransaction[]
-    }
+    conversation: CoreMessage[]
+    result: GetRecommendationsResponse
 }) {
     if (result.transactions.length < 1) {
         throw new Error("No recommendations were generated");
@@ -256,7 +340,7 @@ You will receive a list of recommended transactions that have been selected for 
 Your task is to provide the user with some context for why these transactions are appropriate for them. 
 Your response should start with "The above transactions are likely appropriate for you for the following reasons:". 
 You should conclude with a precise summary of how these transactions help the user achieve their goals.\n\n
-Context:\n\n"""${JSON.stringify(result.context)}"""\n\n
+Stock data:\n\n"""${JSON.stringify(result.stockData)}"""\n\n
 User's investment profile:\n\n"""${JSON.stringify(result.profile)}"""`
     );
 

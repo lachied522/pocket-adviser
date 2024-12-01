@@ -106,16 +106,18 @@ model Stock {
   country           String?
   isEtf             Boolean
   previousClose     Float?
-  changesPercentage Float?
+  change            Float?
   priceTarget       Float?
   beta              Float?
+  stdDev            Float?
   dividendAmount    Float?
   dividendYield     Float?
   marketCap         BigInt
   sector            String?
-  pe                Float?
+  peRatio           Float?
   epsGrowth         Float?
   tags              String[]
+
   Holdings          Holding[]
 
   @@index([name, symbol])

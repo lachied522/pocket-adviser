@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { getAllLessons, getLessonBySlug } from "./helpers";
 
 import LessonNavigation from "./lesson-navigation";
-import CustomInput from "./custom-input";
 
 function H2(props: any) {
     return (
@@ -45,7 +44,7 @@ function Blockquote(props: any) {
 
 function UnorderedList(props: any) {
     return (
-        <ul className='list-disc pl-3'>
+        <ul className='list-disc pl-6'>
             {props.children}
         </ul>
     )
@@ -85,7 +84,7 @@ export default async function Page({
                             rehypePlugins={[rehypeRaw]}
                             components={{
                                 h2: H2, a: A,
-                                img: Img, input: CustomInput,
+                                img: Img,
                                 blockquote: Blockquote,
                                 ul: UnorderedList, li: ListItem
                             }}

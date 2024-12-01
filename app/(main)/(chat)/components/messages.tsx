@@ -7,7 +7,7 @@ import { CheckCheck, OctagonAlert } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
-import RecommendationsTable from "./recommendations-table";
+import RecommendationsTable from "./recommendations";
 import SearchResults from "./search-results";
 import NewsArticle from "./news-article";
 import StockCard from "./stock-card";
@@ -26,7 +26,7 @@ function H3(props: any) {
 
 function OrderedList(props: any) {
     return (
-        <ol className="whitespace-normal leading-loose">
+        <ol className="whitespace-normal leading-loose list-decimal *:ml-3 *:sm:ml-6">
             {props.children}
         </ol>
     )
@@ -34,7 +34,7 @@ function OrderedList(props: any) {
 
 function UnorderedList(props: any) {
     return (
-        <ul className="whitespace-normal leading-loose">
+        <ul className="whitespace-normal leading-loose list-disc *:ml-3 *:sm:ml-6">
             {props.children}
         </ul>
     )
@@ -128,7 +128,7 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
                 if (!toolInvocation.result) {
                     return <ToolStatusMessage msg="Error getting trade ideas" isError={true} />;
                 }
-                return <RecommendationsTable transactions={toolInvocation.result.transactions} />;
+                return <RecommendationsTable {...toolInvocation.result} />;
             } else {
                 return <LoadingMessage msg="Getting trade ideas" />;
             }
@@ -227,8 +227,8 @@ export function ChatMessage({
     return (
         <div
             className={cn(
-                'w-full flex flex-col items-start lg:pr-24 gap-2',
-                role === "user" && 'items-end lg:pr-0 lg:pl-24'
+                'w-full flex flex-col items-start gap-2',
+                role === "user" && 'items-end'
             )}
         >
             <div className='text-sm font-medium text-slate-600'>
