@@ -11,6 +11,18 @@ export default function Loading() {
                 <div className='h-48 w-full flex pt-7 lg:pr-24'>
                     <Skeleton className='flex-1 bg-zinc-200 rounded-xl' />
                 </div>
+                <div className='h-10 w-full flex lg:pl-24'>
+                    <Skeleton className='flex-1 bg-zinc-200 rounded-xl' />
+                </div>
+                <div className='h-48 w-full flex lg:pr-24'>
+                    <Skeleton className='flex-1 bg-zinc-200 rounded-xl' />
+                </div>
+                <div className='h-10 w-full flex lg:pl-24'>
+                    <Skeleton className='flex-1 bg-zinc-200 rounded-xl' />
+                </div>
+                <div className='h-48 w-full flex lg:pr-24'>
+                    <Skeleton className='flex-1 bg-zinc-200 rounded-xl' />
+                </div>
             </div>
 
             <div className='w-full flex flex-col justify-center gap-3 pt-3'>

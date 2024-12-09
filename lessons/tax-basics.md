@@ -3,6 +3,8 @@ title: "Tax Basics"
 lesson: 6
 groupTitle: "Understanding the Stock Market"
 group: 2
+difficulty: 2
+importance: 4
 ---
 ## Tax
 Tax is an important consideration in investing that is often overlooked by new investors. Money made in stocks is not free, and tax implications can have a material impact on your returns. There are also various discounts and benefits available which you can take advantage of to boost your returns.

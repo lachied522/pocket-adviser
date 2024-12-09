@@ -9,7 +9,7 @@ export type Milestone = {
 }
 
 export type UserData = (
-    Pick<User, 'id'|'name'|'accountType'|'email'|'mailFrequency'> &
+    Pick<User, 'id'|'name'|'accountType'|'email'|'mailFrequency'|'lessons'> &
     {
         profile: Profile | null
         holdings: Holding[]

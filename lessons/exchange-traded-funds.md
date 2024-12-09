@@ -3,6 +3,8 @@ title: "Exchange-Traded Funds (ETFs)"
 lesson: 5
 groupTitle: "Understanding the Stock Market"
 group: 2
+difficulty: 1
+importance: 4
 ---
 
 ## Exchange-Traded Funds (ETFs)

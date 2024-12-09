@@ -3,6 +3,8 @@ title: "Dividends & Buybacks"
 lesson: 4
 groupTitle: "Understanding the Stock Market"
 group: 2
+difficulty: 1
+importance: 5
 ---
 
 ## Dividends

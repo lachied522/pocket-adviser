@@ -3,6 +3,9 @@ title: "Stock Market Basics"
 lesson: 2
 groupTitle: "Understanding the Stock Market"
 group: 2
+difficulty: 3
+importance: 3
+prompts: ["What's the difference between the primary and secondary market?"]
 ---
 
 ## What is a stock?

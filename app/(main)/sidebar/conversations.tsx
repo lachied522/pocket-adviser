@@ -81,7 +81,9 @@ export default function Conversations() {
                     </>
                     ) : (
                     <SidebarMenuItem className='text-center p-2'>
-                        <span className='text-xs'>Nothing here yet</span>
+                        <span className='text-xs'>
+                            {state.accountType === "GUEST"? "Signup to save conversations": "Nothing here yet"}
+                        </span>
                     </SidebarMenuItem>
                     )}
                 </SidebarMenu>

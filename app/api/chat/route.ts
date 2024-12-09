@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
 
     let newConversationId: string;
     let extraHeaders: { [key: string]: string } = {};
-    if (!conversationId) {
+    if (accountType !== "GUEST" && !conversationId) {
         const res = await createNewConversation({ userId, messages });
         if (res) {
             newConversationId = res.id;
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
             toolCalls: ToolCallPart[]
             toolResults: ToolResultPart[]
         }) => {
-            if (finishReason !== "error") {
+            if (accountType !== "GUEST" && finishReason !== "error") {
                 const _messages = [
                     ...messages,
                     ...(toolCalls.length > 0? convertToolCallsToMessages({ toolCalls, toolResults }): []),

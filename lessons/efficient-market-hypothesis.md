@@ -3,6 +3,8 @@ title: "Efficient Market Hypothesis & Rationality"
 lesson: 7
 groupTitle: "Human Emotions & Market Psychology"
 group: 3
+difficulty: 2
+importance: 5
 ---
 
 ## Efficient Market Hypothesis (EMH)
@@ -18,7 +20,7 @@ In his book, A Random Walk Down Wall Street, Burton Malkiel claimed that “a bl
 
 Does this mean that all hope is lost?
 
-Contradictions to the EMH
+## Contradictions to the EMH
 "In theory there's no difference between theory and practice, but in practice there is." - Yogi Berra
 The “efficient” part of the EMH refers the assumptions it makes for its claim to hold.
 

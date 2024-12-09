@@ -3,6 +3,8 @@ title: "Introduction to Investing"
 lesson: 1
 groupTitle: "Introduction"
 group: 1
+difficulty: 1
+importance: 1
 ---
 
 ## Introduction

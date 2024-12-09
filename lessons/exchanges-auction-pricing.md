@@ -3,6 +3,8 @@ title: "Exchanges & Auction Pricing"
 lesson: 3
 groupTitle: "Understanding the Stock Market"
 group: 2
+difficulty: 1
+importance: 5
 ---
 
 ## The Stock Exchange

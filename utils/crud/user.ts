@@ -1,13 +1,16 @@
 import { getPrismaClient } from "./client";
 
-import type { User, Stock } from "@prisma/client";
+import { Prisma, type User, type Stock } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
 
 const prisma = getPrismaClient();
 
 export async function createUser(data: Partial<User>) {
     return await prisma.user.create({
-        data
+        data: {
+            ...data,
+            lessons: data.lessons ?? Prisma.JsonNull
+        },
     });
 }
 
@@ -20,7 +23,10 @@ export async function getUserById(id: string) {
 export async function updateUser(id: string, data: Partial<User>) {
     return await prisma.user.update({
         where: { id },
-        data,
+        data: {
+            ...data,
+            lessons: data.lessons ?? Prisma.JsonNull
+        },
     })
 }
 
@@ -66,7 +72,7 @@ export async function getDataByUserId(id: string) {
         throw new Error("User not found");
     }
 
-    const userData: UserData = {
+    const userData = {
         id: user.id,
         name: user.name,
         email: user.email,
@@ -80,7 +86,8 @@ export async function getDataByUserId(id: string) {
             userId: holding.userId,
         })),
         conversations: user.conversations,
-    };
+        lessons: user.lessons,
+    } satisfies UserData;
 
     const stockData: { [id: number]: Stock } = user.holdings.reduce((acc, obj) => ({ ...acc, [obj.stock.id]: obj.stock }), {});
 

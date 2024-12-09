@@ -30,6 +30,12 @@ export type Action = {
 } | {
     type: 'DELETE_CONVERSATION'
     payload: UserData['conversations'][number]['id']
+} | {
+    type: 'COMPLETE_LESSON'
+    payload: {
+        title: string,
+        value: string,
+    }
 }
 
 export function GlobalReducer(state: UserData, action: Action) {
@@ -115,6 +121,16 @@ export function GlobalReducer(state: UserData, action: Action) {
             return {
                 ...state,
                 conversations: state.conversations.filter((converastion) => converastion.id !== action.payload),
+            }
+        }
+
+        case 'COMPLETE_LESSON': {
+            return {
+                ...state,
+                lessons: {
+                    ...state.lessons as any, // TO DO
+                    [action.payload.title]: action.payload.value
+                }
             }
         }
 

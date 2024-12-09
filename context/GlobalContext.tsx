@@ -30,7 +30,8 @@ export type GlobalState = {
   deleteHoldingAndUpdateState: (holdingId: number) => Promise<void>
   insertConversation: (conversation: Pick<Conversation, 'id'|'name'|'updatedAt'>) => void
   updateConversationName: (conversation: Pick<Conversation, 'id'|'name'>) => void
-  deleteConversation: (conversationId: string) => Promise<void>
+  deleteConversation: (conversationId: string) => void
+  completeLesson: (title: string) => void
 }
 
 const GlobalContext = createContext<any>(null);
@@ -200,6 +201,19 @@ export const GlobalProvider = ({
     [dispatch]
   );
 
+  const completeLesson = useCallback(
+    (title: string) => {
+        dispatch({
+          type: "COMPLETE_LESSON",
+          payload: {
+              title,
+              value: "completed",
+          }
+        })
+    },
+    [dispatch]
+  )
+
   return (
     <GlobalContext.Provider
       value={{
@@ -214,6 +228,7 @@ export const GlobalProvider = ({
         insertConversation,
         updateConversationName,
         deleteConversation,
+        completeLesson,
         dispatch
       }}
     >

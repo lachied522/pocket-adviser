@@ -81,7 +81,7 @@ export default function Preferences() {
                                     step={0.001}
                                     value={[field.value ?? 0]}
                                     onValueChange={(value: number[]) => field.onChange(value[0])}
-                                    disabled={!field.value}
+                                    disabled={field.value === null}
                                     className="w-[160px] sm:w-[240px] cursor-pointer"
                                 />
                                 <div className="w-4 sm:w-6 text-sm font-semibold">{field.value? (100 * field.value).toFixed(2): "N/A"}%</div>

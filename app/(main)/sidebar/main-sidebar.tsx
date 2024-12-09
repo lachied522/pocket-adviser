@@ -3,7 +3,9 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-import { ArrowUpDown, BriefcaseBusiness, GraduationCap, Home, MessageCirclePlus, NotebookPen, SearchCheck, UserRound } from "lucide-react";
+import { ArrowUpDown, BriefcaseBusiness, GraduationCap, Home, MessageCirclePlus, NotebookPen, SearchCheck, UserRound, ChevronRight, CheckCheck } from "lucide-react";
+
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import {
     Sidebar,
@@ -19,7 +21,11 @@ import {
     SidebarSeparator,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 import ProfileDialog from "@/components/profile/profile-dialog";
 import NotesDialog from "@/components/dialogs/notes-dialog";
@@ -29,23 +35,18 @@ import PortfolioDialog from "@/components/portfolio/portfolio-dialog";
 import DisclaimerDialog from "@/components/dialogs/disclaimer-dialog";
 
 import Conversations from "./conversations";
-import NewChatButton from "./new-chat-button";
 
-import type { Lesson } from "../education/[slug]/helpers";
-
-const LESSON_GROUPS = [
-    "Introduction",
-    "Understanding the Stock Market",
-    "Human Emotions and Market Psychology"
-]
+import type { LessonGroup } from "../education/helpers";
 
 interface AppSidebarProps {
-    lessons: Pick<Lesson, 'frontmatter'|'slug'>[]
+    lessonGroups: LessonGroup[]
 }
 
 // see https://ui.shadcn.com/blocks - nested sidebars
-export default function AppSidebar({ lessons }: AppSidebarProps) {
+export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
+    const { state } = useGlobalContext() as GlobalState;
     const pathname = usePathname();
+
     return (
         <Sidebar collapsible="icon" className="overflow-hidden [&>[data-sidebar=sidebar]]:flex-row">
             <Sidebar collapsible="none" className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r">
@@ -86,7 +87,7 @@ export default function AppSidebar({ lessons }: AppSidebarProps) {
                                 </SidebarMenuItem>
 
                                 <SidebarMenuItem>
-                                    <Link href='/education/welcome'>
+                                    <Link href={`/education/${Object.entries(state.lessons ?? {}).find(([_, value]) => value === "in-progress")?.[0] ?? 'welcome'}`}>
                                         <SidebarMenuButton
                                             tooltip={{
                                                 children: "Education",
@@ -112,29 +113,53 @@ export default function AppSidebar({ lessons }: AppSidebarProps) {
                 <SidebarHeader className="hidden md:flex">
                     <SidebarTrigger />
                 </SidebarHeader>
+
                 {pathname.includes("education") ? (
                 <SidebarContent>
-                    {LESSON_GROUPS.map((group, index) => (
-                    <SidebarGroup key={`lesson-group-${index}`}>
-                        <SidebarGroupLabel className="text-primary">{group}</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {lessons.filter((lesson) => lesson.frontmatter.group === index + 1)
-                                .map((lesson) => (
-                                <SidebarMenuItem key={`lesson-${lesson.slug}`}>
-                                    <Link href={`/education/${lesson.slug}`}>
-                                        <SidebarMenuButton
-                                            isActive={pathname.includes(lesson.slug)}
-                                            className="h-9 max-w-[200px]"
-                                        >
-                                            <span className="truncate">{lesson.frontmatter.title}</span>
-                                        </SidebarMenuButton>
-                                    </Link>
-                                </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
+                    {lessonGroups.map((group, index) => (
+                    <Collapsible
+                        key={`lesson-group-${index}`}
+                        title={group.title}
+                        defaultOpen={!!group.lessons.find((lesson) => lesson.frontmatter.group === index + 1 && pathname.includes(lesson.slug))}
+                        className="group/collapsible"
+                    >
+                        <SidebarGroup>
+                            <SidebarGroupLabel className="text-primary">
+                                <CollapsibleTrigger className="w-full flex flex-row items-center justify-between gap-1">
+                                    <span className="text-left">{group.title}</span>
+                                    <ChevronRight
+                                        size={16}
+                                        className="shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-90"
+                                    />
+                                </CollapsibleTrigger>
+                            </SidebarGroupLabel>
+                            <CollapsibleContent>
+                                <SidebarGroupContent className="pt-1">
+                                    <SidebarMenu>
+                                        {group.lessons
+                                        .filter((lesson) => lesson.frontmatter.group === index + 1)
+                                        .map((lesson) => (
+                                        <SidebarMenuItem key={`lesson-${lesson.slug}`}>
+                                            <Link href={`/education/${lesson.slug}`}>
+                                                <SidebarMenuButton
+                                                    isActive={pathname === `/education/${lesson.slug}`}
+                                                    className="h-9 max-w-[200px] flex flex-row items-center justify-start gap-1 px-1"
+                                                >
+                                                    <div className='size-4 flex items-center justify-center'>
+                                                        {(state.lessons as any)?.[lesson.slug] === "completed" && (
+                                                        <CheckCheck size={12} className='text-green-400' />
+                                                        )}
+                                                    </div>
+                                                    <span className="text-xs truncate">{lesson.frontmatter.title}</span>
+                                                </SidebarMenuButton>
+                                            </Link>
+                                        </SidebarMenuItem>
+                                        ))}
+                                    </SidebarMenu>
+                                </SidebarGroupContent>
+                            </CollapsibleContent>
+                        </SidebarGroup>
+                    </Collapsible>
                     ))}
                 </SidebarContent>
                 ) : (

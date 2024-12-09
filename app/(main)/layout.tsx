@@ -11,7 +11,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "./sidebar/main-sidebar";
 import Header from "./header/main-header";
 
-import { getAllLessons } from "./education/[slug]/helpers";
+import { getLessonsByGroup } from "./education/helpers";
 
 export default async function MainLayout({
   children,
@@ -33,7 +33,7 @@ export default async function MainLayout({
     return (
       <GlobalProvider initialUserData={data.userData} initialStockData={data.stockData}>
         <SidebarProvider>
-          <Sidebar lessons={getAllLessons()} />
+          <Sidebar lessonGroups={getLessonsByGroup()} />
           <main className='h-dvh flex flex-col overflow-hidden relative'>
             <Header />
             {children}
