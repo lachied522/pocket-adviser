@@ -48,7 +48,7 @@ export default function LessonsProgress({ lessonGroups }: LessonsProgressProps) 
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-12'>
                 <div className='flex flex-col gap-3'>
                     {lessonGroups.map((group) => (
-                    <div className='flex flex-col gap-3'>
+                    <div key={`lesson-group-${group.number}`} className='flex flex-col gap-3'>
                         <span className='text-xl'>{group.title}</span>
                         <span className='text-sm'>{group.lessons.reduce((acc, obj) => acc + ((state.lessons as any)?.[obj.slug] === "completed"? 1: 0), 0)}/{group.lessons.length} complete</span>
 
