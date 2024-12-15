@@ -3,7 +3,19 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-import { ArrowUpDown, BriefcaseBusiness, GraduationCap, Home, MessageCirclePlus, NotebookPen, SearchCheck, UserRound, ChevronRight, CheckCheck } from "lucide-react";
+import {
+    ArrowUpDown,
+    BriefcaseBusiness,
+    GraduationCap,
+    Home,
+    MessageCirclePlus,
+    NotebookPen,
+    SearchCheck,
+    UserRound,
+    ChevronRight,
+    CheckCheck,
+    Inbox,
+} from "lucide-react";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
@@ -27,11 +39,9 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-import ProfileDialog from "@/components/profile/profile-dialog";
 import NotesDialog from "@/components/dialogs/notes-dialog";
 import CheckupDialog from "@/components/dialogs/checkup-dialog";
 import GetAdviceDialog from "@/components/dialogs/get-advice-dialog";
-import PortfolioDialog from "@/components/portfolio/portfolio-dialog";
 import DisclaimerDialog from "@/components/dialogs/disclaimer-dialog";
 
 import Conversations from "./conversations";
@@ -70,6 +80,26 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                     <SidebarGroup>
                         <SidebarGroupContent className="px-1.5 md:px-0">
                             <SidebarMenu className="gap-2">
+                                <SidebarMenuItem className='relative'>
+                                    <Link href='/inbox'>
+                                        <SidebarMenuButton
+                                            tooltip={{
+                                                children: "Inbox",
+                                                hidden: false,
+                                            }}
+                                            isActive={pathname.startsWith('/inbox')}
+                                            className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white relative"
+                                        >
+                                            <Inbox size={20} />
+                                            <span>Inbox</span>
+                                        </SidebarMenuButton>
+                                    </Link>
+
+                                    {!pathname.startsWith('/inbox') && !state.dailyAdviceViewed && (
+                                    <div className='z-10 size-2 bg-red-500 rounded-full absolute top-0 right-0 translate-x-0.5 -translate-y-0.5' />
+                                    )}
+                                </SidebarMenuItem>
+
                                 <SidebarMenuItem>
                                     <Link href='/'>
                                         <SidebarMenuButton
@@ -87,13 +117,45 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                 </SidebarMenuItem>
 
                                 <SidebarMenuItem>
+                                    <Link href='/profile'>
+                                        <SidebarMenuButton
+                                            tooltip={{
+                                                children: "Profile",
+                                                hidden: false,
+                                            }}
+                                            isActive={pathname.startsWith('/profile')}
+                                            className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
+                                        >
+                                            <UserRound size={20} />
+                                            <span>Profile</span>
+                                        </SidebarMenuButton>
+                                    </Link>
+                                </SidebarMenuItem>
+
+                                <SidebarMenuItem>
+                                    <Link href='/portfolio'>
+                                        <SidebarMenuButton
+                                            tooltip={{
+                                                children: "Portfolio",
+                                                hidden: false,
+                                            }}
+                                            isActive={pathname.startsWith('/portfolio')}
+                                            className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
+                                        >
+                                            <BriefcaseBusiness size={20} />
+                                            <span>Portfolio</span>
+                                        </SidebarMenuButton>
+                                    </Link>
+                                </SidebarMenuItem>
+
+                                <SidebarMenuItem>
                                     <Link href={`/education/${Object.entries(state.lessons ?? {}).find(([_, value]) => value === "in-progress")?.[0] ?? 'welcome'}`}>
                                         <SidebarMenuButton
                                             tooltip={{
                                                 children: "Education",
                                                 hidden: false,
                                             }}
-                                            isActive={pathname.includes('education')}
+                                            isActive={pathname.startsWith('education')}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
                                             <GraduationCap size={20} />
@@ -114,7 +176,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                     <SidebarTrigger />
                 </SidebarHeader>
 
-                {pathname.includes("education") ? (
+                {pathname.startsWith("education") ? (
                 <SidebarContent>
                     {lessonGroups.map((group, index) => (
                     <Collapsible
@@ -169,10 +231,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                             <SidebarMenu>
                                 <SidebarMenuItem>
                                     <Link href='/'>
-                                        <SidebarMenuButton
-                                            // variant="outline"
-                                            // className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
-                                        >
+                                        <SidebarMenuButton>
                                             <MessageCirclePlus size={16} />
                                             New chat
                                         </SidebarMenuButton>
@@ -181,10 +240,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
 
                                 <SidebarMenuItem>
                                     <CheckupDialog>
-                                        <SidebarMenuButton
-                                            // variant="outline"
-                                            // className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
-                                        >
+                                        <SidebarMenuButton>
                                             <SearchCheck size={16} />
                                             Portfolio review
                                         </SidebarMenuButton>
@@ -193,10 +249,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
 
                                 <SidebarMenuItem>
                                     <GetAdviceDialog>
-                                        <SidebarMenuButton
-                                            // variant="outline"
-                                            // className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
-                                        >
+                                        <SidebarMenuButton>
                                             <ArrowUpDown size={16} className='rotate-90' />
                                             Deposit/withdraw
                                         </SidebarMenuButton>
@@ -212,23 +265,8 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                         <SidebarGroupContent>
                             <SidebarMenu>
                                 <SidebarMenuItem>
-                                    <ProfileDialog>
-                                        <SidebarMenuButton
-                                            // variant="outline"
-                                            // className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
-                                        >
-                                            <UserRound size={16} />
-                                            Profile
-                                        </SidebarMenuButton>
-                                    </ProfileDialog>
-                                </SidebarMenuItem>
-
-                                <SidebarMenuItem>
                                     <NotesDialog>
-                                        <SidebarMenuButton
-                                            // variant="outline"
-                                            // className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
-                                        >
+                                        <SidebarMenuButton>
                                             <NotebookPen size={16} />
                                             Notes ✨
                                         </SidebarMenuButton>
@@ -238,26 +276,6 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                         </SidebarGroupContent>
                     </SidebarGroup>
                     
-                    <SidebarSeparator />
-
-                    <SidebarGroup>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <PortfolioDialog>
-                                        <SidebarMenuButton
-                                            // variant="outline"
-                                            // className='w-full flex flex-row justify-start gap-2 font-medium py-3 border border-zinc-600'
-                                        >
-                                            <BriefcaseBusiness size={16} />
-                                            Portfolio
-                                        </SidebarMenuButton>
-                                    </PortfolioDialog>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-
                     <SidebarSeparator />
 
                     <Conversations />

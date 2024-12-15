@@ -1,5 +1,5 @@
 "use client";
-import {  useEffect, useRef } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { motion, animate, useMotionValue } from "framer-motion";
 
 interface AnimationWrapperProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -8,7 +8,7 @@ export default function AnimationWrapper({ children, className }: AnimationWrapp
     const x = useMotionValue("0%");
     const animationRef = useRef<ReturnType<typeof animate>>();
 
-    const startAnimation = () => {
+    const startAnimation = useCallback(() => {
         const animation = animate(
             x,
             `${Number(x.get().replace('%', '')) - 100}%`,
@@ -19,7 +19,7 @@ export default function AnimationWrapper({ children, className }: AnimationWrapp
             }
         );
         animationRef.current = animation;
-    }
+    }, []);
 
     const stopAnimation = () => {
         if (animationRef.current) animationRef.current.stop();
@@ -28,7 +28,7 @@ export default function AnimationWrapper({ children, className }: AnimationWrapp
     // start animation on component mount
     useEffect(() => {
         startAnimation();
-    }, []);
+    }, [startAnimation]);
 
     return (
         <motion.div

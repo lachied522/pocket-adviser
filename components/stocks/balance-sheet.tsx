@@ -29,7 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
-import type { CompanyOutlook } from "@/types/data";
+import type { CompanyOutlook } from "@/utils/financial_modelling_prep/types";
 
 function formatValue(value: number) {
     const billion = 1e9;

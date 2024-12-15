@@ -20,11 +20,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { H1 } from "@/components/ui/typography";
 
-import Finance from "@/components/profile/finance";
-import Milestones from "@/components/profile/milestones";
-import Preferences from "@/components/profile/preferences";
-import RiskTolerance from "@/components/profile/risk-tolerance";
-import { formSchema } from "@/components/profile/form-schema";
+import Finance from "@/app/(main)/profile/components/finance";
+import Milestones from "@/app/(main)/profile/components/milestones";
+import Preferences from "@/app/(main)/profile/components/preferences";
+import RiskTolerance from "@/app/(main)/profile/components/risk-tolerance";
+import { formSchema } from "@/app/(main)/profile/components/form-schema";
 
 const TABS = [
     "preferences",

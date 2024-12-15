@@ -10,12 +10,12 @@ import { cn } from "@/components/utils";
 import { useScrollAnchor } from "@/hooks/useScrollAnchor";
 // import { useMessageThrottle } from "@/hooks/useMessageThrottle";
 
-import { type ChatState, useChatContext } from "./context";
+import { type ChatState, useChatContext } from "../context";
 
 import SamplePrompts from "./sample-prompts";
 import { ChatMessage } from "./messages";
 
-import type { StockNews } from "@/types/data";
+import type { StockNews } from "@/utils/financial_modelling_prep/types";
 import type { Message } from "ai";
 
 export default function ChatArea() {

@@ -1,6 +1,6 @@
 import { formatPercent } from "@/utils/formatting";
 
-import type { CompanyOutlook, IncomeStatement } from "@/types/data";
+import type { CompanyOutlook, IncomeStatement } from "@/utils/financial_modelling_prep/types";
 
 function calculateGrowth(
     income: IncomeStatement[], // this is automatically sorted by descending date

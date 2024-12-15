@@ -1,27 +1,37 @@
-import type { Message } from 'ai';
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+
+import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
 import { getConversationById } from '@/utils/crud/conversation';
 
-import { ChatProvider } from '../../components/context';
+import { ChatProvider } from '../../context';
 import ChatArea from "../../components/chat-area";
 
-export default async function MainPage({
+import type { Message } from 'ai';
+
+export default async function ConversationPage({
     params,
     searchParams
 }: {
     params: { conversationId: string },
     searchParams?: { [key: string]: string | string[] | undefined }
 }) {
+      // check if userId is in cookies
+    const cookieStore = cookies();
+    const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
+
     const conversationId = params.conversationId;
 
     let conversationHistory: Message[] = [];
     if (conversationId) {
         const conversation = await getConversationById(conversationId);
 
-        if (conversation) {
-          // TO DO: type this properly
-          conversationHistory = conversation.messages as any;
+        if (!conversation || conversation.userId !== userId) {
+            redirect('/');
         }
+
+        conversationHistory = conversation.messages as Message[];
     }
 
     let initialUserMessage: string | undefined = undefined;

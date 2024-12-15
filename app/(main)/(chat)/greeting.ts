@@ -5,7 +5,7 @@ import { kv } from '@vercel/kv';
 
 import { format } from 'date-fns';
 
-import { getSystemMessage } from '../../api/chat/system';
+import { getSystemMessage } from '@/app/api/ai/system';
 
 const BASE_GREETING = `
 Hello! I'm here to help you navigate the stock market and make informed investment decisions. I can provide insights into market events, assist with portfolio management, and offer guidance on potential investment opportunities.

@@ -36,7 +36,7 @@ import Income from "./income";
 import BalanceSheet from "./balance-sheet";
 import Cashflow from "./cashflow";
 
-import type { CompanyOutlook } from "@/types/data";
+import type { CompanyOutlook } from "@/utils/financial_modelling_prep/types";
 
 const prompts = (symbol: string) => [
     {

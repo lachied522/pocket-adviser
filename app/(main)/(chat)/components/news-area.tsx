@@ -15,13 +15,13 @@ import { cn } from "@/components/utils";
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 import NewsArticle from "./news-article";
 
-import type { StockNews } from "@/types/data";
+import type { StockNews } from "@/utils/financial_modelling_prep/types";
 
 const MAX_PAGES = 3;
 const COOKIE_NAME = "news:state";
 
 export default function NewsArea() {
-    const { state, getStockData } = useGlobalContext() as GlobalState;
+    const { partialStockData } = useGlobalContext() as GlobalState;
     const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isVisible, setIsVisible] = useState<boolean>(getCookie(COOKIE_NAME) === "true");
@@ -39,12 +39,7 @@ export default function NewsArea() {
 
         async function populatePage() {
             setIsLoading(true);
-            const symbols = await Promise.all(
-                state.holdings.map(
-                    (holding) => getStockData(holding.stockId)
-                    .then((stockData) => stockData.symbol)
-                )
-            );
+            const symbols = Object.values(partialStockData).map((obj) => obj.symbol);
             const _data = await getNewsAction(symbols, page, 20);
             // update state, ensuring only unique articles are returned
             setData((curr) => {
@@ -61,7 +56,7 @@ export default function NewsArea() {
             });
             setIsLoading(false);
         }
-    }, [state.holdings, isVisible, page, getStockData]);
+    }, [isVisible, page, partialStockData]);
 
     return (
         <div className='flex flex-col items-start gap-1 px-3 pb-1'>

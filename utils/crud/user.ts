@@ -50,9 +50,17 @@ export async function getDataByUserId(id: string) {
         where: { id },
         relationLoadStrategy: "join",
         include: {
-            profile: true,
             holdings: {
-                include: { stock: true },
+                include: {
+                    stock: {
+                        select: {
+                            id: true,
+                            symbol: true,
+                            previousClose: true,
+                            currency: true,
+                        }
+                    }
+                },
             },
             conversations: {
                 select: {
@@ -72,13 +80,14 @@ export async function getDataByUserId(id: string) {
         throw new Error("User not found");
     }
 
+    // omit unnecesary user data from return object
     const userData = {
         id: user.id,
         name: user.name,
         email: user.email,
         accountType: user.accountType,
         mailFrequency: user.mailFrequency,
-        profile: user.profile,
+        dailyAdviceViewed: user.dailyAdviceViewed,
         holdings: user.holdings.map((holding) => ({
             id: holding.id,
             units: holding.units,
@@ -89,8 +98,10 @@ export async function getDataByUserId(id: string) {
         lessons: user.lessons,
     } satisfies UserData;
 
-    const stockData: { [id: number]: Stock } = user.holdings.reduce((acc, obj) => ({ ...acc, [obj.stock.id]: obj.stock }), {});
+    const stockData = user.holdings.reduce(
+        (acc, obj) => ({ ...acc, [obj.stock.id]: obj.stock }),
+        {}
+    );
 
-    // omit unnecesary user data from return object
     return { userData, stockData };
 }

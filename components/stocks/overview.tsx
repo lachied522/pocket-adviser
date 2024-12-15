@@ -1,6 +1,6 @@
 import StockChart from "./stock-chart";
 
-import type { CompanyOutlook } from "@/types/data";
+import type { CompanyOutlook } from "@/utils/financial_modelling_prep/types";
 
 interface OverviewTabProps {
     stockData: CompanyOutlook

@@ -1,5 +1,5 @@
 "use client";
-import {
+import React, {
   createContext,
   useState,
   useCallback,
@@ -8,26 +8,22 @@ import {
 } from "react";
 
 import { updateUserAction } from "@/actions/crud/user";
-import { updateProfileAction } from "@/actions/crud/profile";
-import { getStockByIdAction } from "@/actions/crud/stocks";
-import { insertHoldingAction, updateHoldingAction, deleteHoldingAction } from "@/actions/crud/holdings";
 import { getForexRateAction } from "@/actions/data/forex";
 
 import { type Action, GlobalReducer } from "./GlobalReducer";
 
-import type { Conversation, Holding, Profile, Stock, User } from "@prisma/client";
+import type { Conversation, Stock, User } from "@prisma/client";
 import type { UserData } from "@/types/helpers";
+
+type PartialStockData = Pick<Stock, 'id'|'symbol'|'previousClose'|'currency'>;
 
 export type GlobalState = {
   state: UserData
+  partialStockData: { [id: number]: PartialStockData }
   dispatch: React.Dispatch<Action>
-  getStockData: (stockId: number) => Promise<Stock>
+  setPartialStockData: React.Dispatch<React.SetStateAction<{ [id: number]: PartialStockData }>>
   calcPortfolioValue: (currency?: 'AUD'|'USD') => Promise<number>
   updateUserAndUpdateState: (user: Partial<User>) => Promise<void>
-  updateProfileAndUpdateState: (profile: Omit<Profile, 'userId'>) => Promise<void>
-  insertHoldingAndUpdateState: (holding: Omit<Holding, 'id'|'userId'>) => Promise<number>
-  updateHoldingAndUpdateState: (holding: Omit<Holding, 'userId'>) => Promise<void>
-  deleteHoldingAndUpdateState: (holdingId: number) => Promise<void>
   insertConversation: (conversation: Pick<Conversation, 'id'|'name'|'updatedAt'>) => void
   updateConversationName: (conversation: Pick<Conversation, 'id'|'name'>) => void
   deleteConversation: (conversationId: string) => void
@@ -43,7 +39,7 @@ export const useGlobalContext = () => {
 interface GlobalProviderProps {
   children: React.ReactNode
   initialUserData: UserData
-  initialStockData: { [id: number]: Stock }
+  initialStockData: { [id: number]: PartialStockData }
 }
 
 export const GlobalProvider = ({
@@ -52,25 +48,8 @@ export const GlobalProvider = ({
   initialStockData,
 }: GlobalProviderProps) => {
   const [state, dispatch] = useReducer(GlobalReducer, initialUserData);
-  const [stockDataMap, setStockDataMap] = useState<{ [id: number]: Stock }>(initialStockData);
+  const [partialStockData, setPartialStockData] = useState<{ [id: number]: PartialStockData }>(initialStockData);
   const [forexMap, setForexMap] = useState<{ [currency: string ]: number }>({});
-
-  const getStockData = useCallback(
-    async (stockId: number) => {
-      if (stockId in stockDataMap) return stockDataMap[stockId];
-
-      try {
-        // fetch stock quote
-        const data = await getStockByIdAction(stockId);
-        if (!data) return;
-        setStockDataMap((curr) => ({ ...curr, [stockId]: data }));
-        return data;
-      } catch (e) {
-        console.error(e); // TO DO
-      }
-    },
-    [stockDataMap, setStockDataMap]
-  );
 
   const calcPortfolioValue = useCallback(
     async (currency: "AUD"|"USD" = "AUD") => {
@@ -87,7 +66,7 @@ export const GlobalProvider = ({
 
       return state.holdings.reduce(
         (acc, obj) => {
-            const stock = stockDataMap[obj.stockId];
+            const stock = partialStockData[obj.stockId];
             if (!stock) return 0;
             let multiplier = stock.currency !== currency? forexRate: 1;
             return acc + multiplier * (stock.previousClose || 0) * obj.units;
@@ -95,7 +74,7 @@ export const GlobalProvider = ({
         0
       )
     },
-    [state.holdings, stockDataMap, forexMap, setForexMap]
+    [state.holdings, partialStockData, forexMap, setForexMap]
   );
 
   const updateUserAndUpdateState = useCallback(
@@ -111,64 +90,6 @@ export const GlobalProvider = ({
         })
     },
     [state, dispatch]
-  );
-
-  const updateProfileAndUpdateState = useCallback(
-    async (profile: Omit<Profile, 'userId'>) => {
-      const res = await updateProfileAction(state.id, profile);
-      dispatch({
-        type: 'UPDATE_PROFILE',
-        payload: res
-      });
-    },
-    [state.id, dispatch]
-  );
-
-  const insertHoldingAndUpdateState = useCallback(
-    async (holding: Omit<Holding, 'id'|'userId'>) => {
-      const res = await insertHoldingAction({
-          ...holding,
-          userId: state.id,
-      });
-      // update state
-      dispatch({
-          type: 'INSERT_HOLDING',
-          payload: res,
-      });
-
-      return res.id;
-    },
-    [state.id, dispatch]
-  );
-
-  const updateHoldingAndUpdateState = useCallback(
-    async (holding: Omit<Holding, 'userId'>) => {
-      const res = await updateHoldingAction({
-        ...holding,
-        userId: state.id,
-      });
-      // update state
-      dispatch({
-        type: 'UPDATE_HOLDING',
-        payload: res
-      });
-    },
-    [state, dispatch]
-  );
-
-  const deleteHoldingAndUpdateState = useCallback(
-    async (holdingId: number) => {
-      try {
-        const res = await deleteHoldingAction(holdingId);
-        dispatch({
-          type: 'DELETE_HOLDING',
-          payload: res.id
-        });
-      } catch (e) {
-        // TO DO: sometimes user deletes a holding that is not yet in DB, which will cause error
-      }
-    },
-    [dispatch]
   );
 
   const insertConversation = useCallback(
@@ -218,13 +139,10 @@ export const GlobalProvider = ({
     <GlobalContext.Provider
       value={{
         state,
-        getStockData,
+        partialStockData,
+        setPartialStockData,
         calcPortfolioValue,
         updateUserAndUpdateState,
-        updateProfileAndUpdateState,
-        insertHoldingAndUpdateState,
-        updateHoldingAndUpdateState,
-        deleteHoldingAndUpdateState,
         insertConversation,
         updateConversationName,
         deleteConversation,

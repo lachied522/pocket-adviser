@@ -2,7 +2,7 @@
 
 import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
-import type { StockNews } from "@/types/data";
+import type { StockNews } from "@/utils/financial_modelling_prep/types";
 
 export async function getNewsAction(symbols: string[], page: number = 0, limit: number = 12) {
     try {

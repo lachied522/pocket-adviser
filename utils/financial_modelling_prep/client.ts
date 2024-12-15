@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote, EconomicsEvent, EarningsEvent, CompanyOutlook } from "@/types/data";
+import type { CompanyProfile, AnalystResearch, StockNews, StockQuote, PriceTargetConsesus, IncomeGrowth, Ratios, FXQuote, EconomicsEvent, EarningsEvent, CompanyOutlook } from "@/utils/financial_modelling_prep/types";
 
 export class FinancialModellingPrepClient {
     API_KEY = process.env.FMP_API_KEY;

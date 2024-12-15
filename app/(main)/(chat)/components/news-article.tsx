@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { cn } from "@/components/utils";
 
-import type { StockNews } from "@/types/data";
+import type { StockNews } from "@/utils/financial_modelling_prep/types";
 
 interface NewsArticleProps {
     article: StockNews

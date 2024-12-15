@@ -28,14 +28,14 @@ export default async function MainLayout({
     }
   
     // fetch user data if able
-    const data = await getDataByUserId(userId);
+    const { userData, stockData } = await getDataByUserId(userId);
 
     return (
-      <GlobalProvider initialUserData={data.userData} initialStockData={data.stockData}>
+      <GlobalProvider initialUserData={userData} initialStockData={stockData}>
         <SidebarProvider>
           <Sidebar lessonGroups={getLessonsByGroup()} />
           <main className='h-dvh flex flex-col overflow-hidden relative'>
-            <Header />
+            <Header accountType={userData.accountType} />
             {children}
           </main>
         </SidebarProvider>

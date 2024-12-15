@@ -7,13 +7,13 @@ import { CheckCheck, OctagonAlert } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/components/utils";
 
-import RecommendationsTable from "./recommendations";
+import AdviceTabs from "@/components/advice/advice-tabs";
 import SearchResults from "./search-results";
 import NewsArticle from "./news-article";
 import StockCard from "./stock-card";
 
 import type { Message, ToolInvocation } from "ai";
-import type { StockNews } from "@/types/data";
+import type { StockNews } from "@/utils/financial_modelling_prep/types";
 
 /** formatting functions for markdown */
 function H3(props: any) {
@@ -128,7 +128,7 @@ function ToolMessage({ toolInvocation }: { toolInvocation: ToolInvocation }) {
                 if (!toolInvocation.result) {
                     return <ToolStatusMessage msg="Error getting trade ideas" isError={true} />;
                 }
-                return <RecommendationsTable {...toolInvocation.result} />;
+                return <AdviceTabs advice={toolInvocation.result} />;
             } else {
                 return <LoadingMessage msg="Getting trade ideas" />;
             }
@@ -231,7 +231,7 @@ export function ChatMessage({
                 role === "user" && 'items-end'
             )}
         >
-            <div className='text-sm font-medium text-slate-600'>
+            <div className='text-sm font-medium text-zinc-400'>
                 {role === "assistant"? "Pocket Adviser": "Me"}
             </div>
 

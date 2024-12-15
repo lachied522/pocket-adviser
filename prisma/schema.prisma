@@ -3,6 +3,10 @@ generator client {
   previewFeatures = ["relationJoins"]
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider  = "postgresql"
   // Uses connection pooling
@@ -13,25 +17,26 @@ datasource db {
 }
 
 model User {
-  id               String         @id @default(cuid())
-  name             String?
-  email            String?        @unique
-  hashedPassword   String?
-  emailVerified    DateTime?
-  image            String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  stripeCustomerId String?
-  accountType      AccountType    @default(FREE)
-  mailFrequency    MailFrequency?
-  accounts         Account[]
-  sessions         Session[]
-  holdings         Holding[]
-  recommendations  Advice[]
-  conversations    Conversation[]
-  notes            Note[]
-  profile          Profile?
-  lessons          Json?
+  id                String         @id @default(cuid())
+  name              String?
+  email             String?        @unique
+  hashedPassword    String?
+  emailVerified     DateTime?
+  image             String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  stripeCustomerId  String?
+  accountType       AccountType    @default(FREE)
+  mailFrequency     MailFrequency?
+  accounts          Account[]
+  sessions          Session[]
+  holdings          Holding[]
+  advice            Advice[]
+  conversations     Conversation[]
+  notes             Note[]
+  profile           Profile?
+  lessons           Json?
+  dailyAdviceViewed Boolean        @default(true)
 }
 
 model Account {
@@ -91,35 +96,37 @@ model Profile {
   riskToleranceQ4       Int               @default(3)
   international         Float?
   targetYield           Float?
+  /// [Preferences]
   preferences           Json?
+  /// [Milestone]
   milestones            Json?
 
-  User                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Stock {
-  id                Int       @id @default(autoincrement())
-  symbol            String    @unique
-  name              String
-  description       String?
-  exchange          String
-  currency          String
-  country           String?
-  isEtf             Boolean
-  previousClose     Float?
-  change            Float?
-  priceTarget       Float?
-  beta              Float?
-  stdDev            Float?
-  dividendAmount    Float?
-  dividendYield     Float?
-  marketCap         BigInt
-  sector            String?
-  peRatio           Float?
-  epsGrowth         Float?
-  tags              String[]
+  id             Int      @id @default(autoincrement())
+  symbol         String   @unique
+  name           String
+  description    String?
+  exchange       String
+  currency       String
+  country        String?
+  isEtf          Boolean
+  previousClose  Float?
+  change         Float?
+  priceTarget    Float?
+  beta           Float?
+  stdDev         Float?
+  dividendAmount Float?
+  dividendYield  Float?
+  marketCap      BigInt
+  sector         String?
+  peRatio        Float?
+  epsGrowth      Float?
+  tags           String[]
 
-  Holdings          Holding[]
+  Holdings Holding[]
 
   @@index([name, symbol])
 }
@@ -135,14 +142,17 @@ model Holding {
 }
 
 model Advice {
-  id                Int      @id @default(autoincrement())
-  action            Action   @default(REVIEW)
-  amount            Float?   @default(0)
-  transactions      Json[]
-  initialAdjUtility Float?
-  finalAdjUtility   Float?
-  createdAt         DateTime @default(now())
-  userId            String
+  id           Int        @id @default(autoincrement())
+  amount       Float?     @default(0)
+  type         AdviceType @default(REVIEW)
+  /// [Transaction]
+  transactions Json[]
+  /// [PartialStockData]
+  stockData    Json[]
+  /// [Statistics]
+  statistics   Json
+  createdAt    DateTime   @default(now())
+  userId       String
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -199,8 +209,9 @@ enum EmploymentStatus {
   RETIRED
 }
 
-enum Action {
+enum AdviceType {
   DEPOSIT
   WITHDRAW
   REVIEW
+  DAILY
 }

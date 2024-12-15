@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { FinancialModellingPrepClient } from "@/utils/financial_modelling_prep/client";
 
-import type { EarningsEvent, EconomicsEvent } from "@/types/data";
+import type { EarningsEvent, EconomicsEvent } from "@/utils/financial_modelling_prep/types";
 
 // key for data in kv store
 const KEY = "DATA_CALENDAR";
