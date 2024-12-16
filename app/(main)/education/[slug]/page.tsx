@@ -11,11 +11,27 @@ import { cn } from "@/components/utils";
 import { getAllLessons, getLessonBySlug } from "../helpers";
 import LessonNavigation from "./lesson-navigation";
 
+function H1(props: any) {
+    return (
+        <h1 className="text-2xl font-semibold">
+            {props.children}
+        </h1>
+    )
+}
+
 function H2(props: any) {
     return (
         <h2 className="text-xl font-semibold">
             {props.children}
         </h2>
+    )
+}
+
+function H3(props: any) {
+    return (
+        <h3 className="font-semibold">
+            {props.children}
+        </h3>
     )
 }
 
@@ -114,8 +130,8 @@ export default async function Page({
                         <Markdown
                             rehypePlugins={[rehypeRaw]}
                             components={{
-                                h2: H2, a: A,
-                                img: Img,
+                                h1: H1, h2: H2, h3: H3,
+                                a: A, img: Img,
                                 blockquote: Blockquote,
                                 ul: UnorderedList, li: ListItem
                             }}

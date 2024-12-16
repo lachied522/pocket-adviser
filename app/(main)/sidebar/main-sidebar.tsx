@@ -155,7 +155,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                                 children: "Education",
                                                 hidden: false,
                                             }}
-                                            isActive={pathname.startsWith('education')}
+                                            isActive={pathname.startsWith('/education')}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
                                             <GraduationCap size={20} />
@@ -176,7 +176,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                     <SidebarTrigger />
                 </SidebarHeader>
 
-                {pathname.startsWith("education") ? (
+                {pathname.startsWith("/education") ? (
                 <SidebarContent>
                     {lessonGroups.map((group, index) => (
                     <Collapsible

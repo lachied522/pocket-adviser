@@ -26,7 +26,7 @@ There are a few items that can cause earnings to deviate from cash flows.
 - Accounts receivable (AR) - when a company delivers a good or service before receiving payment, the amount owed to the company is added to accounts receivable and recorded as income even though no cash has been received.
 - Unrealised Gains or Losses - when the company owns an asset that has increased in value, the gain is recognised as income even if the asset has not yet been sold.
 
-# Operating Cash Flow (OCF)
+### Operating Cash Flow (OCF)
 Operating cash flow includes any changes in cash that are considered part of the core operations of a business, like sales, wages, marketing, and taxes.
 
 Operating cash flow is calculated by starting at net income (from the income statement), which already includes operating expenses, and adding back all the non-cash or non-operating items. For example, depreciation and amortization which was deducted from income on the income statement is added back, which has the effect of removing it from the resulting figure. This process is demonstrated by the sample cash flow statement below.
@@ -35,7 +35,7 @@ Operating cash flow is important because it shows how much cash the core busines
 
 It is also good to compare operating cash flow to net income to determine the portion of earnings that are cash-based. If operating cash flow is significantly lower than net income, that indicates that a high portion of earnings are non-cash. This is a bad sign because, as mentioned above, businesses can't pay its employees, suppliers, etc. without cash.
 
-# Investing Cash Flow
+### Investing Cash Flow
 All businesses must invest in physical assets like land, equipment, or machinery to operate. It may even acquire other businesses, or choose to put its spare cash to use and buy shares or other assets. These activities are not considered regular or part of the day to day operations of the business, and are classified as investing cash flows.
 
 Investing is how companies grow. If a business wants to grow over the long term it puts its spare cash into things like stores, factories, equipment, or technology so that it can improve its operations in the future. For that reason, investing cash flow is often negative.
@@ -49,7 +49,7 @@ As we know, there are various things a company can do to raise money. The money 
 
 Like investing cash flow, a negative financing cash flow is actually normal. Ideally, a business that has been operating for some time receives all the cash it needs from its core operations, so there is no need to raise capital through external sources. However, sometimes businesses want to make a large purchase, such as acquiring another company, in which case it is often appropriate to raise more money. If you see positive investing cash flow, try to find out what the company intends to use the cash for.
 
-# Free Cash Flow (FCF)
+### Free Cash Flow (FCF)
 Free cash flow is the cash generated from the core business after accounting for the amount spent to maintain, acquire, or upgrade its physical assets (PP&E on the balance sheet). The money spent on physical assets is called capital expenditure or capex.
 
 Capital expenditure is an important expense because businesses require some amount of physical assets to operate. It is not included in operating cash flow, meaning that operating cash flow does not provide a full picture of what running the business is really like.

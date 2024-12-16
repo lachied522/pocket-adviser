@@ -36,10 +36,11 @@ const PREFERENCE_OPTIONS = [
 
 interface PreferencesSelectorProps {
   value: { [key: string]: 'like' | 'dislike' }
+  disabled?: boolean
   onChange: (event: any) => void
 }
 
-export default function PreferencesSelector({ value, onChange }: PreferencesSelectorProps) {
+export default function PreferencesSelector({ value, disabled, onChange }: PreferencesSelectorProps) {
   const togglePreference = (name: string) => {
       const newValue = { ...value }; // clone preferences
 
@@ -62,11 +63,14 @@ export default function PreferencesSelector({ value, onChange }: PreferencesSele
         {PREFERENCE_OPTIONS.map((name, index) => (
             <Card
                 key={`preference-option-${index}`}
-                onClick={() => togglePreference(name)}
+                onClick={() => {
+                    if (!disabled) togglePreference(name);
+                }}
                 className={cn(
-                    "flex items-center justify-center rounded-xl cursor-pointer",
+                    "flex items-center justify-center rounded-xl",
+                    !disabled && "cursor-pointer",
                     value[name]==="like" && "text-green-400 bg-green-100 border-solid border-green-200",
-                    value[name]==="dislike" && "text-red-400 bg-red-100 border-red-200"
+                    value[name]==="dislike" && "text-red-400 bg-red-100 border-red-200",
                 )}
             >
               <CardContent className="text-xs font-medium px-3 sm:px-4 py-2 select-none">

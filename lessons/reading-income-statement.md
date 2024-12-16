@@ -37,7 +37,7 @@ It is even better if the rate of growth in both revenue and earnings is increasi
 
 Revenue and, therefore, earnings are very often cyclical in nature, meaning they naturally fluctuate up and down with business conditions. For example, the revenue of mining companies like BHP or Rio Tinto (RIO) are directly influenced by the price of resources which can change significantly at different points in the cycle. Another example is retailers like Target (TGT), which experience greater sales during the December quarter because of the holiday season. In these situations it is not appropriate to compare revenue and earnings over short timeframes. That is why it is important to consider the trend over the long-term, like four to five years.
 
-# Price to Earnings (PE) ratio
+### Price to Earnings (PE) ratio
 
 > Price to Earnings Ratio = Share Price / Annual EPS
 
@@ -71,7 +71,7 @@ This is an important concept that will recur throughout this section. Because ea
 
 Another way to can assess the valuation is by looking at the PE ratio over time. Just like we did with the S&P 500 Index above, we can compare the current PE ratio the historical average to see whether the stock is cheaper compared to itself. This is great because single companies tend not to change significantly over time, which provides a setting that satisfies the "all else equal" problem.
 
-# Price to Earnings Growth (PEG) Ratio
+### Price to Earnings Growth (PEG) Ratio
 
 > PEG ratio = PE ratio / EPS growth rate (%)
 
@@ -86,7 +86,7 @@ In general, you should look for a PEG ratio below or around 1.0. However, there 
 
 One of the shortcomings of the PEG ratio is that growth is not always positive. In fact, pretty much every company will experience negative growth at some point in its life. And when growth is negative the PEG ratio is negative, which has no meaning at all. This pretty much disqualifies the PEG ratio from being used in sectors where growth fluctuate, like energy or mining, and during economic downturns. However, in all other situations the PEG ratio is one of the best for assessing valuation.
 
-# Price to Sales (PS) Ratio
+### Price to Sales (PS) Ratio
 
 > Price to Sales Ratio = Share Price / Annual Revenue per Share
 
@@ -98,7 +98,7 @@ You can see in the figure above how the average PS ratio is much greater for the
 
 However, this ratio does not take costs into account and therefore relates less closely to how much shareholders get to take home than the PE ratio does. For this reason, I would recommend only using the PS ratio as a stand-in when the PE ratio can't be used.
 
-# Profit Margin
+### Profit Margin
 
 > Profit Margin = Net Income / Revenue
 
@@ -112,7 +112,7 @@ You should also consider the change in profit margin over time, as it can reveal
 
 On the other hand, if revenue is growing while profit margin is falling it means that costs are growing faster than revenue. Again, not all costs are bad. In this situation, you should find out what the company is spending money on. Is it something that supports the future growth of the business? If not, it could indicate that continued expansion of the business is unsustainable.
 
-# Gross Margin
+### Gross Margin
 
 > Gross Margin = Gross Profit / Revenue
 

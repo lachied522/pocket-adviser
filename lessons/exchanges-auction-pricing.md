@@ -31,7 +31,7 @@ Before the internet, stock brokers were all real people who had to phone the exc
 
 The other type of broker is called a discount, or execution-only, broker. These brokers are electronic and simply execute the orders you give them. They are much cheaper than a traditional broker.
 
-## Brokerage Fees
+### Brokerage Fees
 > Key Concept - you will incur a brokerage fee every time you buy and sell a stock.
 
 Recently, some online brokers like Robinhood have been offering commission-free trading (unfortunately Robinhood is not available in Australia). Other than these special cases, brokers typically charge a commission every time you transact.

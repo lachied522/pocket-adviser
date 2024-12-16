@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 
 import { NotebookPen, Pencil } from "lucide-react";
 
@@ -47,15 +48,16 @@ export default function ProfileForm() {
                 </>
                 ) : (
                 <>
-                    <Button
-                        type='button'
-                        variant='outline'
-                        className='flex flex-row gap-2 justify-start'
-                        disabled
-                    >
-                        <NotebookPen size={16} />
-                        Take assessment
-                    </Button>
+                    <Link href='/onboarding/profile'>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            className='flex flex-row gap-2 justify-start'
+                        >
+                            <NotebookPen size={16} />
+                            Take assessment
+                        </Button>
+                    </Link>
 
                     <Button
                         type='button'

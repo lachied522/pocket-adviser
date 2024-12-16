@@ -9,12 +9,12 @@ importance: 2
 
 ## Reading the Cash Flow Statement
 
-# Cash Flow Growth
+### Cash Flow Growth
 The first thing to consider on the cash flow statement is the change in cash flow over time. You want to see that the business is generating more cash over time, and that cash is coming from operations rather than investing or financing.
 
 Ideally, investing and financing cash flows are negative, indicating the business is expanding and returning capital to lenders and shareholders. One or two periods of positive investing or financing cash flows are fine, but anything further would be considered a red flag.
 
-# Price to Free Cash Flow (FCF) Ratio
+### Price to Free Cash Flow (FCF) Ratio
 
 > Price to Free Cash Flow (FCF) Ratio = Share Price / Free Cash Flow per Share
 
@@ -24,7 +24,7 @@ The advantage of the price to free cash flow ratio over the PE ratio is that it 
 
 The price to free cash flow ratio can be used in all the same ways as the PE ratio. However, the difference between sectors can be more pronounced than the PE ratio. Some sectors, such as mining and industrials, require large amounts of fixed assets to operate, meaning capital expenditure is greater and free cash flow is lower. Other sectors, like technology, require very little fixed assets so free cash flow is higher.
 
-# Cash Flow Margin
+### Cash Flow Margin
 
 > Cash Flow Margin = Operating Cash Flow / Revenue
 
@@ -32,7 +32,7 @@ The cash flow margin is a profitability metric, like the profit margin. It repre
 
 Again, the advantage of this ratio over its accrual-based counterpart is that it is cash-based and only includes cash flows from the core operations.
 
-# Cash Flow Coverage Ratio
+### Cash Flow Coverage Ratio
 
 > Cash Flow Coverage Ratio = Operating Cash Flow / Total Debt
 

@@ -44,19 +44,24 @@ const OBJECTIVE_MAP = {
 
 interface ObjectiveSelectorProps {
     value: string
+    disabled?: boolean
     onChange: (event: any) => void
 }
 
-export default function ObjectiveSelector({ value, onChange }: ObjectiveSelectorProps) {
+export default function ObjectiveSelector({ value, disabled, onChange }: ObjectiveSelectorProps) {
     return (
         <div className='md:max-w-[1000px] flex flex-wrap gap-2 items-stretch justify-center px-2 py-6 mx-auto'>
             {Object.entries(OBJECTIVE_MAP).map(([objective, props], index) => (
             <Card
                 key={`objective-card-${index}`}
-                onClick={() => onChange(objective)}
+                onClick={() => {
+                    if (!disabled) onChange(objective);
+                }}
                 className={cn(
-                    'h-[120px] md:h-[140px] w-[220px] md:w-[250px] flex flex-col items-center justify-between p-3.5 md:p-5 cursor-pointer hover:bg-zinc-50',
-                    value === objective && 'bg-zinc-100 border-zinc-200 hover:bg-zinc-100'
+                    'h-[120px] md:h-[140px] w-[220px] md:w-[250px] flex flex-col items-center justify-between p-3.5 md:p-5',
+                    value === objective && 'bg-zinc-100 border-zinc-200',
+                    value === objective && !disabled && 'cursor-pointer hover:bg-zinc-100',
+                    value !== objective && !disabled && 'cursor-pointer hover:bg-zinc-50',
                 )}
             >
                 <div className="flex flex-row items-start gap-1 md:gap-3.5">

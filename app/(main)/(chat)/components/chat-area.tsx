@@ -47,7 +47,7 @@ export default function ChatArea() {
     return (
         <div className='flex-1 flex flex-col overflow-hidden'>
             <div ref={scrollAreaRef} className='flex-1 overflow-y-auto scroll-smooth'>
-                <div className='max-w-6xl flex flex-col px-3 md:px-6 mx-auto overflow-hidden'>
+                <div className='max-w-6xl flex mx-auto overflow-hidden'>
                     <div
                         onDragEnter={() => setIsDragging(true)}
                         onDragLeave={() => setIsDragging(false)}
@@ -58,7 +58,7 @@ export default function ChatArea() {
                         onDrop={onDrop}
                         className={cn('flex-1 overflow-hidden', isDragging && 'shadow-inner')}
                     >
-                        <div className='flex flex-col justify-start gap-3 md:px-3 py-3'>
+                        <div className='flex flex-col justify-start gap-3 py-3'>
                             {messages.map((message: Message) => (
                             <ChatMessage
                                 key={message.id}

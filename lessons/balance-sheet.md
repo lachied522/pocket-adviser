@@ -16,18 +16,18 @@ Shareholder's equity is simply the amount of money belonging to the company's sh
 
 ![Apple's Balance Sheet 2024](/education/aapl-balance-sheet-2024.png)
 
-# Tangibility
+### Tangibility
 Assets and liabilities are mostly **tangible**, meaning you can physically touch them or their value can be easily measured. You can touch a machine or a building, so they are tangible assets. Even money in the bank could be withdrawn for you to touch it if you really wanted.
 
 On the other hand, **intangible** assets can't be physically touched and their value is less certain. This includes things like branding (think of brand recognition and customer loyalty), patents, and trademarks.
 
-# Current and non-current
+### Current and non-current
 Assets and liabilities are further categorised based on when the corresponding money flow is expected to occur. An asset or liability is considered **current** if its benefit or cost is expected to be derived in the next 12 months, and **non-current** if it’s any longer.
 
 Below are some of the assets and liabilities that are usually included in the balance sheet.
 
 ## Assets​
-# Cash and Cash Equivalents (CCE)
+### Cash and Cash Equivalents (CCE)
 Cash and cash equivalents is the total value of assets held that are cash or can be readily converted to cash. The term "cash" has a broader meaning here than the paper money you are probably thinking of. In accounting, cash means money in the form of a currency that can be spent, which is most often just money in a bank account.
 
 Cash equivalents are investments the company may hold that can be sold quickly, such as treasury bills or money market accounts.
@@ -36,19 +36,19 @@ Cash is extremely important to the health of a business. Cash is what the compan
 
 We will discuss later how to measure cash and what sort of cash levels to look for.
 
-# Accounts Receivable (AR)
+### Accounts Receivable (AR)
 Accounts receivable is the money owed to the company by its customers. This occurs when the business delivers goods or services to customers in advance of payment. For example, a manufacturing company may manufacture a product and invoice the customer. The customer may have up to 90 days to make the payment, during which the amount is an account receivable.
 
 In a small number of situations, customers may not pay what they owe to the company. In this case, the amount will be written off as a bad debt. However, 99% of the time the company will receive what it is owed.
 
-# Inventory
+### Inventory
 Inventory is the total value of goods the company has that are available to sell. Retailers typically keeps a high number of goods in storage so that it can readily replace the items on its shelves. Inventory also includes raw materials that go into making the final product, and intermediate goods that are not yet finished.
 
-# Property, Plant, and Equipment (PP&E)
+### Property, Plant, and Equipment (PP&E)
 Property, plant, and equipment is the total value of the land, buildings, and other physical assets like machinery or vehicles owned by the company. These assets are vital to running the business. PP&E are considered non-current assets because they are not easily, or intended to be, sold and converted to cash.​
 
 ## Liabilities
-# Borrowings or debt
+### Borrowings or debt
 Borrowings or debt is the amount owed by the company to its lenders. This includes banks and other lenders like bondholders.
 
 Debt allows companies to invest in projects that they otherwise wouldn't be able to. Having some amount of debt is not only expected, but, because of leverage which we will discuss below, can actually be a good thing. Companies carefully balance the amount of debt they carry to ensure it is neither too high or too low.
@@ -57,20 +57,20 @@ Another benefit of debt is that the repayments are tax-deductible. This means th
 
 We will discuss later how to measure debt and what levels are appropriate.
 
-# Accounts Payable (AP)
+### Accounts Payable (AP)
 Accounts payable is the amount owed by the company to its suppliers. This is similar to accounts receivable above, and occurs when the company receives a good or service from a supplier that it has not yet paid for.
 
-# Deferred Revenue
+### Deferred Revenue
 Deferred revenue is the value of goods or services the company is obligated to deliver to customers. This occurs when the business receives payment for a good or service that it has not yet delivered. For example, a utility company may receive upfront payment to deliver energy to a customer for the next month. The revenue from this transaction is "deferred" because it has not yet been earned by the company.
 
-# Lease Liabilities
+### Lease Liabilities
 Lease liabilities is the total value of the leases held by the company, most often for land or buildings. A lease is a type of contract where the lessee, in this case, the company, uses an asset that is legally owned by another party in exchange for a fixed payment. This is the same thing as when you rent a house from your landlord.
 
 ## Shareholder's Equity
-# Equity Capital
+### Equity Capital
 Equity capital or stock is the money contributed to the company by shareholders during equity raising events, such as the IPO or secondary offerings.
 
-# Retained Earnings
+### Retained Earnings
 Retained earnings is the amount of profit that has been accumulated and retained by the company (rather than distributed to shareholders). It is not necessarily kept as cash in the bank, but could have been reinvested in the business or used to payoff loans.
 
 ## Some Accounting

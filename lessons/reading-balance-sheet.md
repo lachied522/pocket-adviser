@@ -8,7 +8,7 @@ importance: 3
 ---
 
 ## Reading the Balance Sheet
-# Debt to Equity (DE) Ratio
+### Debt to Equity (DE) Ratio
 
 > Debt to Equity Ratio = Total Liabilities / Shareholder's Equity
 
@@ -20,7 +20,7 @@ Companies must always pay their obligations no matter how much money they earn, 
 
 The lower the debt to equity ratio the better. However, some industries, such as mining or manufacturing, involve large fixed assets which are appropriately borrowed rather than bought outright, in which case the ratio will naturally be higher. The consensus is that a DE ratio below 2.0 is safe, but I believe you should look for a ratio below 1.0.
 
-# Cash to Total Debt Ratio
+### Cash to Total Debt Ratio
 
 > Cash to Total Debt Ratio = Cash & Equivalents / Total Debt
 
@@ -32,7 +32,7 @@ However, high cash to total debt ratios should be within reason. We know that so
 
 In saying this, company managers are generally aware of these concerns and know how best to deploy their cash. That's why I believe having high amounts of cash is pretty much always a good sign. You should look for cash to total debt ratios above 0.5.
 
-# Price to Book (PB) ratio
+### Price to Book (PB) ratio
 
 > PB ratio = Share Price / Shareholder's Equity per Share
 
@@ -50,7 +50,7 @@ In his famous book on value investing, The Intelligent Investor, first published
 
 These days, you will rarely find a stock trading below a PB ratio of 1.0. I believe the explosion in technology since The Intelligent Investor was first published has significantly changed growth rates for companies and expectations of investors. Furthermore, because of the significant differences between market sectors, I don't believe there is an absolute figure you should look for in the PB ratio. You should use the PB ratio to compare companies within the same sector, or compare it to the PB ratio of the same company on a historical basis.
 
-# Return on Equity (ROE)
+### Return on Equity (ROE)
 
 > Return on Equity = Net Income / Shareholder's Equity
 
@@ -60,7 +60,7 @@ Return on equity is important because it directly determines the company’s gro
 
 Look for an ROE above 20%.
 
-# Current Ratio
+### Current Ratio
 
 > Current Ratio = Total Current Assets / Total Current Liabilities
 
@@ -72,7 +72,7 @@ However, if the current ratio is extremely high, for example 3.0 or above, it ma
 
 > Tip - Look for a current ratio between 1.0 and 3.0.
 
-# ​Other Things to Consider
+### ​Other Things to Consider
 One of the other things I like to look at on the balance sheet is how debt evolves over time. For example, if debt is stable or decreasing over time it is evident that it is within a level that is manageable by the company. On the other, if debt is consistently increasing over time it is an indicator that the business is not making enough money to cover interest payments. It's also possible that the business is simply relying on debt financing to expand its operations, in which case you would like to see revenue expanding at the same or faster pace then debt.
 
 ## Summary of Key Concepts
