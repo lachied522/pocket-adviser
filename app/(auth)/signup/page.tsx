@@ -82,7 +82,7 @@ export default function SignupPage() {
                 "credentials",
                 {
                     ...values,
-                    callbackUrl: '/onboarding/profile',
+                    callbackUrl: '/onboarding/profile/?new',
                     redirect: true,
                 }
             );

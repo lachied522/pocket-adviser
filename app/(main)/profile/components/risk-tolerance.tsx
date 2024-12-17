@@ -12,14 +12,14 @@ import {
     RadioGroupItem
 } from "@/components/ui/radio-group";
 
-import type { FormValues } from "./form-schema";
+import type { FormValues } from "../../../../components/profile/form-schema";
 
 export default function RiskTolerance() {
     const form = useFormContext<FormValues>();
     return (
         <div className='flex flex-col gap-6 sm:gap-12 px-2'>
             <p className='text-xs sm:text-sm'>
-                <span className='font-medium'>Note.</span> Risk of an investment is defined as the probability that it will incur a financial loss. 
+                <span className='font-medium'>Note.</span> Risk of an investment is defined as the probability that it will incur a financial loss.
                 The higher the risk of an investment, the greater both the <b>potential gain</b> and <b>potential loss</b> will be.
             </p>
 
@@ -132,7 +132,7 @@ export default function RiskTolerance() {
                             What is your willingness to take on financial risk?
                         </FormLabel>
                         <FormControl>
-                            <RadioGroup 
+                            <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
                                 className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
@@ -182,7 +182,7 @@ export default function RiskTolerance() {
                             What range of returns do you expect to receive from your portfolio?
                         </FormLabel>
                         <FormControl>
-                            <RadioGroup 
+                            <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
                                 className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"
@@ -233,7 +233,7 @@ export default function RiskTolerance() {
                             portfolio fall before you begin to feel uncomfortable?
                         </FormLabel>
                         <FormControl>
-                            <RadioGroup 
+                            <RadioGroup
                                 onValueChange={field.onChange}
                                 defaultValue={String(field.value)}
                                 className="w-full flex flex-wrap justify-center md:justify-between gap-3 py-3"

@@ -21,7 +21,7 @@ import { Slider } from "@/components/ui/slider";
 
 import DOBPicker from "./dob-picker";
 
-import type { FormValues } from "./form-schema";
+import type { FormValues } from "../../../../components/profile/form-schema";
 
 export default function Finance() {
     const form = useFormContext<FormValues>();

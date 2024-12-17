@@ -15,7 +15,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { updateProfileAction } from "@/actions/crud/profile";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
-import { type FormValues, formSchema } from "@/app/(main)/profile/components/form-schema";
+import { type FormValues, formSchema } from "@/components/profile/form-schema";
 
 import type { Profile } from "@prisma/client";
 
@@ -103,13 +103,13 @@ export const ProfileProvider = ({
         const values = form.getValues();
         const expectedReturn = getExpectedReturnFromValues(values);
         const annualContribution = values.percentIncomeInvested * values.income;
-        
+
         const _data = [];
         const date = new Date();
         let prevValue = startingValue;
         for (let t = 0; t < 100; t++) {
             date.setFullYear(new Date().getFullYear() + t);
-            
+
             let wealth = t > 0? prevValue * (1 + expectedReturn) + annualContribution: startingValue;
             // adjust wealth for any milestones during year
             for (const obj of values.milestones) {

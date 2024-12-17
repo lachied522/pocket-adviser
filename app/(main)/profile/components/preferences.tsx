@@ -18,10 +18,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
 // import ObjectiveSelector from "./objective-selector";
-import PreferencesSelector from "./preferences-selector";
+import PreferencesSelector from "../../../../components/profile/preferences-selector";
 
-import type { FormValues } from "./form-schema";
-import ObjectiveSelector from "./objective-selector";
+import type { FormValues } from "../../../../components/profile/form-schema";
+import ObjectiveSelector from "../../../../components/profile/objective-selector";
 
 export default function Preferences() {
     const form = useFormContext<FormValues>();
@@ -56,8 +56,8 @@ export default function Preferences() {
 
                         <div className='grid grid-cols-1 sm:grid-cols-[1.5fr_0.5fr] items-start gap-2'>
                             <FormDescription className='text-xs sm:text-sm text-black'>
-                                Use this to adjust the percent return you wish to make via dividend income. 
-                                High dividend yields come at the cost of <b>reduced capital growth</b> and may impact your overall return. 
+                                Use this to adjust the percent return you wish to make via dividend income.
+                                High dividend yields come at the cost of <b>reduced capital growth</b> and may impact your overall return.
                                 You should contact a financial adviser if you require advice.
                             </FormDescription>
 
@@ -120,7 +120,7 @@ export default function Preferences() {
                                 <p className='text-sm text-black'>No preference</p>
                             </div>
                         </div>
-                        
+
                         <div className='relative'>
                             <FormControl>
                                 <div className='flex flex-row items-center justify-center gap-3 sm:gap-5 py-5'>

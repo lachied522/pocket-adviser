@@ -3,25 +3,28 @@ import { cookies } from "next/headers";
 
 import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 
-import { getProfileByUserId } from "@/utils/crud/user";
+import ProfileChat from "./profile-chat";
 
-import ProfileForm from "./profile-form";
-
-export default async function Page() {
-    // check for existing profile
+export default function WelcomePage({
+    searchParams
+}: {
+    searchParams?: { [key: string]: string | string[] | undefined }
+}) {
     const cookieStore = cookies();
     const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
 
     if (!userId) {
-        // middleware should handle this
         redirect('/login');
     }
 
-    const profile = await getProfileByUserId(userId);
+    const isNewUser = typeof searchParams?.new === "string";
 
     return (
-        <main className='min-h-screen flex items-center justify-center bg-white'>
-            <ProfileForm initialValues={profile} />
+        <main className='h-dvh flex flex-col overflow-hidden'>
+            <ProfileChat
+                userId={userId}
+                isNewUser={isNewUser}
+            />
         </main>
     )
 }

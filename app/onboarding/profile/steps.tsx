@@ -23,9 +23,9 @@ import { cn } from "@/components/utils";
 
 import { PlainTextMessage } from "@/components/ai/messages";
 
-import type { FormValues } from "@/app/(main)/profile/components/form-schema";
-import ObjectiveSelector from "@/app/(main)/profile/components/objective-selector";
-import PreferencesSelector from "@/app/(main)/profile/components/preferences-selector";
+import type { FormValues } from "@/components/profile/form-schema";
+import ObjectiveSelector from "@/components/profile/objective-selector";
+import PreferencesSelector from "@/components/profile/preferences-selector";
 
 export const STEPS = [
     {
@@ -39,6 +39,7 @@ Let's start by completing your investment profile.`
     },
     {
         label: "objective",
+        marker: "Objective",
         content: (
 `Let's start with your primary investment objective. This is the main thing you wish to achieve by investing. Here are a few options:\n\n
 1. Long-term Savings - Accumulate capital over the long term. Time Horizon 20-30 years.
@@ -51,6 +52,7 @@ Let's start by completing your investment profile.`
     },
     {
         label: "riskToleranceQ1",
+        marker: "Risk Tolerance",
         content: (
 `Great! Now let's understand your tolerance for risk. How do you feel about the possibility of losing money in the short term?\n
 A) I'm very uncomfortable with any losses, even small ones.\n
@@ -100,6 +102,7 @@ D) Yes, I've taken high-risk investments, like cryptocurrencies or speculative s
     },
     {
         label: "employmentStatus",
+        marker: "Finances",
         content: "What is your current employment status?"
     },
     {
@@ -116,32 +119,36 @@ D) Yes, I've taken high-risk investments, like cryptocurrencies or speculative s
     },
     {
         label: "preferences",
+        marker: "Preferences",
         content: "Lastly, do you have any preferences for particular market sectors or categories?"
     },
     {
         label: "finish",
-        content: "That's all. Thanks for completing your profile."
+        content: "That's all. Your profile has now been updated."
     }
 ] as const;
 
 interface OnboardingStepProps {
     step: number
-    isComplete?: boolean
+    disabled?: boolean
     onNextStep: () => void
+    handleUserMessage: (content: string) => void
 }
 
-function StartStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function StartStep({ disabled, onNextStep }: OnboardingStepProps) {
     return (
         <>
-            <div className='text-sm font-medium text-zinc-400'>
-                Pocket Adviser
+            <div className='w-full flex flex-col items-start gap-2'>
+                <div className='text-sm font-medium text-zinc-400'>
+                    Pocket Adviser
+                </div>
+                <PlainTextMessage content={STEPS[0].content} />
             </div>
-            <PlainTextMessage content={STEPS[0].content} />
             <div className='w-full flex flex-row items-center justify-center p-6'>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Get started
                 </Button>
@@ -150,46 +157,19 @@ function StartStep({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function FinishStep({ step, isComplete, onNextStep }: OnboardingStepProps) {
-    return (
-        <>
-            <div className='text-sm font-medium text-zinc-400'>
-                Pocket Adviser
-            </div>
-            <PlainTextMessage content={STEPS[step].content} />
-            <div className='w-full flex flex-row items-center justify-center gap-3 p-6'>
-                <Button
-                    type='button'
-                    variant='secondary'
-                    onClick={() => {}}
-                    disabled={isComplete}
-                >
-                    Restart
-                </Button>
-                <Button
-                    type='submit'
-                    disabled={isComplete}
-                >
-                    Submit
-                </Button>
-            </div>
-        </>
-    )
-}
-
-function ObjectiveStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function ObjectiveStep({ disabled, onNextStep, handleUserMessage }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
+            <FormLabel className='text-lg'>Investment Objective</FormLabel>
+
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="objective"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormLabel className='text-base'>Investment Objective</FormLabel>
-
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Let&apos;s start with your primary investment objective. This is the main thing you wish to achieve by investing.
                         </FormDescription>
 
@@ -209,14 +189,17 @@ function ObjectiveStep({ isComplete, onNextStep }: OnboardingStepProps) {
                 <Button
                     type='button'
                     variant='secondary'
-                    disabled={isComplete}
+                    disabled={disabled}
+                    onClick={() => {
+                        handleUserMessage("Can you help me decide on an objective?");
+                    }}
                 >
-                    I'm not sure
+                    I&apos;m not sure
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -225,19 +208,19 @@ function ObjectiveStep({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function PreferencesStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function PreferencesStep({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
+            <FormLabel className='text-lg'>Preferences</FormLabel>
+
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="preferences"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormLabel className='text-base'>Preferences</FormLabel>
-
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Lastly, do you have preferences for any of the following investment categories?
                         </FormDescription>
 
@@ -254,43 +237,37 @@ function PreferencesStep({ isComplete, onNextStep }: OnboardingStepProps) {
 
             <div className='w-full flex flex-row items-center justify-center gap-3 p-6'>
                 <Button
-                    type='button'
-                    variant='secondary'
-                    onClick={onNextStep}
-                    disabled={isComplete}
+                    type='submit'
+                    onClick={() => {
+                        console.log(form.formState.errors);
+                    }}
+                    disabled={disabled}
                 >
-                    Skip
-                </Button>
-                <Button
-                    type='button'
-                    onClick={onNextStep}
-                    disabled={isComplete}
-                >
-                    Confirm
+                    Submit
                 </Button>
             </div>
         </>
     )
 }
 
-function RiskToleranceStep1({ isComplete, onNextStep }: OnboardingStepProps) {
+function RiskToleranceStep1({ disabled, onNextStep, handleUserMessage }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
+            <FormLabel className='text-lg'>Risk Tolerance</FormLabel>
+
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="riskToleranceQ1"
                 render={({ field }) => (
                     <FormItem className=''>
-                        <FormLabel className='text-base'>Risk Tolerance</FormLabel>
-
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Great! Now let&apos;s move on to risk tolerance. How do you feel about the possibility of losing money in the short term?
                         </FormDescription>
 
                         <FormControl>
-                            <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3 py-3'>
+                            <div className='w-full flex flex-wrap gap-3 py-3'>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <Button
@@ -339,7 +316,7 @@ function RiskToleranceStep1({ isComplete, onNextStep }: OnboardingStepProps) {
                                             disabled={field.disabled}
                                             className={cn(field.value === 4 && 'bg-zinc-100 border-zinc-200 hover:bg-zinc-100')}
                                         >
-                                            {"D) I'm comfortable with large losses in the short term for the chance of high rewards."}
+                                            {"D) I'm comfortable with large losses for the chance of high rewards."}
                                         </Button>
                                     </FormControl>
                                 </FormItem>
@@ -353,15 +330,17 @@ function RiskToleranceStep1({ isComplete, onNextStep }: OnboardingStepProps) {
                 <Button
                     type='button'
                     variant='secondary'
-                    onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
+                    onClick={() => {
+                        handleUserMessage("Can you explain more about what risk means?");
+                    }}
                 >
-                    Skip
+                    I&apos;m not sure
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -370,22 +349,22 @@ function RiskToleranceStep1({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function RiskToleranceStep2({ isComplete, onNextStep }: OnboardingStepProps) {
+function RiskToleranceStep2({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="riskToleranceQ2"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             What would you do if your investment portfolio dropped 20% in value over a few months?
                         </FormDescription>
 
                         <FormControl>
-                            <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3 py-3'>
+                            <div className='w-full flex flex-wrap gap-3 py-3'>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <Button
@@ -436,14 +415,14 @@ function RiskToleranceStep2({ isComplete, onNextStep }: OnboardingStepProps) {
                     type='button'
                     variant='secondary'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Skip
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -452,22 +431,22 @@ function RiskToleranceStep2({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function RiskToleranceStep4({ isComplete, onNextStep }: OnboardingStepProps) {
+function RiskToleranceStep4({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="riskToleranceQ4"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Which of the following is most important to you?
                         </FormDescription>
 
                         <FormControl>
-                            <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3 py-3'>
+                            <div className='w-full flex flex-wrap gap-3 py-3'>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <Button
@@ -518,14 +497,14 @@ function RiskToleranceStep4({ isComplete, onNextStep }: OnboardingStepProps) {
                     type='button'
                     variant='secondary'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Skip
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -534,22 +513,22 @@ function RiskToleranceStep4({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function ExperienceStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function ExperienceStep({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="experience"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Have you invested before?
                         </FormDescription>
 
                         <FormControl>
-                            <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-3 py-3'>
+                            <div className='w-full flex flex-wrap gap-3 py-3'>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
                                         <Button
@@ -613,14 +592,14 @@ function ExperienceStep({ isComplete, onNextStep }: OnboardingStepProps) {
                     type='button'
                     variant='secondary'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Skip
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -629,69 +608,72 @@ function ExperienceStep({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function EmploymentStatusStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function EmploymentStatusStep({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
-        <FormField
-            control={form.control}
-            disabled={isComplete}
-            name="employmentStatus"
-            render={({ field }) => (
-                <FormItem className='w-full'>
-                    <FormLabel className='text-base'>Finances</FormLabel>
-                    <FormDescription className='text-xs sm:text-sm text-black'>
-                        What is your current employment status?
-                    </FormDescription>
+        <>
+            <FormLabel className='text-lg'>Finances</FormLabel>
 
-                    <div className='flex flex-row items-center justify-center gap-3 p-12'>
-                        <Select onValueChange={field.onChange} defaultValue={String(field.value)} disabled={field.disabled}>
-                            <FormControl>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Select one..." />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="STUDENT">Student</SelectItem>
-                                <SelectItem value="CASUAL">Casual</SelectItem>
-                                <SelectItem value="PARTTIME">Part Time</SelectItem>
-                                <SelectItem value="FULLTIME">Full Time</SelectItem>
-                                <SelectItem value="SELFEMPLOYED">Self Employed</SelectItem>
-                                <SelectItem value="FREELANCE">Freelance</SelectItem>
-                                <SelectItem value="RETIRED">Retired</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button
-                            type='button'
-                            variant='secondary'
-                            onClick={onNextStep}
-                            disabled={isComplete}
-                        >
-                            Skip
-                        </Button>
-                        <Button
-                            type='button'
-                            onClick={onNextStep}
-                            disabled={isComplete}
-                        >
-                            Confirm
-                        </Button>
-                    </div>
-                </FormItem>
-            )}
-        />
+            <FormField
+                control={form.control}
+                disabled={disabled}
+                name="employmentStatus"
+                render={({ field }) => (
+                    <FormItem className='w-full'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
+                            What is your current employment status?
+                        </FormDescription>
+
+                        <div className='flex flex-row items-center justify-center gap-3 p-12'>
+                            <Select onValueChange={field.onChange} defaultValue={String(field.value)} disabled={field.disabled}>
+                                <FormControl>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Select one..." />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="STUDENT">Student</SelectItem>
+                                    <SelectItem value="CASUAL">Casual</SelectItem>
+                                    <SelectItem value="PARTTIME">Part Time</SelectItem>
+                                    <SelectItem value="FULLTIME">Full Time</SelectItem>
+                                    <SelectItem value="SELFEMPLOYED">Self Employed</SelectItem>
+                                    <SelectItem value="FREELANCE">Freelance</SelectItem>
+                                    <SelectItem value="RETIRED">Retired</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                type='button'
+                                variant='secondary'
+                                onClick={onNextStep}
+                                disabled={disabled}
+                            >
+                                Skip
+                            </Button>
+                            <Button
+                                type='button'
+                                onClick={onNextStep}
+                                disabled={disabled}
+                            >
+                                Confirm
+                            </Button>
+                        </div>
+                    </FormItem>
+                )}
+            />
+        </>
     )
 }
 
-function IncomeStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function IncomeStep({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <FormField
             control={form.control}
-            disabled={isComplete}
+            disabled={disabled}
             name="income"
             render={({ field }) => (
                 <FormItem className='w-full'>
-                    <FormDescription className='text-xs sm:text-sm text-black'>
+                    <FormDescription className='text-sm sm:text-base text-black'>
                         Approximately what is your annual income?
                     </FormDescription>
 
@@ -712,14 +694,14 @@ function IncomeStep({ isComplete, onNextStep }: OnboardingStepProps) {
                             type='button'
                             variant='secondary'
                             onClick={onNextStep}
-                            disabled={isComplete}
+                            disabled={disabled}
                         >
                             Skip
                         </Button>
                         <Button
                             type='button'
                             onClick={onNextStep}
-                            disabled={isComplete}
+                            disabled={disabled}
                         >
                             Confirm
                         </Button>
@@ -730,17 +712,17 @@ function IncomeStep({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function PercentIncomeStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function PercentIncomeStep({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="percentIncomeInvested"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Approximately what percentage of your income are you comfortable investing?
                         </FormDescription>
 
@@ -767,14 +749,14 @@ function PercentIncomeStep({ isComplete, onNextStep }: OnboardingStepProps) {
                     type='button'
                     variant='secondary'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Skip
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -783,17 +765,17 @@ function PercentIncomeStep({ isComplete, onNextStep }: OnboardingStepProps) {
     )
 }
 
-function PercentAssetsStep({ isComplete, onNextStep }: OnboardingStepProps) {
+function PercentAssetsStep({ disabled, onNextStep }: OnboardingStepProps) {
     const form = useFormContext<FormValues>();
     return (
         <>
             <FormField
                 control={form.control}
-                disabled={isComplete}
+                disabled={disabled}
                 name="percentAssetsInvested"
                 render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormDescription className='text-xs sm:text-sm text-black'>
+                        <FormDescription className='text-sm sm:text-base text-black'>
                             Approximately what percentage of your net assets are you comfortable investing in stocks?
                         </FormDescription>
 
@@ -820,14 +802,14 @@ function PercentAssetsStep({ isComplete, onNextStep }: OnboardingStepProps) {
                     type='button'
                     variant='secondary'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Skip
                 </Button>
                 <Button
                     type='button'
                     onClick={onNextStep}
-                    disabled={isComplete}
+                    disabled={disabled}
                 >
                     Confirm
                 </Button>
@@ -873,9 +855,6 @@ export function OnboardingStep(props: OnboardingStepProps) {
         }
         case "preferences": {
             return <PreferencesStep {...props} />
-        }
-        case "finish": {
-            return <FinishStep {...props} />
         }
     }
 }

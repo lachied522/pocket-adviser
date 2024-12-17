@@ -7,8 +7,12 @@ import {
 } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
+const SYSTEM_MESSAGE = (
+`You are an enthusiastic investment advisor working for Pocket Adviser. The user is a brand-new investor who you are currently helping complete their investment profile. Assume the user has no prior knowledge of the stock market.`
+)
+
 type RequestBody = {
-    messages: Message[]
+    messages: CoreMessage[]
     userId: string
 }
 
@@ -19,7 +23,8 @@ export async function POST(request: NextRequest) {
 
     const response = await streamText({
         model: openai('gpt-4o'),
-        messages: convertToCoreMessages(messages),
+        system: SYSTEM_MESSAGE,
+        messages,
     });
 
     return response.toDataStreamResponse();

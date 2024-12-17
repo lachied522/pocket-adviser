@@ -60,7 +60,7 @@ export function PlainTextMessage({
 }) {
     if (content.length === 0) return null;
     return (
-        <Card>
+        <Card className="overflow-hidden">
             <CardContent className={cn(
                 "max-w-[900px] px-3 py-2 text-wrap whitespace-pre-line",
                 role === "user" && "bg-neutral-50 border-none"

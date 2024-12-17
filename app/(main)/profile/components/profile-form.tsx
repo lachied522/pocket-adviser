@@ -55,7 +55,7 @@ export default function ProfileForm() {
                             className='flex flex-row gap-2 justify-start'
                         >
                             <NotebookPen size={16} />
-                            Take assessment
+                            Survey
                         </Button>
                     </Link>
 
@@ -66,7 +66,7 @@ export default function ProfileForm() {
                         className='flex flex-row gap-2 justify-start'
                     >
                         <Pencil size={16} />
-                        Edit profile
+                        Edit manually
                     </Button>
                 </>
                 )}

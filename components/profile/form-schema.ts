@@ -25,4 +25,22 @@ export const formSchema = z.object({
     ),
 });
 
+export const defaultValues = {
+    dob: new Date(),
+    objective: "RETIREMENT" as const,
+    employmentStatus: "CASUAL" as const,
+    income: 0,
+    percentIncomeInvested: 0.10,
+    percentAssetsInvested: 0.10,
+    experience: 1,
+    riskToleranceQ1: 3,
+    riskToleranceQ2: 3,
+    riskToleranceQ3: 3,
+    riskToleranceQ4: 3,
+    targetYield: 0.01,
+    international: 0.7,
+    preferences: {},
+    milestones: [],
+}
+
 export type FormValues = z.infer<typeof formSchema>;

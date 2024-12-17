@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
 
 import { useScrollAnchor } from "@/hooks/useScrollAnchor";
-// import { useMessageThrottle } from "@/hooks/useMessageThrottle";
 
 import { type ChatState, useChatContext } from "../context";
 
@@ -21,7 +20,6 @@ import type { Message } from "ai";
 export default function ChatArea() {
     const { input, article, messages, isLoading, error, setInput, setArticle, onSubmit } = useChatContext() as ChatState;
     const { scrollAreaRef, anchorRef, setShouldAutoScroll } = useScrollAnchor();
-    // const throttledMessages = useMessageThrottle(messages, 200);
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 
     const onDrop = useCallback(
@@ -47,7 +45,7 @@ export default function ChatArea() {
     return (
         <div className='flex-1 flex flex-col overflow-hidden'>
             <div ref={scrollAreaRef} className='flex-1 overflow-y-auto scroll-smooth'>
-                <div className='max-w-6xl flex mx-auto overflow-hidden'>
+                <div className='max-w-7xl flex px-3 md:px-6 mx-auto overflow-hidden'>
                     <div
                         onDragEnter={() => setIsDragging(true)}
                         onDragLeave={() => setIsDragging(false)}
@@ -58,7 +56,7 @@ export default function ChatArea() {
                         onDrop={onDrop}
                         className={cn('flex-1 overflow-hidden', isDragging && 'shadow-inner')}
                     >
-                        <div className='flex flex-col justify-start gap-3 py-3'>
+                        <div className='flex flex-col justify-start gap-3 px-3'>
                             {messages.map((message: Message) => (
                             <ChatMessage
                                 key={message.id}
