@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import NextAuth, { AuthError } from "next-auth";
+import { AuthError, type NextAuthConfig } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -26,7 +26,7 @@ declare module "next-auth" {
 const adapter = PrismaAdapter(prisma);
 
 // see https://next-auth.js.org/getting-started/example
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthConfig = {
     providers: [
       Credentials({
         // You can specify which fields should be submitted, by adding keys to the `credentials` object.
@@ -94,4 +94,4 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       maxAge: 7 * 24 * 60 * 60 // 7 days
     },
     secret: process.env.AUTH_SECRET
-});
+};
