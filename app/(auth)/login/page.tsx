@@ -73,7 +73,7 @@ export default function LoginPage() {
 
             router.replace(response.url || '/');
         },
-        [form, setIsLoading]
+        [form, router, setIsLoading]
     );
 
     return (

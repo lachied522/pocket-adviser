@@ -11,8 +11,6 @@ export const parameters = z.object({
     exchange: z.enum(["ASX", "NASDAQ", "NYSE"]).default("NASDAQ").describe("Exchange that stock trades on"),
 });
 
-export type StockInfoResponse = ResolvedPromise<ReturnType<typeof getStockInfo>>;
-
 export async function getStockInfo(symbol: string, exchange: "ASX"|"NASDAQ"|"NYSE") {
     // add '.AX' if exchange is ASX
     if (exchange === 'ASX' && !symbol.endsWith('.AX')) {

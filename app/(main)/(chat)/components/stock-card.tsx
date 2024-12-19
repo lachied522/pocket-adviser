@@ -9,9 +9,14 @@ import ChangeIndicator from "@/components/stocks/change-indicator";
 
 import { formatDollar, formatMarketCap } from "@/utils/formatting";
 
-import type { StockInfoResponse } from "@/app/api/chat/tools/get-stock-info";
-
-interface StockCardProps extends StockInfoResponse {};
+interface StockCardProps {
+    symbol: string
+    name: string
+    exchange: string
+    previousClose: number
+    changePercent: number
+    marketCap: number
+}
 
 export default function StockCard({
     symbol,
