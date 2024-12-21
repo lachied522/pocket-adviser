@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { AuthError, type NextAuthConfig } from "next-auth";
+import NextAuth, { AuthError, type NextAuthResult } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -15,6 +15,8 @@ import type { DefaultSession } from "@auth/core/types"
 
 const prisma = new PrismaClient();
 
+// extend default session object to include user id
+// see https://authjs.dev/getting-started/typescript
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
@@ -25,8 +27,9 @@ declare module "next-auth" {
 
 const adapter = PrismaAdapter(prisma);
 
-// see https://next-auth.js.org/getting-started/example
-export const authOptions: NextAuthConfig = {
+// issue with inferred type here, this is a workaround
+// see https://github.com/nextauthjs/next-auth/discussions/9950
+const result = NextAuth({
     providers: [
       Credentials({
         // You can specify which fields should be submitted, by adding keys to the `credentials` object.
@@ -94,4 +97,9 @@ export const authOptions: NextAuthConfig = {
       maxAge: 7 * 24 * 60 * 60 // 7 days
     },
     secret: process.env.AUTH_SECRET
-};
+});
+
+export const handlers: NextAuthResult['handlers'] = result.handlers;
+export const auth: NextAuthResult['auth'] = result.auth;
+export const signIn: NextAuthResult['signIn'] = result.signIn;
+export const signOut: NextAuthResult['signOut'] = result.signOut;
