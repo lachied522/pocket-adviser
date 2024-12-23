@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 
 export default function Loading() {
     return (
-        <div className='flex-1 w-full max-w-6xl flex flex-col pb-6 px-3 md:px-6 mx-auto overflow-hidden'>
-            <div className='max-h-full h-full flex flex-col justify-start gap-3 md:px-3 py-3 scroll-smooth'>
+        <div className='flex-1 w-full max-w-7xl flex flex-col pb-6 mx-auto overflow-hidden'>
+            <div className='max-h-full h-full flex flex-col justify-start gap-3 px-3 sm:px-6 py-3 scroll-smooth'>
                 <div className='h-48 w-full flex pt-7 lg:pr-24'>
                     <Skeleton className='flex-1 bg-zinc-200 rounded-xl' />
                 </div>

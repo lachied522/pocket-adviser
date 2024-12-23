@@ -23,14 +23,7 @@ export default async function ProfilePage() {
     return (
         <ProfileProvider initialProfile={profile}>
             <div className='flex-1 p-3 overflow-y-scroll'>
-                <div className='w-full max-w-6xl mx-auto'>
-                    <div className='flex flex-col gap-3'>
-                        <H3>My Profile</H3>
-                        <p>Tell Pocket Adviser about yourself so it can provide accurate suggestions.</p>
-                    </div>
-
-                    <ProfileForm />
-                </div>
+                <ProfileForm />
             </div>
         </ProfileProvider>
     )

@@ -59,7 +59,7 @@ export default function NewsArea() {
     }, [isVisible, page, partialStockData]);
 
     return (
-        <div className='flex flex-col items-start gap-1 px-3 pb-1'>
+        <div className='flex flex-col items-start gap-1 px-2 pb-1'>
             <div>
                 <Button
                     variant='ghost'
@@ -67,7 +67,7 @@ export default function NewsArea() {
                     onClick={toggleVisible}
                     className={cn('h-7 w-7', isVisible && 'bg-zinc-100')}
                 >
-                    <Newspaper size={20} />
+                    <Newspaper size={16} />
                 </Button>
                 {/* {isVisible && data.length > 0 && (
                 <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>

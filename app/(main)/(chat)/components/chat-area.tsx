@@ -45,7 +45,7 @@ export default function ChatArea() {
     return (
         <div className='flex-1 flex flex-col overflow-hidden'>
             <div ref={scrollAreaRef} className='flex-1 overflow-y-auto scroll-smooth'>
-                <div className='max-w-7xl flex px-3 md:px-6 mx-auto overflow-hidden'>
+                <div className='max-w-7xl flex mx-auto overflow-hidden'>
                     <div
                         onDragEnter={() => setIsDragging(true)}
                         onDragLeave={() => setIsDragging(false)}
@@ -56,7 +56,7 @@ export default function ChatArea() {
                         onDrop={onDrop}
                         className={cn('flex-1 overflow-hidden', isDragging && 'shadow-inner')}
                     >
-                        <div className='flex flex-col justify-start gap-3 px-3'>
+                        <div className='flex flex-col justify-start gap-3 px-3 sm:px-6'>
                             {messages.map((message: Message) => (
                             <ChatMessage
                                 key={message.id}
@@ -84,7 +84,7 @@ export default function ChatArea() {
                 </div>
             </div>
 
-            <div className='w-full max-w-6xl flex flex-col justify-center gap-3 px-2 pb-3 md:pb-6 mx-auto'>
+            <div className='w-full max-w-7xl flex flex-col justify-center gap-3 px-6 py-3 mx-auto'>
                 <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
                 
                 <div className='w-full flex flex-row gap-1'>

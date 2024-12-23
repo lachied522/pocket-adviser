@@ -18,7 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 
 import StockDialog from "@/components/stocks/stock-dialog";
 
@@ -30,7 +29,7 @@ interface DataTableProps<TData, TValue> {
   emptyComponent?: JSX.Element
 }
 
-export default function StockTable<TData, TValue>({
+export default function DataTable<TData, TValue>({
   columns,
   data,
   emptyComponent
@@ -60,7 +59,7 @@ export default function StockTable<TData, TValue>({
                     <TableRow key={headerGroup.id} className='bg-zinc-50'>
                     {headerGroup.headers.map((header) => {
                         return (
-                        <TableHead key={header.id} className='py-2 sm:py-3 font-medium'>
+                        <TableHead key={header.id} className='py-1'>
                             {header.isPlaceholder
                             ? null
                             : flexRender(

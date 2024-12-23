@@ -127,7 +127,7 @@ function TapeItem({
                 />
             </div>
 
-            <span className='text-sm md:text-sm font-medium text-neutral-800'>
+            <span className='text-xs md:text-sm font-medium text-neutral-800'>
                 {symbol.endsWith('.AX')? symbol.split('.')[0]: symbol}
             </span>
 
@@ -166,7 +166,7 @@ async function StockTapeBody({ exchange } : { exchange?: "ASX" | "NASDAQ" }) {
 
 export default function TickerTape({ exchange } : { exchange?: "ASX" | "NASDAQ" }) {
     return (
-        <div className='flex flex-row items-center justify-evenly px-1 md:px-2 py-2 gap-1 md:gap-3 overflow-hidden'>
+        <div className='flex flex-row items-center justify-evenly py-2 gap-1 md:gap-2 overflow-hidden'>
             <Suspense fallback={<StockTapeSkeleton />}>
                 <StockTapeBody exchange={exchange} />
             </Suspense>

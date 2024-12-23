@@ -10,6 +10,7 @@ import {
 
 import { Pencil, Search, Trash2 } from "lucide-react";
 
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatDollar } from "@/utils/formatting";
 
 import {
@@ -35,14 +36,16 @@ const columns: ColumnDef<PopulatedHolding>[] = [
       </div>
     ),
     cell: ({ row }) => (
-      <div className='flex flex-row items-center gap-2 sm:pl-3 py-5'>
-        <Image
-            src={row.original["exchange"]==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
-            alt='flag'
-            height={16}
-            width={16}
-        />
-        <span className='text-sm lg:text-base font-medium'>
+      <div className='flex flex-row items-center gap-2 sm:pl-3 py-3'>
+        <div className='h-3 sm:h-3.5 w-3 sm:w-3.5 relative'>
+          <Image
+              src={row.original["exchange"]==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+              alt='flag'
+              sizes="14px"
+              fill
+          />
+        </div>
+        <span className='text-xs lg:text-sm font-medium'>
           {(row.getValue('symbol') as string).toUpperCase()}
         </span>
       </div>
@@ -52,7 +55,7 @@ const columns: ColumnDef<PopulatedHolding>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <div className='max-w-[180px] sm:max-w-[240px] text-sm lg:text-base font-medium line-clamp-1 py-5'>
+      <div className='max-w-[180px] sm:max-w-[240px] text-xs lg:text-sm font-medium line-clamp-1 overflow-hidden py-3'>
         {(row.getValue('name') as string).toUpperCase()}
       </div>
     )
@@ -61,17 +64,17 @@ const columns: ColumnDef<PopulatedHolding>[] = [
     accessorKey: "units",
     header: "Units",
     cell: ({ row }) => (
-      <div className='text-sm lg:text-base font-medium py-5'>{row.getValue('units')}</div>
+      <div className='text-xs lg:text-sm font-medium py-3'>{row.getValue('units')}</div>
     )
   },
   {
     accessorKey: "value",
     header: "Value",
     cell: ({ row }) => (
-      <div className='text-sm lg:text-base font-medium py-5'>{formatDollar(row.getValue('value'))}</div>
+      <div className='text-xs lg:text-sm font-medium py-3'>{formatDollar(row.getValue('value'))}</div>
     )
   },
-]
+] as const;
 
 interface DataTableProps {
     populatedHoldings: PopulatedHolding[]
@@ -79,21 +82,29 @@ interface DataTableProps {
 }
 
 export default function DataTable({ populatedHoldings, setPopulatedHoldings }: DataTableProps) {
+    const isMobile = useMediaQuery();
+
     // see https://ui.shadcn.com/docs/components/data-table
     const table = useReactTable<PopulatedHolding>({
         data: populatedHoldings.map((holding) => ({ ...holding, value: holding.units * (holding.previousClose ?? 0) })),
-        columns,
+        columns: columns.filter((column) => {
+            if (isMobile) {
+              // @ts-ignore: issue with ColumnDef type https://github.com/TanStack/table/issues/4241
+              return ["symbol", "units", "value"].includes(column.accessorKey);
+            }
+            return true;
+        }),
         getCoreRowModel: getCoreRowModel(),
     });
 
     return (
-        <div className='rounded-md border'>
+        <div className='rounded-md border overflow-y-auto'>
             <Table>
                 <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id} className='bg-zinc-50'>
                       {headerGroup.headers.map((header) => (
-                        <TableHead key={header.id} className='py-3.5 font-medium'>
+                        <TableHead key={header.id} className='py-3 font-medium'>
                             {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -118,8 +129,8 @@ export default function DataTable({ populatedHoldings, setPopulatedHoldings }: D
                         </TableCell>
                         ))}
 
-                        <TableCell className='w-[80px]'>
-                          <div className='flex flex-row items-center justify-end gap-1'>
+                        <TableCell className=''>
+                          <div className='flex flex-row items-center justify-end gap-1 shrink pr-3'>
                             <EditHoldingDialog
                               holding={row.original}
                               onChange={(holding: PopulatedHolding) => {
@@ -129,32 +140,42 @@ export default function DataTable({ populatedHoldings, setPopulatedHoldings }: D
                                 <Button
                                     type='button'
                                     variant='ghost'
+                                    size='sm'
                                     className='group hover:bg-transparent'
                                 >
-                                    <Pencil size={18} strokeWidth={2.5} className='group-hover:scale-110' />
+                                    <Pencil
+                                      size={isMobile? 13: 16}
+                                      strokeWidth={2}
+                                      className='group-hover:scale-110'
+                                    />
                                 </Button>
                             </EditHoldingDialog>
 
                             <Button
                                 type='button'
                                 variant='ghost'
+                                size='sm'
                                 className='group hover:bg-transparent'
                             >
-                                <Trash2 size={18} strokeWidth={2.5} className='group-hover:text-red-400 group-hover:scale-110' />
+                                <Trash2
+                                  size={isMobile? 13: 16}
+                                  strokeWidth={2}
+                                  className='group-hover:text-red-400 group-hover:scale-110'
+                                />
                             </Button>
                           </div>
                         </TableCell>
                     </TableRow>
                     ))
                 ) : (
-                    <TableRow className='hover:bg-transparent'>
-                        <TableCell colSpan={columns.length} className='p-12'>
-                          <div className='flex flex-col items-center gap-2'>
-                            <Search size={18} color='black' />
-                            <span>Use the search bar above to add stocks to your portfolio.</span>
-                          </div>
-                        </TableCell>
-                    </TableRow>
+                <TableRow className='hover:bg-transparent'>
+                    <TableCell colSpan={columns.length} className='p-12'>
+                      <div className='flex flex-col items-center gap-2'>
+                        <Search size={18} color='black' />
+                        <span>Use the search bar above to add stocks to your portfolio.</span>
+                      </div>
+                    </TableCell>
+                </TableRow>
                 )}
                 </TableBody>
             </Table>

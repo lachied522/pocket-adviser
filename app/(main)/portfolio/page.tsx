@@ -38,14 +38,7 @@ export default async function PortfolioPage() {
     return (
         <PortfolioProvider initialHoldings={holdings} initialStocks={stocks}>
             <div className='flex-1 p-3 overflow-y-auto'>
-                <div className='w-full max-w-6xl flex flex-col mx-auto'>
-                    <div className='flex flex-col gap-3'>
-                        <H3>My Portfolio</H3>
-                        <p>If you own stocks with a broker, you can keep your portfolio up to date here to ensure Pocket Adviser provides accurate suggestions.</p>
-                    </div>
-
-                    <Portfolio />
-                </div>
+                <Portfolio />
             </div>
         </PortfolioProvider>
     )

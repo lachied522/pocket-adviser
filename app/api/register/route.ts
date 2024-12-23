@@ -10,7 +10,7 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 const prisma = new PrismaClient();
 
 type Body = {
-    name?: string
+    name: string
     email: string
     password: string
 }
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const cookieStore = cookies();
     const { email, password, name } = await req.json() as Body;
 
-    // check if user already exists
+    // check if email already exists
     const exist = await prisma.user.findUnique({
         where: { email },
     });
@@ -28,24 +28,33 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
-    // create hashed password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // check if user exists as a guest
     const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
     if (userId) {
         try {
-            // add credentials to existing user
-            const user = await prisma.user.update({
+            const existingUser = await prisma.user.findUnique({
                 where: { id: userId },
-                data: {
-                    name,
-                    email,
-                    hashedPassword,
-                    accountType: "FREE",
+                select: {
+                    id: true,
+                    accountType: true,
                 }
             });
-            return NextResponse.json(user);
+
+            if (existingUser?.accountType === "GUEST") {
+                // create hashed password
+                const hashedPassword = await bcrypt.hash(password, 10);
+                // add credentials to existing user
+                const user = await prisma.user.update({
+                    where: { id: userId },
+                    data: {
+                        name,
+                        email,
+                        hashedPassword,
+                        accountType: "FREE", // update account type
+                    }
+                });
+                return NextResponse.json(user);
+            }
         } catch (e) {
             // something went wrong converting guest account
             console.log("Could not convert guest user: ", e);
@@ -53,6 +62,8 @@ export async function POST(req: Request) {
     }
 
     // create brand new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
         data: {
             name,

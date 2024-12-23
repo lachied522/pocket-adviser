@@ -39,7 +39,7 @@ function HeaderCell<TData, TValue> ({
     <Button
       variant="ghost"
       className={cn(
-        "flex items-center text-sm h-8 data-[state=open]:bg-accent px-0",
+        "flex items-center text-xs h-7 data-[state=open]:bg-accent px-1",
         className
       )}
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -64,12 +64,14 @@ export const columns: ColumnDef<PopulatedHolding>[] = [
     ),
     cell: ({ row }) => (
       <div className='flex flex-row items-center gap-2 sm:pl-3 py-2 sm:py-3'>
-        <Image
-            src={row.original["exchange"]==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
-            alt='flag'
-            height={16}
-            width={16}
-        />
+        <div className='h-3 sm:h-3.5 w-3 sm:w-3.5 relative'>
+          <Image
+              src={row.original["exchange"]==="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
+              alt='flag'
+              sizes="14px"
+              fill
+          />
+        </div>
         <span className='text-xs lg:text-sm font-medium'>
           {(row.getValue('symbol') as string).toUpperCase()}
         </span>

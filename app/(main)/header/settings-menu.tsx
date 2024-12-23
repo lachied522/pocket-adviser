@@ -22,17 +22,36 @@ import { removeCookies } from "@/utils/cookies";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
+function LogoutButton() {
+    return (
+        <Button
+            title='Logout'
+            aria-label='logout'
+            variant='ghost'
+            onClick={() => {
+                // must remove cookies before signout
+                removeCookies();
+                signOut();
+            }}
+            className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+        >
+            <LogOut size={16} strokeWidth={2} />
+            <span className='text-xs'>Logout</span>
+        </Button>
+    )
+}
+
 export default function SettingsMenu() {
     const { state } = useGlobalContext() as GlobalState;
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
-                <div className='w-12 flex items-center justify-center pr-3'>
-                    <CircleUserRound size={22} />
-                </div>
+            <DropdownMenuTrigger asChild>
+                <Button variant='ghost' className='h-7 w-7 ml-2'>
+                    <CircleUserRound size={18} />
+                </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent collisionPadding={{ right: 20 }}>
+            <DropdownMenuContent collisionPadding={{ right: 10 }}>
                 {/* <AboutDialog>
                     <Button
                         variant='ghost'
@@ -49,6 +68,10 @@ export default function SettingsMenu() {
                     <div className='text-sm p-2'>
                         Logged in as: Guest
                     </div>
+
+                    <DropdownMenuSeparator className='' />
+
+                    <LogoutButton />
 
                     <DropdownMenuSeparator className='' />
 
@@ -81,32 +104,19 @@ export default function SettingsMenu() {
 
                     <SettingsDialog>
                         <Button
-                            aria-label='email-preferences'
+                            aria-label='settings'
                             variant='ghost'
                             size='sm'
                             className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
                         >
                             <Settings size={18} strokeWidth={2} />
-                            <span className='text-xs'>Email settings</span>
+                            <span className='text-xs'>Settings</span>
                         </Button>
                     </SettingsDialog>
 
                     <DropdownMenuSeparator className='' />
 
-                    <Button
-                        title='Logout'
-                        aria-label='logout'
-                        variant='ghost'
-                        onClick={() => {
-                            // must remove cookies before signout
-                            removeCookies();
-                            signOut();
-                        }}
-                        className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
-                    >
-                        <LogOut size={16} strokeWidth={2} />
-                        <span className='text-xs'>Logout</span>
-                    </Button>
+                    <LogoutButton />
                 </>
                 )}
             </DropdownMenuContent>

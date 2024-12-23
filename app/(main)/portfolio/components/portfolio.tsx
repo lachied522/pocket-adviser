@@ -9,6 +9,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { H3 } from "@/components/ui/typography";
 
 import { useChatNavigation } from "@/hooks/useChatNavigation";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -87,36 +88,45 @@ export default function Portfolio() {
     }, [holdings, stockDataMap]);
 
     return (
-        <>
-            <div className='w-full flex flex-row items-center justify-end gap-3 py-6'>
-                <Tooltip>
-                    <TooltipTrigger>
+        <div className='w-full max-w-6xl flex flex-col gap-3 mx-auto'>
+            <div className='w-full flex flex-row items-center justify-between gap-3'>
+                <div className='flex flex-col gap-2'>
+                    <H3>My Portfolio</H3>
+                    <p className='text-sm'>If you own stocks with a broker, you can keep your portfolio up to date here to ensure Pocket Adviser provides accurate suggestions.</p>
+                </div>
+
+                <div className='flex flex-row items-center gap-2'>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Button
+                                variant='outline'
+                                size='sm'
+                                className='flex flex-row gap-2 justify-start'
+                                disabled
+                            >
+                                <Link size={13} />
+                                Link broker
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                            side="top"
+                            align="center"
+                        >
+                            Coming soon
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <EditPortfolioDialog>
                         <Button
                             variant='outline'
+                            size='sm'
                             className='flex flex-row gap-2 justify-start'
-                            disabled
                         >
-                            <Link size={16} />
-                            Link broker
+                            <Pencil size={13} />
+                            Edit portfolio
                         </Button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                        side="top"
-                        align="center"
-                    >
-                        Coming soon
-                    </TooltipContent>
-                </Tooltip>
-
-                <EditPortfolioDialog>
-                    <Button
-                        variant='outline'
-                        className='flex flex-row gap-2 justify-start'
-                    >
-                        <Pencil size={16} />
-                        Edit portfolio
-                    </Button>
-                </EditPortfolioDialog>
+                    </EditPortfolioDialog>
+                </div>
             </div>
 
             <PortfolioTable
@@ -141,6 +151,6 @@ export default function Portfolio() {
                     </div>
                 )}
             />
-        </>
+        </div>
     )
 }

@@ -278,7 +278,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <Columns2 size={20} />
+      <Columns2 size={16} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -289,7 +289,7 @@ const SidebarHiddenTrigger = () =>  {
   const { isMobile, state } = useSidebar();
 
   return (
-      <div className={cn("hidden pl-3", (isMobile || state === "collapsed") && "block")}>
+      <div className={cn("hidden", (isMobile || state === "collapsed") && "block")}>
           <SidebarTrigger />
       </div>
   )

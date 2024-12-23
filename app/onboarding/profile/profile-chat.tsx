@@ -7,11 +7,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 
-import { ArrowBigUp, Home, OctagonAlert, RefreshCcw, SquareArrowUpRight, X } from "lucide-react";
+import { ArrowBigUp, ExternalLink, Home, OctagonAlert, RefreshCcw } from "lucide-react";
 
 import { updateProfileAction } from "@/actions/crud/profile";
 
-import { H3 } from "@/components/ui/typography";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/utils";
@@ -125,7 +124,7 @@ export default function ProfileChat({
 
     return (
         <>
-            <div className='flex flex-row items-center gap-6 p-6'>
+            <div className='flex flex-row items-center justify-between gap-6 p-6'>
                 <div className='shrink-0'>
                     <h1 className='font-medium'>My Profile</h1>
                 </div>
@@ -144,11 +143,11 @@ export default function ProfileChat({
 
             <div className='flex-1 flex flex-col overflow-hidden'>
                 <div className='flex-1 flex overflow-y-auto scroll-smooth'>
-                    <div className='max-w-7xl px-3 md:px-0 flex mx-auto'>
+                    <div className='w-full max-w-6xl flex mx-auto'>
                         <FormProvider {...form}>
                             <form
                                 onSubmit={form.handleSubmit(onSubmit)}
-                                className='flex-1 flex flex-col justify-start gap-12 px-3'
+                                className='flex-1 flex flex-col justify-start gap-12 px-3 sm:px-6'
                             >
                                 {messages.map((message: Message) => (
                                 <div
@@ -204,7 +203,7 @@ export default function ProfileChat({
                                             {isNewUser? (
                                             <Button className='flex flex-row gap-2 justify-start'>
                                                 Next
-                                                <SquareArrowUpRight size={16} />
+                                                <ExternalLink size={16} />
                                             </Button>
                                             ): (
                                             <Button className='flex flex-row gap-2 justify-start'>
@@ -228,7 +227,7 @@ export default function ProfileChat({
                     </div>
                 </div>
 
-                <div className='w-full max-w-7xl flex flex-col justify-center gap-3 px-2 py-3 mx-auto'>
+                <div className='w-full max-w-6xl flex flex-col justify-center gap-3 px-2 py-3 mx-auto'>
                     <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
 
                     <div className='w-full flex flex-row gap-1'>

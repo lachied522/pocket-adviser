@@ -9,7 +9,7 @@ interface ProgressBarProps {
 
 export default function ProgressBar({ currentStep }: ProgressBarProps) {
     return (
-        <div className='h-3 w-full flex flex-row border border-black rounded-xl'>
+        <div className='h-3 w-full hidden lg:flex flex-row border border-black rounded-xl'>
             {STEPS.map((step, index) => (
                 <div
                     key={`progress-indicator-${index}`}

@@ -19,11 +19,11 @@ export default function ChangeIndicator({
             {withIcon && (
             <div className=''>
                 {!change? (
-                <Minus color='gray' size={size === 'sm'? 18: 24} />
+                <Minus color='gray' size={size === 'sm'? 13: 24} />
                 ) : value > 0 ? (
-                <TrendingUp color='rgb(74 222 128)' size={size === 'sm'? 18: 24} />
+                <TrendingUp color='rgb(74 222 128)' size={size === 'sm'? 13: 24} />
                 ) :  (
-                <TrendingDown color='rgb(248 113 113)' size={size === 'sm'? 18: 24} />
+                <TrendingDown color='rgb(248 113 113)' size={size === 'sm'? 13: 24} />
                 )}
             </div>
             )}
