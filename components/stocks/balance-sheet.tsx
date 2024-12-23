@@ -100,6 +100,14 @@ export default function BalanceSheet({ stockData }: { stockData: CompanyOutlook 
         [stockData, period]
     );
 
+    if (!formattedData.length) {
+        return (
+            <div className='text-center p-24'>
+                Not available
+            </div>
+        )
+    }
+
     return (
         <div className='flex flex-col gap-3'>
             <ChartContainer config={chartConfig} className="min-h-[200px] w-full">

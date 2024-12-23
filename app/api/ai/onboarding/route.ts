@@ -19,8 +19,6 @@ type RequestBody = {
 export async function POST(request: NextRequest) {
     const { messages, userId } = await request.json() as RequestBody;
 
-    console.log(messages);
-
     const response = await streamText({
         model: openai('gpt-4o'),
         system: SYSTEM_MESSAGE,

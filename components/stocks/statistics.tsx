@@ -6,12 +6,15 @@ function calculateGrowth(
     income: IncomeStatement[], // this is automatically sorted by descending date
     key: "eps" | "revenue"
 ) {
-    return 100 * ((income[0][key] / income[income.length - 1][key]) - 1);
+    if (income.length > 1) {
+        return 100 * ((income[0][key] / income[income.length - 1][key]) - 1);
+    }
+    return null;
 }
 
 export default function Statistics({ stockData }: { stockData: CompanyOutlook }) {
     return (
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 pt-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 pt-6 px-3'>
             <div className='flex flex-col gap-6'>
                 <div className='flex flex-col gap-6'>
                     <h6 className='text-lg font-medium'>Dividends</h6>
@@ -25,7 +28,7 @@ export default function Statistics({ stockData }: { stockData: CompanyOutlook })
                         <span>{formatPercent(stockData.ratios[0].dividendYielPercentageTTM)}</span>
                     </div>
 
-                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>                        
+                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>
                         <span className='font-medium'>Payout Ratio</span>
                         <span>{formatPercent(stockData.ratios[0].payoutRatioTTM)}</span>
                     </div>
@@ -53,7 +56,7 @@ export default function Statistics({ stockData }: { stockData: CompanyOutlook })
                         <span>{stockData.ratios[0].priceToFreeCashFlowsRatioTTM.toFixed(2)}</span>
                     </div>
 
-                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>                        
+                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>
                         <span className='font-medium'>Price to Earnings Growth (PEG) Ratio </span>
                         <span>{stockData.ratios[0].pegRatioTTM.toFixed(2)}</span>
                     </div>
@@ -78,7 +81,7 @@ export default function Statistics({ stockData }: { stockData: CompanyOutlook })
                         <span>{formatPercent(100 * stockData.ratios[0].returnOnEquityTTM)}</span>
                     </div>
 
-                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>                        
+                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>
                         <span className='font-medium'>Return on Assets</span>
                         <span>{formatPercent(100 * stockData.ratios[0].returnOnAssetsTTM)}</span>
                     </div>
@@ -94,7 +97,7 @@ export default function Statistics({ stockData }: { stockData: CompanyOutlook })
                         <span className='font-medium'>Current Ratio</span>
                         <span>{stockData.ratios[0].currentRatioTTM.toFixed(2)}</span>
                     </div>
-                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>                        
+                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>
                         <span className='font-medium'>Cash Ratio</span>
                         <span>{stockData.ratios[0].cashRatioTTM.toFixed(2)}</span>
                     </div>
@@ -107,7 +110,7 @@ export default function Statistics({ stockData }: { stockData: CompanyOutlook })
                         <span>{formatPercent(calculateGrowth(stockData.financialsAnnual.income, "eps"))}</span>
                     </div>
 
-                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>                        
+                    <div className='flex flex-row justify-between pb-2 border-b border-zinc-200'>
                         <span className='font-medium'>Revenue Growth (5Y)</span>
                         <span>{formatPercent(calculateGrowth(stockData.financialsAnnual.income, "revenue"))}</span>
                     </div>

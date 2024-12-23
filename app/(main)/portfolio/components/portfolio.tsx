@@ -16,7 +16,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import { type PortfolioState, usePortfolioContext } from "../context";
 import { columns } from "./columns";
-import PortfolioTable from "./portfolio-table";
+import PortfolioTable from "./data-table";
 import EditPortfolioDialog from "./edit-portfolio-dialog";
 
 const TABS = {

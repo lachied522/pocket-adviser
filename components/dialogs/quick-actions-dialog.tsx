@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { PiggyBank, TrendingUp } from "lucide-react";
+import { PiggyBank, SearchCheck, TrendingUp } from "lucide-react";
 
 import {
     Dialog,
@@ -34,17 +34,15 @@ import { useChatNavigation } from "@/hooks/useChatNavigation";
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 const formSchema = z.object({
-    action: z.enum(["deposit", "withdraw"]),
-    amount: z.coerce.number().min(0, {
-        message: "Please enter an amount above $0!"
-    }),
+    action: z.enum(["deposit", "withdraw", "review"]),
+    amount: z.coerce.number(),
 });
 
-interface GetAdviceDialogProps {
+interface QuickActionsDialogProps {
     children: React.ReactNode
 }
 
-export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
+export default function QuickActionsDialog({ children }: QuickActionsDialogProps) {
     const { calcPortfolioValue } = useGlobalContext() as GlobalState;
     const { onSubmit } = useChatNavigation();
     const { setOpenMobile: setSidebarOpen } = useSidebar();
@@ -61,7 +59,10 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
     const action = form.watch("action");
 
     const proposedValue = useMemo(() => {
-        return action === "deposit"? currentValue + Number(amount): Math.max(currentValue - Number(amount), 0);
+        return Math.max(
+            currentValue + (action === "deposit"? Number(amount): action === "withdraw"? - Number(amount): 0),
+            0
+        );
     }, [currentValue, amount, action]);
 
     useEffect(() => {
@@ -84,44 +85,48 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
         [onSubmit, setIsOpen, setSidebarOpen]
     );
 
-    const onClose = () => {
-        // reset form after 1 sec
-        setTimeout(() => form.reset(), 1000);
-    }
-
     return (
         <Dialog open={isOpen} onOpenChange={(value: boolean) => setIsOpen(value)}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-w-lg'>
+            <DialogContent className='max-w-2xl'>
                 <DialogHeader>
                     <DialogTitle>
-                        Quickly Ask for Ideas
+                        Quick Actions
                     </DialogTitle>
                 </DialogHeader>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className='flex flex-col gap-6'>
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className='flex flex-col gap-6 py-3'>
                         <p>I would like to...</p>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3">
+                        <div className="flex flex-wrap items-start sm:items-center justify-between gap-3">
                             <Button
                                 type="button"
-                                variant={action==='deposit' ? 'default': 'secondary'}
+                                variant={action==='deposit'? 'default': 'secondary'}
                                 onClick={() => form.setValue('action', 'deposit')}
-                                className="flex flex-row gap-3 items-center justify-center"
+                                className="flex flex-row gap-2 items-center justify-center"
                             >
-                                <TrendingUp size={20} />
+                                <TrendingUp size={16} />
                                 Invest some money
                             </Button>
                             <Button
                                 type="button"
-                                variant={action==='withdraw' ? 'default': 'secondary'}
+                                variant={action==='withdraw'? 'default': 'secondary'}
                                 onClick={() => form.setValue('action', 'withdraw')}
-                                className="flex flex-row gap-3 items-center justify-center"
+                                className="flex flex-row gap-2 items-center justify-center"
                             >
-                                <PiggyBank size={24} />
+                                <PiggyBank size={20} />
                                 Make a withdrawal
+                            </Button>
+                            <Button
+                                type="button"
+                                variant={action==='review'? 'default': 'secondary'}
+                                onClick={() => form.setValue('action', 'review')}
+                                className="flex flex-row gap-2 items-center justify-center"
+                            >
+                                <SearchCheck size={16} />
+                                Review my portfolio
                             </Button>
                         </div>
 
@@ -129,14 +134,15 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                             control={form.control}
                             name="amount"
                             render={({ field }) => (
-                                <FormItem className='flex flex-col gap-3'>
+                                <FormItem className='w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 space-y-0'>
                                     <span>Amount to invest/withdraw ($)</span>
                                     <FormControl>
                                         <Input
                                             type="number"
                                             min={0}
                                             step={100}
-                                            className="w-[180px] h-[36px] text-base mx-3"
+                                            disabled={action === "review"}
+                                            className="w-[100px] py-0 ml-3"
                                             {...field}
                                         />
                                     </FormControl>
@@ -147,12 +153,12 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
 
                         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <span className=''>Current portfolio value</span>
-                            <div className='px-3'>{formatDollar(currentValue ?? 0)}</div>
+                            <div className='ml-3'>{formatDollar(currentValue ?? 0)}</div>
                         </div>
 
                         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <span className=''>Proposed portfolio value</span>
-                            <div className='px-3'>{formatDollar(proposedValue ?? 0)}</div>
+                            <div className='ml-3'>{formatDollar(proposedValue ?? 0)}</div>
                         </div>
 
                         <div className='h-full flex flex-row items-end justify-between mt-3'>
@@ -160,7 +166,10 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
                                 <Button
                                     type='button'
                                     variant='secondary'
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        // reset form after 1 sec
+                                        setTimeout(() => form.reset(), 1000);
+                                    }}
                                 >
                                     Cancel
                                 </Button>
@@ -168,7 +177,7 @@ export default function GetAdviceDialog({ children }: GetAdviceDialogProps) {
 
                             <Button
                                 type='submit'
-                                disabled={proposedValue === currentValue || proposedValue === 0}
+                                disabled={action!=="review" && (proposedValue === currentValue || proposedValue === 0)}
                             >
                                 Submit
                             </Button>

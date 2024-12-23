@@ -34,7 +34,7 @@ export default async function InboxPage() {
 
     return (
         <div className='flex-1 p-3 overflow-y-scroll'>
-            <div className='w-full max-w-6xl mx-auto pb-12'>
+            <div className='w-full max-w-6xl flex flex-col gap-2 mx-auto'>
                 <div className='flex flex-col gap-3'>
                     <H3>Inbox</H3>
                 </div>

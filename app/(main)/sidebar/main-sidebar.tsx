@@ -10,7 +10,6 @@ import {
     Home,
     MessageCirclePlus,
     NotebookPen,
-    SearchCheck,
     UserRound,
     ChevronRight,
     CheckCheck,
@@ -40,8 +39,7 @@ import {
 } from "@/components/ui/collapsible";
 
 import NotesDialog from "@/components/dialogs/notes-dialog";
-import CheckupDialog from "@/components/dialogs/checkup-dialog";
-import GetAdviceDialog from "@/components/dialogs/get-advice-dialog";
+import QuickActionsDialog from "@/components/dialogs/quick-actions-dialog";
 import DisclaimerDialog from "@/components/dialogs/disclaimer-dialog";
 
 import Conversations from "./conversations";
@@ -239,21 +237,12 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                 </SidebarMenuItem>
 
                                 <SidebarMenuItem>
-                                    <CheckupDialog>
-                                        <SidebarMenuButton>
-                                            <SearchCheck size={16} />
-                                            Portfolio review
-                                        </SidebarMenuButton>
-                                    </CheckupDialog>
-                                </SidebarMenuItem>
-
-                                <SidebarMenuItem>
-                                    <GetAdviceDialog>
+                                    <QuickActionsDialog>
                                         <SidebarMenuButton>
                                             <ArrowUpDown size={16} className='rotate-90' />
-                                            Deposit/withdraw
+                                            Quick actions
                                         </SidebarMenuButton>
-                                    </GetAdviceDialog>
+                                    </QuickActionsDialog>
                                 </SidebarMenuItem>
                             </SidebarMenu>
                         </SidebarGroupContent>
@@ -275,7 +264,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                             </SidebarMenu>
                         </SidebarGroupContent>
                     </SidebarGroup>
-                    
+
                     <SidebarSeparator />
 
                     <Conversations />

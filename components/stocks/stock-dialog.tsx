@@ -92,7 +92,7 @@ export default function StockDialog({ children, symbol, name }: StockModalProps)
                 {children}
             </DialogTrigger>
             <DialogContent className='h-dvh w-full max-w-[100vw] flex flex-col border-none shadow-none rounded-none'>
-                <div className='max-w-6xl mx-auto md:mb-3 overflow-hidden'>
+                <div className='max-w-6xl mx-auto md:mb-3'>
                     <DialogHeader>
                         <DialogTitle>
                             {name}
@@ -157,7 +157,7 @@ export default function StockDialog({ children, symbol, name }: StockModalProps)
                             ) : (
                             <div className='hidden md:flex flex-col items-center'>
                                 <span className='font-medium text-base md:text-lg'>{formatMarketCap(stockData.profile.mktCap)}</span>
-                                <span className='text-slate-600 text-xs md:text-sm'>Market Cap.</span>
+                                <span className='text-zinc-600 text-xs md:text-sm'>Market Cap.</span>
                             </div>
                             )}
 
@@ -165,24 +165,29 @@ export default function StockDialog({ children, symbol, name }: StockModalProps)
                             <Skeleton className='hidden md:block' />
                             ) : (
                             <div className='hidden md:flex flex-col items-center'>
-                                <span className='font-medium text-base md:text-lg line-clamp-1'>{stockData.profile.sector}</span>
-                                <span className='text-slate-600 text-xs md:text-sm'>Sector</span>
+                                <span className='font-medium text-base md:text-lg line-clamp-1'>{stockData.profile.sector ?? "N/A"}</span>
+                                <span className='text-zinc-600 text-xs md:text-sm'>Sector</span>
                             </div>
                             )}
 
                             {!stockData || isLoading ? (
                             <Skeleton />
                             ) : (
-                            <div className='flex flex-col items-center'>
-                                <span className={cn(
-                                    'font-medium text-base md:text-lg line-clamp-1',
-                                    stockData.rating[0].ratingRecommendation.includes("Sell") && 'text-red-400',
-                                    stockData.rating[0].ratingRecommendation.includes("Buy") && 'text-green-400',
-                                )}>
-                                    {stockData.rating[0].ratingRecommendation}
-                                </span>
-                                <span className='text-slate-600 text-xs md:text-sm'>Analyst Rating</span>
-                            </div>
+                                <div className='flex flex-col items-center'>
+
+                                    {stockData.rating.length > 0 ? (
+                                    <span className={cn(
+                                        'font-medium text-base md:text-lg line-clamp-1',
+                                        stockData.rating[0].ratingRecommendation.includes("Sell") && 'text-red-400',
+                                        stockData.rating[0].ratingRecommendation.includes("Buy") && 'text-green-400',
+                                    )}>
+                                        {stockData.rating[0].ratingRecommendation}
+                                    </span>
+                                    ) : (
+                                    <span className='font-medium text-base md:text-lg'>N/A</span>
+                                    )}
+                                    <span className='text-zinc-600 text-xs md:text-sm'>Analyst Rating</span>
+                                </div>
                             )}
                         </div>
 
