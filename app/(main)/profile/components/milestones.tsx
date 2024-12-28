@@ -64,7 +64,8 @@ export default function Milestones() {
                     <Button
                         type='button'
                         variant='outline'
-                        className='flex flex-row gap-2 justify-start font-medium py-3 border border-neutral-600'
+                        size='dynamic'
+                        className='flex flex-row gap-2 justify-start'
                     >
                         <Plus size={16} />
                         New milestone

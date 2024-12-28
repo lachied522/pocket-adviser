@@ -59,7 +59,7 @@ export default function NewsArea() {
     }, [isVisible, page, partialStockData]);
 
     return (
-        <div className='flex flex-col items-start gap-1 px-2 pb-1'>
+        <div className='flex flex-col items-start gap-1 sm:px-2 pb-1'>
             <div>
                 <Button
                     variant='ghost'

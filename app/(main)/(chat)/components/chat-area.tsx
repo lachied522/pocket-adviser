@@ -84,12 +84,12 @@ export default function ChatArea() {
                 </div>
             </div>
 
-            <div className='w-full max-w-7xl flex flex-col justify-center gap-3 px-6 py-3 mx-auto'>
+            <div className='w-full max-w-7xl flex flex-col justify-center gap-1 sm:gap-3 px-3 sm:px-6 py-2 sm:py-3 mx-auto'>
                 <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
                 
                 <div className='w-full flex flex-row gap-1'>
                     <div className={cn(
-                        "h-12 flex-1 flex flex-row border border-zinc-100 rounded-l-md overflow-hidden",
+                        "h-10 sm:h-12 flex-1 flex flex-row border border-zinc-100 rounded-l-md overflow-hidden",
                         article && "h-16"
                     )}>
                         {article && (

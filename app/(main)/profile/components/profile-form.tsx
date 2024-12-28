@@ -27,13 +27,13 @@ export default function ProfileForm() {
 
     return (
         <form onSubmit={onSave} className='w-full max-w-6xl flex flex-col gap-3 mx-auto'>
-            <div className='w-full flex flex-row items-center justify-between gap-3'>
+            <div className='w-full flex flex-col sm:flex-row items-center justify-between gap-3'>
                 <div className='flex flex-col gap-2'>
                     <H3>My Profile</H3>
                     <p className='text-sm'>Tell Pocket Adviser about yourself so it can provide accurate suggestions.</p>
                 </div>
 
-                <div className='flex flex-row items-center gap-2'>
+                <div className='w-full sm:w-auto flex flex-row items-center gap-2'>
                     {isEditting ? (
                     <>
                         <Button
@@ -85,7 +85,7 @@ export default function ProfileForm() {
                     className="flex-1"
                 >
                     <TabsList className='w-full justify-between gap-3 bg-transparent border-b border-zinc-200'>
-                        <TabsTrigger value="forecasts" className=''>Forecasts</TabsTrigger>
+                        <TabsTrigger value="forecasts" className='hidden sm:flex'>Forecasts</TabsTrigger>
                         <TabsTrigger value="preferences" className=''>Preferences</TabsTrigger>
                         <TabsTrigger value="risk-tolerance" className=''>Risk Tolerance</TabsTrigger>
                         <TabsTrigger value="finance" className=''>Finance</TabsTrigger>

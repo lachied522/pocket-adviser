@@ -89,13 +89,13 @@ export default function Portfolio() {
 
     return (
         <div className='w-full max-w-6xl flex flex-col gap-3 mx-auto'>
-            <div className='w-full flex flex-row items-center justify-between gap-3'>
+            <div className='w-full flex flex-col sm:flex-row items-center justify-between gap-3'>
                 <div className='flex flex-col gap-2'>
                     <H3>My Portfolio</H3>
                     <p className='text-sm'>If you own stocks with a broker, you can keep your portfolio up to date here to ensure Pocket Adviser provides accurate suggestions.</p>
                 </div>
 
-                <div className='flex flex-row items-center gap-2'>
+                <div className='w-full sm:w-auto flex flex-row items-center gap-2'>
                     <Tooltip>
                         <TooltipTrigger>
                             <Button

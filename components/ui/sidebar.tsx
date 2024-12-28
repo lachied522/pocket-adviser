@@ -286,10 +286,10 @@ const SidebarTrigger = React.forwardRef<
 SidebarTrigger.displayName = "SidebarTrigger"
 
 const SidebarHiddenTrigger = () =>  {
-  const { isMobile, state } = useSidebar();
+  const { state } = useSidebar();
 
   return (
-      <div className={cn("hidden", (isMobile || state === "collapsed") && "block")}>
+      <div className={cn("block sm:hidden", (state === "collapsed") && "sm:block")}>
           <SidebarTrigger />
       </div>
   )
@@ -564,17 +564,19 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
-    const { isMobile, state } = useSidebar()
+    const { isMobile, state, setOpenMobile } = useSidebar()
 
     const button = (
-      <Comp
-        ref={ref}
-        data-sidebar="menu-button"
-        data-size={size}
-        data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-        {...props}
-      />
+      <div onClick={() => setOpenMobile(false)}>
+        <Comp
+          ref={ref}
+          data-sidebar="menu-button"
+          data-size={size}
+          data-active={isActive}
+          className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+          {...props}
+        />
+      </div>
     )
 
     if (!tooltip) {

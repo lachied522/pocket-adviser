@@ -16,7 +16,7 @@ import type { Advice } from "@prisma/client";
 function ErrorFallback({ text }: { text: string }) {
     return (
         <div className='h-64 w-full flex items-center justify-center'>
-            <span>{text}</span>
+            <span className='text-xs sm:text-sm'>{text}</span>
         </div>
     )
 }

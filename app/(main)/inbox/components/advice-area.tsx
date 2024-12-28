@@ -22,7 +22,7 @@ export default function AdviceArea({
 
                 <div className='w-full flex flex-row items-center justify-end'>
                     <Link href={`/?adviceId=${advice.id}&query=${encodeURIComponent("Tell me more about why I should consider the above transactions")}`}>
-                        <Button>
+                        <Button size='dynamic'>
                             Find out more
                         </Button>
                     </Link>

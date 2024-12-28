@@ -52,7 +52,7 @@ interface AppSidebarProps {
 
 // see https://ui.shadcn.com/blocks - nested sidebars
 export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
-    const { state } = useGlobalContext() as GlobalState;
+    const { state, dispatch } = useGlobalContext() as GlobalState;
     const pathname = usePathname();
 
     return (
@@ -76,7 +76,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
 
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarGroupContent className="px-1.5 md:px-0">
+                        <SidebarGroupContent>
                             <SidebarMenu className="gap-2">
                                 <SidebarMenuItem className='relative'>
                                     <Link href='/inbox'>
@@ -86,6 +86,15 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                                 hidden: false,
                                             }}
                                             isActive={pathname.startsWith('/inbox')}
+                                            onClick={() => {
+                                                dispatch({
+                                                    type: 'SET_DATA',
+                                                    payload: {
+                                                        ...state,
+                                                        dailyAdviceViewed: true,
+                                                    }
+                                                });
+                                            }}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white relative"
                                         >
                                             <Inbox size={20} />

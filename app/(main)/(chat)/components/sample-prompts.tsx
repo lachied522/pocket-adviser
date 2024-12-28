@@ -85,6 +85,7 @@ export default function SamplePrompts() {
             <Button
                 key={`sample-prompt-${prompt.input}`}
                 variant='outline'
+                size='dynamic'
                 onClick={() => onSubmit(prompt.input, 'tool' in prompt? prompt.tool: undefined)}
                 className='hover:scale-[1.02] transition-transform duration-150'
             >

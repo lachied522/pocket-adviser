@@ -94,7 +94,7 @@ export default function Statistics({ statistics }: StatisticsProps) {
             Object.entries(statistics.proposedPortfolio.sectorAllocations)
             .map(([sector, allocation], index) => ({ sector, allocation: 100 * parseFloat(allocation as string), fill: COLORS[index % COLORS.length] }))
         ]
-    }, [statistics.currentPortfolio.sectorAllocations, statistics.proposedPortfolio.sectorAllocations]);
+    }, [statistics]);
 
     return (
         <div className='w-full flex flex-col gap-3'>

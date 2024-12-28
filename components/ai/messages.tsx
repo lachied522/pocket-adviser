@@ -62,7 +62,7 @@ export function PlainTextMessage({
     return (
         <Card className="overflow-hidden">
             <CardContent className={cn(
-                "max-w-[900px] px-3 py-2 text-wrap whitespace-pre-line",
+                "max-w-[900px] px-3 py-2 text-wrap text-sm sm:text-base whitespace-pre-line",
                 role === "user" && "bg-neutral-50 border-none"
             )}>
                 <Markdown components={{ h3: H3, ol: OrderedList, ul: UnorderedList, a: Link, strong: Strong }}>

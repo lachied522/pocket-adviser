@@ -117,7 +117,7 @@ function TapeItem({
     change: number
 }) {
     return (
-        <div className='flex flex-row items-center justify-between gap-1 md:gap-2 rounded-lg px-1.5 md:px-3 py-1.5'>            
+        <div className='flex flex-row items-center justify-between gap-1 md:gap-2 rounded-lg px-1.5 md:px-3'>
             <div className='h-3 md:h-3.5 w-3 md:w-3.5 relative'>
                 <Image
                     src={exchange=="ASX"? "/aus-flag-icon.png": "/us-flag-icon.png"}
