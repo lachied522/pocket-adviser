@@ -11,16 +11,17 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { H1, H3 } from "@/components/ui/typography";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 
 import { createCheckoutSession, createBillingPortalSession } from "@/actions/billing/portals";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
+import type { AccountType } from "@prisma/client";
+
 interface SubscribeButtonProps {
     userId: string,
-    accountType?: "FREE"|"PAID"|"ADMIN"|"GUEST"
+    accountType?: AccountType
 }
 
 function SubscribeButton({ userId, accountType = "FREE" }: SubscribeButtonProps) {

@@ -88,19 +88,23 @@ export default function SettingsMenu() {
                 </>
                 ) : (
                 <>
-                    <PremiumDialog>
-                        <Button
-                            variant='ghost'
-                            className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
-                        >
-                            <Sparkles size={18} strokeWidth={2} />
-                            <span className='text-xs'>Premium</span>
-                        </Button>
-                    </PremiumDialog>
+                    {state.accountType !== "STUDENT" && (
+                    <>
+                        <PremiumDialog>
+                            <Button
+                                variant='ghost'
+                                className='w-full h-[42px] grid grid-cols-[20px_1fr] justify-items-start font-medium gap-2 px-2'
+                            >
+                                <Sparkles size={18} strokeWidth={2} />
+                                <span className='text-xs'>Premium</span>
+                            </Button>
+                        </PremiumDialog>
 
-                    <BillingButton />
+                        <BillingButton />
 
-                    <DropdownMenuSeparator className='' />
+                        <DropdownMenuSeparator className='' />
+                    </>
+                    )}
 
                     <SettingsDialog>
                         <Button
