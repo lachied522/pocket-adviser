@@ -187,10 +187,10 @@ export default function Advanced({
                                 <div className=''>Standard Deviation</div>
                             </TableCell>
                             <TableCell className='text-center'>
-                                {statistics.currentPortfolio.standardDeviation}
+                                {parseFloat(statistics.currentPortfolio.standardDeviation)?.toFixed(2) ?? "N/A"}
                             </TableCell>
                             <TableCell className='text-center'>
-                                {statistics.proposedPortfolio.standardDeviation}
+                                {parseFloat(statistics.proposedPortfolio.standardDeviation)?.toFixed(2) ?? "N/A"}
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -198,10 +198,10 @@ export default function Advanced({
                                 <div className=''>Beta</div>
                             </TableCell>
                             <TableCell className='text-center'>
-                                {statistics.currentPortfolio.beta}
+                                {parseFloat(statistics.currentPortfolio.beta)?.toFixed(2) ?? "N/A"}
                             </TableCell>
                             <TableCell className='text-center'>
-                                {statistics.proposedPortfolio.beta}
+                                {parseFloat(statistics.proposedPortfolio.beta)?.toFixed(2) ?? "N/A"}
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -209,10 +209,10 @@ export default function Advanced({
                                 <div className=''>Sharpe Ratio</div>
                             </TableCell>
                             <TableCell className='text-center'>
-                                {statistics.currentPortfolio.sharpeRatio}
+                                {parseFloat(statistics.currentPortfolio.sharpeRatio)?.toFixed(2) ?? "N/A"}
                             </TableCell>
                             <TableCell className='text-center'>
-                                {statistics.proposedPortfolio.sharpeRatio}
+                                {parseFloat(statistics.proposedPortfolio.sharpeRatio)?.toFixed(2) ?? "N/A"}
                             </TableCell>
                         </TableRow>
                     </TableBody>

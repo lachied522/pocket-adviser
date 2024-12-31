@@ -38,8 +38,8 @@ type OptimalPortfolioResponse = {
 type Statistics = {
     expectedReturn: number
     standardDeviation: number
-    sharpeRatio: number
-    treynorRatio: number
+    sharpeRatio: number | null
+    treynorRatio: number | null
     beta: number
     dividendYield: number
     sectorAllocations: { [sector: string]: number }
@@ -146,8 +146,8 @@ async function fetchPortfolioStatistics(
         return {
             expectedReturn: statistics.expectedReturn.toFixed(4),
             standardDeviation: statistics.standardDeviation.toFixed(4),
-            sharpeRatio: statistics.sharpeRatio.toFixed(4),
-            treynorRatio: statistics.treynorRatio.toFixed(4),
+            sharpeRatio: statistics.sharpeRatio?.toFixed(4),
+            treynorRatio: statistics.treynorRatio?.toFixed(4),
             beta: statistics.beta.toFixed(4),
             dividendYield: statistics.dividendYield.toFixed(4),
             sectorAllocations,
@@ -190,6 +190,10 @@ async function selectTransactions(
      * Further refine recommended transactions returned by the above endpoint based on user's profile, portfolio, conversation history
      */
     const MAX_TRANSACTIONS = 3; // TO DO: add this as a function argument
+
+    if (response.recommendedTransactions.length < 1) {
+        return [];
+    }
 
     const { object } = await generateObject({
         model: openai('gpt-4o'),
@@ -285,31 +289,37 @@ export async function getRecommendations(
     args: z.infer<typeof parameters>,
     userId: string
 ) {
-    args = {
-        ...args,
-        amount: args.action === "WITHDRAW"? -Math.abs(args.amount): args.action === "DEPOSIT"? Math.abs(args.amount): 0,
-    }
+    try {
+        args = {
+            ...args,
+            amount: args.action === "WITHDRAW"? -Math.abs(args.amount): args.action === "DEPOSIT"? Math.abs(args.amount): 0,
+        }
 
-    const response = filterResponse(await fetchOptimalPortfolio(args, userId), args);
+        const response = filterResponse(await fetchOptimalPortfolio(args, userId), args);
 
-    // LLM will refine recommended transactions
-    const selectedTransactions = await selectTransactions(response, args);
+        // LLM will refine recommended transactions
+        const selectedTransactions = await selectTransactions(response, args);
 
-    // adjust selected transactions for intended investment amount
-    const adjustedTransactions = adjustTransactions(selectedTransactions, args);
+        // adjust selected transactions for intended investment amount
+        const adjustedTransactions = adjustTransactions(selectedTransactions, args);
 
-    const statistics = await fetchPortfolioStatistics({ transactions: adjustedTransactions }, userId);
+        const statistics = await fetchPortfolioStatistics({ transactions: adjustedTransactions }, userId);
 
-    // only return data for stocks included in the selected transactions
-    const stockData = response.stockData.filter(
-        (stock) => !!selectedTransactions.find((transaction) => transaction.stockId === stock.id)
-    );
+        // only return data for stocks included in the selected transactions
+        const stockData = response.stockData.filter(
+            (stock) => !!adjustedTransactions.find((transaction) => transaction.stockId === stock.id)
+        );
 
-    return {
-        profile: response.profile,
-        transactions: adjustedTransactions,
-        statistics,
-        stockData,
+        return {
+            profile: response.profile,
+            transactions: adjustedTransactions,
+            statistics,
+            stockData,
+        }
+    } catch (e) {
+        if (e instanceof Error)
+            console.error(e.message.toString());
+        throw e;
     }
 }
 

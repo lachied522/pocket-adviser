@@ -96,7 +96,9 @@ export function ChatProvider({
             }
         },
         onFinish(message) {
-            setShouldSyncConverastion(message.role === "assistant" && message.content.length > 0);
+            if (state.accountType !== "GUEST") {
+                setShouldSyncConverastion(message.role === "assistant" && message.content.length > 0);
+            }
         }
     });
 

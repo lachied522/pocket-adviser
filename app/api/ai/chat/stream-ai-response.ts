@@ -20,6 +20,8 @@ import { description as readUrlDescription, parameters as readUrlParams, readUrl
 
 import { getSystemMessage } from '../system';
 
+import type { AccountType } from '@prisma/client';
+
 export type ToolName = "getRecommendations" | "getPortfolio" | "getProfile" | "getStockInfo" | "getMarketNews" | "getStockNews" | "getAnalystResearch" | "searchWeb" | "readUrl";
 
 function getFinishStep(finishReason: "stop"|"tool-calls"|"error") {
@@ -53,7 +55,7 @@ export async function* streamAIResponse({
     messages: CoreMessage[]
     toolName?: ToolName
     userId: string
-    accountType: "GUEST"|"FREE"|"PAID"|"ADMIN"
+    accountType: AccountType
     onFinish: ({
         text,
         finishReason,
@@ -70,7 +72,11 @@ export async function* streamAIResponse({
         toolResults: ToolResultPart[]
     }) => void
 }) {
-    const systemMessage = await getSystemMessage(userId, accountType);
+    const systemMessage = await getSystemMessage({
+        userId,
+        accountType,
+    });
+
     const response = await streamText({
         model: openai('gpt-4o'),
         system: systemMessage,

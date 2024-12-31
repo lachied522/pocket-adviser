@@ -13,7 +13,7 @@ export default function Header({ accountType }: HeaderProps) {
     return (
         <div className='flex flex-row items-center overflow-hidden sticky top-0 sm:px-2 pt-1'>
             <SidebarHiddenTrigger />
-            <TickerTape exchange="ASX" />
+            <TickerTape exchange={accountType === "STUDENT"? "ASX": undefined} />
             <SettingsMenu />
         </div>
     )

@@ -31,6 +31,7 @@ import {
     SidebarMenuItem,
     SidebarSeparator,
     SidebarTrigger,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import {
     Collapsible,
@@ -53,6 +54,7 @@ interface AppSidebarProps {
 // see https://ui.shadcn.com/blocks - nested sidebars
 export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
     const { state, dispatch } = useGlobalContext() as GlobalState;
+    const { setOpenMobile } = useSidebar();
     const pathname = usePathname();
 
     return (
@@ -87,6 +89,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                             }}
                                             isActive={pathname.startsWith('/inbox')}
                                             onClick={() => {
+                                                setOpenMobile(false);
                                                 dispatch({
                                                     type: 'SET_DATA',
                                                     payload: {
@@ -115,6 +118,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                                 hidden: false,
                                             }}
                                             isActive={pathname === '/' || pathname.includes('/c/')}
+                                            onClick={() => setOpenMobile(false)}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
                                             <Home size={20} />
@@ -131,6 +135,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                                 hidden: false,
                                             }}
                                             isActive={pathname.startsWith('/profile')}
+                                            onClick={() => setOpenMobile(false)}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
                                             <UserRound size={20} />
@@ -147,6 +152,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                                 hidden: false,
                                             }}
                                             isActive={pathname.startsWith('/portfolio')}
+                                            onClick={() => setOpenMobile(false)}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
                                             <BriefcaseBusiness size={20} />
@@ -163,6 +169,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                                 hidden: false,
                                             }}
                                             isActive={pathname.startsWith('/education')}
+                                            onClick={() => setOpenMobile(false)}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
                                             <GraduationCap size={20} />
@@ -238,7 +245,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                             <SidebarMenu>
                                 <SidebarMenuItem>
                                     <Link href='/'>
-                                        <SidebarMenuButton>
+                                        <SidebarMenuButton onClick={() => setOpenMobile(false)}>
                                             <MessageCirclePlus size={16} />
                                             New chat
                                         </SidebarMenuButton>
@@ -259,22 +266,26 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
 
                     <SidebarSeparator />
 
-                    <SidebarGroup>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <NotesDialog>
-                                        <SidebarMenuButton>
-                                            <NotebookPen size={16} />
-                                            Notes ✨
-                                        </SidebarMenuButton>
-                                    </NotesDialog>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
+                    {state.accountType === "PAID" && (
+                    <>
+                        <SidebarGroup>
+                            <SidebarGroupContent>
+                                <SidebarMenu>
+                                    <SidebarMenuItem>
+                                        <NotesDialog>
+                                            <SidebarMenuButton>
+                                                <NotebookPen size={16} />
+                                                Notes ✨
+                                            </SidebarMenuButton>
+                                        </NotesDialog>
+                                    </SidebarMenuItem>
+                                </SidebarMenu>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
 
-                    <SidebarSeparator />
+                        <SidebarSeparator />
+                    </>
+                    )}
 
                     <Conversations />
                 </SidebarContent>

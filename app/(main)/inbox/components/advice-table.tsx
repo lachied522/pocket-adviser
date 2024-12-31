@@ -16,7 +16,7 @@ interface AdviceTableProps {
 
 export default function AdviceTable({ data }: AdviceTableProps) {
     return (
-        <div className='flex flex-col gap-3 py-12'>
+        <div className='flex flex-col gap-3'>
             <p>Older suggestions</p>
             <div className='rounded-md border'>
                 <Table>

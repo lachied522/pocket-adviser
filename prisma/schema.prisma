@@ -182,6 +182,7 @@ enum AccountType {
   FREE
   PAID
   ADMIN
+  STUDENT
 }
 
 enum MailFrequency {

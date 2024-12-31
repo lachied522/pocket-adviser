@@ -15,7 +15,7 @@ export default function AdviceArea({
 }: TransactionsProps) {
     return (
         <div className='flex flex-col gap-3'>
-            <p>Daily suggestions</p>
+            <p>Suggestions for you</p>
             {(advice && advice.transactions.length > 0) ? (
             <div className='flex flex-col items-start gap-3'>
                 <AdviceTabs advice={advice} />
@@ -29,8 +29,8 @@ export default function AdviceArea({
                 </div>
             </div>
             ) : (
-            <div className='flex items-center justify-center'>
-                <span>Nothing here yet.</span>
+            <div className='flex items-center justify-center p-12'>
+                <span className='text-sm'>Nothing here yet.</span>
             </div>
             )}
         </div>
