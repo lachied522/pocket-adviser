@@ -1,4 +1,4 @@
-import NewsArea from "./components/news-area";
+import NewsArea from "./chat/components/news-area";
 
 export default function ChatLayout({
     children,
@@ -7,8 +7,8 @@ export default function ChatLayout({
 }>) {
     return (
         <>
-            <NewsArea />
             {children}
+            <NewsArea />
         </>
     )
 }

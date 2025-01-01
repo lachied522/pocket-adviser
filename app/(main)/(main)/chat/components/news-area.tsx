@@ -13,6 +13,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/components/utils";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
+
 import NewsArticle from "./news-article";
 
 import type { StockNews } from "@/utils/financial_modelling_prep/types";
@@ -24,7 +25,7 @@ export default function NewsArea() {
     const { partialStockData } = useGlobalContext() as GlobalState;
     const [data, setData] = useState<StockNews[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [isVisible, setIsVisible] = useState<boolean>(getCookie(COOKIE_NAME) === "true");
+    const [isVisible, setIsVisible] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
 
     const toggleVisible = useCallback(() => {
@@ -33,6 +34,10 @@ export default function NewsArea() {
             return !curr;
         });
     }, [setIsVisible]);
+
+    useEffect(() => {
+        setIsVisible(getCookie(COOKIE_NAME) === "true");
+    }, []);
 
     useEffect(() => {
         if (isVisible) populatePage();
@@ -59,22 +64,18 @@ export default function NewsArea() {
     }, [isVisible, page, partialStockData]);
 
     return (
-        <div className='flex flex-col items-start gap-1 sm:px-2 pb-1'>
-            <div>
-                <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={toggleVisible}
-                    className={cn('h-7 w-7', isVisible && 'bg-zinc-100')}
-                >
-                    <Newspaper size={16} />
-                </Button>
-                {/* {isVisible && data.length > 0 && (
-                <div className='hidden md:block text-xs'>Tip: drag an article into the chat</div>
-                )} */}
-            </div>
+        <div className='flex flex-col items-start gap-1 px-3 pb-1'>
+            <Button
+                variant='ghost'
+                size='sm'
+                onClick={toggleVisible}
+                className={cn('', isVisible && 'bg-zinc-100')}
+            >
+                <Newspaper size={12} />
+                <span className='text-xs'>{isVisible? "Hide": "Show"}</span>
+            </Button>
 
-            <ScrollArea className={cn('w-full max-h-0 overflow-hidden transition-all duration-300 ease-in-out', isVisible && 'max-h-none')}>
+            <ScrollArea className={cn('hidden w-full max-h-0 overflow-hidden transition-all duration-300 ease-in-out', isVisible && 'block max-h-none')}>
                 <div className='flex flex-row items-center pb-2 gap-2'>
                     {data.map((article) => (
                     <NewsArticle

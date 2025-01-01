@@ -2,8 +2,13 @@
 import { useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
+type SubmitOptions = {
+    adviceId?: string
+    toolName?: string
+}
+
 export function extractConversationIdFromPathname(pathname: string) {
-    const regex = /\/c\/([a-zA-Z0-9]+)/;
+    const regex = /chat\/c\/([a-zA-Z0-9]+)/;
     const match = pathname.match(regex);
     return match ? match[1] : null;
 }
@@ -13,15 +18,11 @@ export function useChatNavigation() {
     const pathname = usePathname();
 
     const onSubmit = useCallback(
-        (query: string, options?: { toolName?: string, url?: string }) => {
-            let url = '/';
+        (query: string, options?: SubmitOptions) => {
             const conversationId = extractConversationIdFromPathname(pathname);
-            url += conversationId? `c/${conversationId}`: '';
-            url += `?query=${encodeURIComponent(query)}`;
+            let url = conversationId? `/chat/c/${conversationId}`: '/chat';
 
-            if (options && options.toolName) {
-                url += `&toolName=${encodeURIComponent(options.toolName)}`;
-            }
+            url += `/?${new URLSearchParams({ query, ...options }).toString()}`;
 
             if (conversationId) router.replace(url)
             else router.push(url);
@@ -33,9 +34,9 @@ export function useChatNavigation() {
         (conversationId?: string) => {
             // conversationId is undefined for new chat
             if (conversationId) {
-                router.push(`/c/${conversationId}`);
+                router.push(`/chat/c/${conversationId}`);
             } else {
-                router.push(`/`);
+                router.push("/chat");
             }
         },
         [router]

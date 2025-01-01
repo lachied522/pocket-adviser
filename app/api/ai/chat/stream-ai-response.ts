@@ -188,6 +188,7 @@ export async function* streamAIResponse({
                             yield `e:${JSON.stringify(getFinishStep("tool-calls"))}\n`;
 
                             const subStream = handleRecommendations({
+                                accountType,
                                 conversation: messages, 
                                 result: part.result,
                             });

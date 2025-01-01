@@ -13,8 +13,10 @@ import {
     UserRound,
     ChevronRight,
     CheckCheck,
-    Inbox,
+    Bot,
 } from "lucide-react";
+
+import { useChatNavigation } from "@/hooks/useChatNavigation";
 
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
@@ -54,6 +56,7 @@ interface AppSidebarProps {
 // see https://ui.shadcn.com/blocks - nested sidebars
 export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
     const { state, dispatch } = useGlobalContext() as GlobalState;
+    const { onNavigateConversation } = useChatNavigation();
     const { setOpenMobile } = useSidebar();
     const pathname = usePathname();
 
@@ -81,13 +84,13 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                         <SidebarGroupContent>
                             <SidebarMenu className="gap-2">
                                 <SidebarMenuItem className='relative'>
-                                    <Link href='/inbox'>
+                                    <Link href='/'>
                                         <SidebarMenuButton
                                             tooltip={{
-                                                children: "Inbox",
+                                                children: "Home",
                                                 hidden: false,
                                             }}
-                                            isActive={pathname.startsWith('/inbox')}
+                                            isActive={pathname === '/'}
                                             onClick={() => {
                                                 setOpenMobile(false);
                                                 dispatch({
@@ -100,29 +103,29 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                             }}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white relative"
                                         >
-                                            <Inbox size={20} />
-                                            <span>Inbox</span>
+                                            <Home size={20} />
+                                            <span>Home</span>
                                         </SidebarMenuButton>
                                     </Link>
 
-                                    {!pathname.startsWith('/inbox') && !state.dailyAdviceViewed && (
+                                    {pathname !== '/' && !state.dailyAdviceViewed && (
                                     <div className='z-10 size-2 bg-red-500 rounded-full absolute top-0 right-0 translate-x-0.5 -translate-y-0.5' />
                                     )}
                                 </SidebarMenuItem>
 
                                 <SidebarMenuItem>
-                                    <Link href='/'>
+                                    <Link href='/chat'>
                                         <SidebarMenuButton
                                             tooltip={{
-                                                children: "Home",
+                                                children: "Chat",
                                                 hidden: false,
                                             }}
-                                            isActive={pathname === '/' || pathname.includes('/c/')}
+                                            isActive={pathname === '/chat' || pathname.startsWith('/chat/c/')}
                                             onClick={() => setOpenMobile(false)}
                                             className="px-2.5 md:px-2 data-[active=true]:bg-sidebar-primary/90 data-[active=true]:text-white"
                                         >
-                                            <Home size={20} />
-                                            <span>Home</span>
+                                            <Bot size={20} />
+                                            <span>Chat</span>
                                         </SidebarMenuButton>
                                     </Link>
                                 </SidebarMenuItem>
@@ -244,12 +247,15 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                         <SidebarGroupContent>
                             <SidebarMenu>
                                 <SidebarMenuItem>
-                                    <Link href='/'>
-                                        <SidebarMenuButton onClick={() => setOpenMobile(false)}>
-                                            <MessageCirclePlus size={16} />
-                                            New chat
-                                        </SidebarMenuButton>
-                                    </Link>
+                                    <SidebarMenuButton
+                                        onClick={() => {
+                                            onNavigateConversation();
+                                            setOpenMobile(false);
+                                        }}
+                                    >
+                                        <MessageCirclePlus size={16} />
+                                        New chat
+                                    </SidebarMenuButton>
                                 </SidebarMenuItem>
 
                                 <SidebarMenuItem>

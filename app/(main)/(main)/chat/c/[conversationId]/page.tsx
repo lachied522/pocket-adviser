@@ -17,7 +17,7 @@ export default async function ConversationPage({
     params: { conversationId: string },
     searchParams?: { [key: string]: string | string[] | undefined }
 }) {
-      // check if userId is in cookies
+    // check if userId is in cookies
     const cookieStore = cookies();
     const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
 
@@ -28,7 +28,7 @@ export default async function ConversationPage({
         const conversation = await getConversationById(conversationId);
 
         if (!conversation || conversation.userId !== userId) {
-            redirect('/');
+            redirect("/chat");
         }
 
         conversationHistory = conversation.messages as Message[];

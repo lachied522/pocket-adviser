@@ -12,9 +12,25 @@ import { H3 } from "@/components/ui/typography";
 import AdviceArea from "./components/advice-area";
 import AdviceTable from "./components/advice-table";
 import MarketUpdate from "./components/market-update";
-import NewsArea from "../(chat)/components/news-area";
+import WelcomeDialog from "./components/welcome-dialog";
 
-export default async function InboxPage() {
+const DEFAULT_USER_ID = "DEFAULT_USER";
+
+async function getDailyAdvice(userId: string) {
+    const advice = await getAdviceByUserId(userId, 20);
+
+    if (advice.length > 0) {
+        return advice;
+    } 
+
+    return await getAdviceByUserId(DEFAULT_USER_ID, 1);
+}
+
+export default async function HomePage({
+    searchParams
+}: {
+    searchParams?: { [key: string]: string | string[] | undefined }
+}) {
     // check if userId is in cookies
     const cookieStore = cookies();
     const userId = cookieStore.get(COOKIE_NAME_FOR_USER_ID)?.value;
@@ -29,27 +45,25 @@ export default async function InboxPage() {
     if (!user) redirect('/login');
 
     const [adviceData, marketUpdate, _] = await Promise.all([
-        getAdviceByUserId(userId, 20),
+        getDailyAdvice(userId),
         getTodayMarketSummary(),
         updateUser(userId, { dailyAdviceViewed: true }),
     ]);
 
-    const dailyAdvice = adviceData[0];
-
     return (
         <>
-            <NewsArea />
+            {searchParams?.welcome === "true" && <WelcomeDialog initialIsOpen={true} />}
             <div className='flex-1 p-3 overflow-y-scroll'>
-                <div className='w-full max-w-6xl flex flex-col gap-6 pb-12 mx-auto'>
+                <div className='w-full max-w-6xl flex flex-col gap-6 mx-auto'>
                     <div className='flex flex-col gap-3'>
                         <H3>Welcome{user.name? ` ${user.name}`: ''}!</H3>
                     </div>
 
                     <MarketUpdate content={marketUpdate} />
 
-                    <AdviceArea advice={dailyAdvice} />
+                    <AdviceArea advice={adviceData[0]} />
 
-                    <AdviceTable data={adviceData.filter((advice) => advice.id !== dailyAdvice.id)} />
+                    <AdviceTable data={adviceData.slice(1)} />
                 </div>
             </div>
         </>

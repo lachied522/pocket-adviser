@@ -76,8 +76,10 @@ export default function QuickActionsDialog({ children }: QuickActionsDialogProps
 
     const handleSubmit = useCallback(
         (values: z.infer<typeof formSchema>) => {
-            const content = values.action === "deposit"? `What can I buy with ${formatDollar(values.amount)}?`: `I need to raise ${formatDollar(values.amount)}. What should I sell?`;
-            onSubmit(content, { toolName: "getRecommendations" });
+            onSubmit(
+                values.action === "deposit"? `What can I buy with ${formatDollar(values.amount)}?`: values.action === "withdraw"? `I need to raise ${formatDollar(values.amount)}. What should I sell?`: "Can you review my portfolio and provide some suggestions?",
+                { toolName: "getRecommendations" }
+            );
             setIsOpen(false);
             // close sidebar on mobile
             setSidebarOpen(false);
@@ -90,7 +92,7 @@ export default function QuickActionsDialog({ children }: QuickActionsDialogProps
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className='max-w-2xl'>
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
                         Quick Actions
@@ -130,6 +132,7 @@ export default function QuickActionsDialog({ children }: QuickActionsDialogProps
                             </Button>
                         </div>
 
+                        {action !== "review" && (
                         <FormField
                             control={form.control}
                             name="amount"
@@ -141,7 +144,6 @@ export default function QuickActionsDialog({ children }: QuickActionsDialogProps
                                             type="number"
                                             min={0}
                                             step={100}
-                                            disabled={action === "review"}
                                             className="w-[100px] py-0 ml-3"
                                             {...field}
                                         />
@@ -150,6 +152,7 @@ export default function QuickActionsDialog({ children }: QuickActionsDialogProps
                                 </FormItem>
                             )}
                         />
+                        )}
 
                         <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <span className=''>Current portfolio value</span>

@@ -66,9 +66,7 @@ async function getDailySummary(exchange?: "ASX"|"NASDAQ") {
             prompt: `What's happening in the stock market? Use 200 words.`,
         });
 
-        return {
-            summary: text.split('\n').join(' '),
-        }
+        return { summary: text };
     } catch (e) {
         console.error("Error getting daily summary: ", e);
         return null;
@@ -98,7 +96,7 @@ Use this information to answer the user's query.\n\n${JSON.stringify(lastMonthEn
         prompt: `What happened in the stock market in the month of ${monthName}? Use 200 words.`,
     });
 
-    return text.split('\n').join(' ');
+    return text;
 }
 
 async function getCompactedSummary(summaries: DateSummaryMap) {
@@ -145,13 +143,10 @@ async function getCompactedSummary(summaries: DateSummaryMap) {
 }
 
 async function updateMarketSummary(summaries: DateSummaryMap, exchange?: "ASX"|"NASDAQ") {
-    console.log("updating market summary");
-
     const [dailySummary, compactedSummaries] = await Promise.all([
         getDailySummary(exchange),
         getCompactedSummary(summaries)
     ]);
-
 
     if (dailySummary) {
         const todayString = format(new Date(), "d_MM_yyyy");
@@ -169,10 +164,10 @@ function formatMarketSummary(summaries: DateSummaryMap) {
         if (isWithinCalendarMonthRange(date, 0)) {
             // if date is from this calendar month,
             // format Friday, April 29th, 1453
-            summaryString += `${format(date, "EEEE, MMMM d")}: ${summary}\n\n`;
+            summaryString += `${format(date, "EEEE, MMMM d")}: ${summary.split('\n').join(' ')}\n\n`;
         } else {
             // format month name only
-            summaryString += `${format(date, "MMMM")}: ${summary}\n\n`;
+            summaryString += `${format(date, "MMMM")}: ${summary.split('\n').join(' ')}\n\n`;
         }
     }
 

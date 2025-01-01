@@ -1,5 +1,6 @@
 "use client";
-import Link from "next/link";
+import { useChatNavigation } from "@/hooks/useChatNavigation";
+
 import { Button } from "@/components/ui/button";
 
 import AdviceTabs from "@/components/advice/advice-tabs";
@@ -13,6 +14,8 @@ interface TransactionsProps {
 export default function AdviceArea({
     advice
 }: TransactionsProps) {
+    const { onSubmit } = useChatNavigation();
+
     return (
         <div className='flex flex-col gap-3'>
             <p>Suggestions for you</p>
@@ -21,11 +24,17 @@ export default function AdviceArea({
                 <AdviceTabs advice={advice} />
 
                 <div className='w-full flex flex-row items-center justify-end'>
-                    <Link href={`/?adviceId=${advice.id}&query=${encodeURIComponent("Tell me more about why I should consider the above transactions")}`}>
-                        <Button size='dynamic'>
-                            Find out more
-                        </Button>
-                    </Link>
+                    <Button
+                        size='dynamic'
+                        onClick={() => {
+                            onSubmit(
+                                "Tell me more about why I should consider the above transactions",
+                                { adviceId: String(advice.id) }
+                            )
+                        }}
+                    >
+                        Find out more
+                    </Button>
                 </div>
             </div>
             ) : (

@@ -34,7 +34,7 @@ export default async function MainLayout({
       <GlobalProvider initialUserData={userData} initialStockData={stockData}>
         <SidebarProvider>
           <Sidebar lessonGroups={getLessonsByGroup()} />
-          <main className='h-dvh flex flex-col overflow-hidden relative'>
+          <main className='h-dvh flex flex-col gap-2 overflow-hidden relative'>
             <Header accountType={userData.accountType} />
             {children}
           </main>

@@ -11,6 +11,7 @@ import {
     TabsTrigger
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { H3 } from "@/components/ui/typography";
 
 import { type ProfileState, useProfileContext } from "../context";
 
@@ -19,7 +20,6 @@ import Finance from "./finance";
 import Milestones from "./milestones";
 import RiskTolerance from "./risk-tolerance";
 import WealthChart from "./forecast";
-import { H3 } from "@/components/ui/typography";
 
 export default function ProfileForm() {
     const { onSave, onCancel } = useProfileContext() as ProfileState;

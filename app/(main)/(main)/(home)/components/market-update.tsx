@@ -1,11 +1,8 @@
-
-
 interface MarketUpdateProps {
     content: string | null
 }
 
 export default function MarketUpdate({ content }: MarketUpdateProps) {
-
     return (
         <div className='flex flex-col gap-3'>
             <span className=''>What&apos;s going on in the market?</span>

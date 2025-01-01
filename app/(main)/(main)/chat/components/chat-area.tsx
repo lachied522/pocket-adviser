@@ -1,7 +1,7 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
-import { ArrowBigUp, OctagonAlert, X } from "lucide-react";
+import { ArrowBigUp, OctagonAlert, Plus, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,41 +22,37 @@ export default function ChatArea() {
     const { scrollAreaRef, anchorRef, setShouldAutoScroll } = useScrollAnchor();
     const [isDragging, setIsDragging] = useState<boolean>(false); // true when user is dragging an article
 
-    const onDrop = useCallback(
-        (e: React.DragEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            try {
-                const data = JSON.parse(e.dataTransfer.getData("text"));
-                if ('article' in data) {
-                    const article = data.article as StockNews;
-                    setArticle(article);
-                }
-                if ('input' in data) {
-                    setInput(data.input);
-                }
-                
-                setIsDragging(false);
-            } catch (e) {
-                // pass
-            }
-        }, [setArticle, setInput, setIsDragging]
-    );
-
     return (
-        <div className='flex-1 flex flex-col overflow-hidden'>
+        <div
+            onDragEnter={() => setIsDragging(true)}
+            onDragLeave={() => setIsDragging(false)}
+            onDragOver={(e) => {
+                e.preventDefault(); // enable dropping
+                setIsDragging(true);
+            }}
+            onDrop={(e: React.DragEvent<HTMLDivElement>) => {
+                e.preventDefault();
+                try {
+                    const data = JSON.parse(e.dataTransfer.getData("text"));
+                    if ('article' in data) {
+                        const article = data.article as StockNews;
+                        setArticle(article);
+                    }
+                    if ('input' in data) {
+                        setInput(data.input);
+                    }
+                    
+                    setIsDragging(false);
+                } catch (e) {
+                    // pass
+                }
+            }}
+            className={cn('flex-1 flex flex-col overflow-hidden relative', isDragging && 'shadow-inner')}
+        >
             <div ref={scrollAreaRef} className='flex-1 overflow-y-auto scroll-smooth'>
                 <div className='max-w-7xl flex mx-auto overflow-hidden'>
-                    <div
-                        onDragEnter={() => setIsDragging(true)}
-                        onDragLeave={() => setIsDragging(false)}
-                        onDragOver={(e) => {
-                            e.preventDefault(); // enable dropping
-                            setIsDragging(true);
-                        }}
-                        onDrop={onDrop}
-                        className={cn('flex-1 overflow-hidden', isDragging && 'shadow-inner')}
-                    >
-                        <div className='flex flex-col justify-start gap-3 px-3 sm:px-6'>
+                    <div className='flex-1 overflow-hidden'>
+                        <div className='flex flex-col justify-start gap-3 px-3 sm:px-6 py-2'>
                             {messages.map((message: Message) => (
                             <ChatMessage
                                 key={message.id}
@@ -84,16 +80,16 @@ export default function ChatArea() {
                 </div>
             </div>
 
-            <div className='w-full max-w-7xl flex flex-col justify-center gap-1 sm:gap-3 px-3 sm:px-6 py-2 sm:py-3 mx-auto'>
+            <div className='w-full max-w-7xl flex flex-col justify-center gap-1 sm:gap-3 px-3 sm:px-6 mx-auto'>
                 <span className='text-xs text-center'>Please double-check important information and contact a financial adviser if you require advice.</span>
                 
                 <div className='w-full flex flex-row gap-1'>
                     <div className={cn(
                         "h-10 sm:h-12 flex-1 flex flex-row border border-zinc-100 rounded-l-md overflow-hidden",
-                        article && "h-16"
+                        article && "h-12 sm:h-16"
                     )}>
                         {article && (
-                        <div className="h-16 w-32 relative group">
+                        <div className="h-full w-24 sm:w-32 relative group">
                             <img
                                 src={article.image || ''}
                                 alt={article.title}
@@ -137,6 +133,13 @@ export default function ChatArea() {
                         <ArrowBigUp size={24} strokeWidth={2} color="white"/>
                     </Button>
                 </div>
+            </div>
+
+            <div className={cn(
+                'absolute inset-0 hidden bg-zinc-50 opacity-30 border border-zinc-200',
+                isDragging && 'flex items-center justify-center'
+            )}>
+                <Plus size={32} color="gray" />
             </div>
         </div>
     )

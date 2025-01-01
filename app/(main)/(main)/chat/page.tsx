@@ -2,14 +2,12 @@ import { generateId, type Message } from 'ai';
 
 import { getAdviceById } from '@/utils/crud/advice';
 
-import WelcomeDialog from "@/components/dialogs/welcome-dialog";
-
 import { getGreeting } from "./greeting";
 
 import { ChatProvider } from "./context";
 import ChatArea from "./components/chat-area";
 
-export default async function MainPage({
+export default async function ChatPage({
     searchParams
 }: {
     searchParams?: { [key: string]: string | string[] | undefined }
@@ -49,7 +47,6 @@ export default async function MainPage({
         initialToolName={typeof searchParams?.toolName === "string"? searchParams.toolName: undefined}
       >
         <ChatArea />
-        {searchParams?.welcome === "true" && <WelcomeDialog initialIsOpen={true} />}
       </ChatProvider>
     )
 }

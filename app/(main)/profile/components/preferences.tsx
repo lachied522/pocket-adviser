@@ -17,13 +17,14 @@ import { Button } from "@/components/ui/button";
 
 import { cn } from "@/components/utils";
 
-// import ObjectiveSelector from "./objective-selector";
-import PreferencesSelector from "../../../../components/profile/preferences-selector";
+import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
-import type { FormValues } from "../../../../components/profile/form-schema";
-import ObjectiveSelector from "../../../../components/profile/objective-selector";
+import type { FormValues } from "@/components/profile/form-schema";
+import PreferencesSelector from "@/components/profile/preferences-selector";
+import ObjectiveSelector from "@/components/profile/objective-selector";
 
 export default function Preferences() {
+    const { state } = useGlobalContext() as GlobalState;
     const form = useFormContext<FormValues>();
 
     return (
@@ -98,6 +99,7 @@ export default function Preferences() {
                 )}
             />
 
+            {state.accountType !== "STUDENT" && (
             <FormField
                 control={form.control}
                 name="international"
@@ -176,6 +178,7 @@ export default function Preferences() {
                     </FormItem>
                 )}
             />
+            )}
 
             <FormField
                 control={form.control}

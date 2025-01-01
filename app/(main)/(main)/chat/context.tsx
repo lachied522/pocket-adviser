@@ -91,7 +91,7 @@ export function ChatProvider({
                     updatedAt: new Date(),
                 });
                 // update path without triggering refresh
-                window.history.pushState(null, '', `/c/${_conversationId}`);
+                window.history.pushState(null, '', `chat/c/${_conversationId}`);
                 setConversationId(_conversationId);
             }
         },
