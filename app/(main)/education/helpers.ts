@@ -33,16 +33,20 @@ export function getLessonSlugs() {
 }
 
 export function getLessonBySlug(slug: string) {
-    const realSlug = slug.replace(/\.md$/, '');
-    const fullPath = join(postsDirectory, `${realSlug}.md`);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
-    const { data, content } = matter(fileContents);
-  
-    return {
-        frontmatter: data as FrontMatter,
-        slug: realSlug,
-        content,
-    } satisfies Lesson;
+    try {
+        const realSlug = slug.replace(/\.md$/, '');
+        const fullPath = join(postsDirectory, `${realSlug}.md`);
+        const fileContents = fs.readFileSync(fullPath, "utf8");
+        const { data, content } = matter(fileContents);
+      
+        return {
+            frontmatter: data as FrontMatter,
+            slug: realSlug,
+            content,
+        } satisfies Lesson;
+    } catch (e) {
+        // pass
+    }
 }
 
 export function getAllLessons() {
@@ -50,7 +54,7 @@ export function getAllLessons() {
     const lessons = slugs
         .map((slug) => getLessonBySlug(slug));
     // sort by lesson number before returning
-    return lessons.sort((a, b) => a.frontmatter.lesson - b.frontmatter.lesson);
+    return lessons.filter((lesson) => lesson !== undefined).sort((a, b) => a.frontmatter.lesson - b.frontmatter.lesson);
 }
 
 export function getLessonsByGroup() {

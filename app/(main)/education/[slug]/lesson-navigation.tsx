@@ -35,7 +35,7 @@ export default function LessonNavigation({ slug }: LessonNavigationProps) {
 
             {nextLesson && (
             <CompleteAndContinueButton
-                lesson={lessons[index].slug}
+                lesson={lessons[index]?.slug}
                 nextLesson={nextLesson}
             />
             )}

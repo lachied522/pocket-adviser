@@ -3,6 +3,8 @@ title: "Introduction to Fundamental Analysis"
 lesson: 8
 groupTitle: "Fundamental Analysis"
 group: 4
+difficulty: 1
+importance: 1
 ---
 ## Introduction to Fundamental Analysis
 When I was starting out in the market I frequently fell, subconsciously, into the notion that a stock was just a number that moved up and down on my computer screen. I found myself checking the number often, thinking “go up you darned thing!” In focusing on price, we lose sight of what it really is that we are buying. That is, a real company with products, customers, brands, employees, etc..

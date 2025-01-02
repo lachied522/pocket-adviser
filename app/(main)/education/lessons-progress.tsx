@@ -1,5 +1,6 @@
 "use client";
 import { useMemo } from "react";
+import Link from "next/link";
 
 import { CheckCheck } from "lucide-react";
 
@@ -10,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 import type { Lesson, LessonGroup } from "./helpers";
-import Link from "next/link";
 
 interface LessonsProgressProps {
     lessonGroups: LessonGroup[]

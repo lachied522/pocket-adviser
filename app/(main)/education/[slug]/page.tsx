@@ -1,15 +1,20 @@
 import { notFound } from "next/navigation";
 
-import Markdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
+import { getMDXComponent } from "next-contentlayer/hooks";
+import type { MDXComponents } from "mdx/types";
 
 import { Star } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/components/utils";
 
-import { getAllLessons, getLessonBySlug } from "../helpers";
 import LessonNavigation from "./lesson-navigation";
+
+import { allMDXLessons } from "contentlayer/generated";
+
+import ImageWithCaption from "./components/image-with-caption";
+import AnnuityCalculator from "./components/annuity-calculator";
+import CoinFlipper from "./components/coin-flipper";
 
 function H1(props: any) {
     return (
@@ -97,27 +102,37 @@ export default async function Page({
   }) {
     const slug = (await params).slug;
 
-    const lesson = getLessonBySlug(slug);
+    const lesson = allMDXLessons.find((lesson) => lesson._raw.flattenedPath === slug);
 
     if (!lesson) {
         return notFound();
     }
-    
+
+    const mdxComponents: MDXComponents = {
+        h1: H1, h2: H2, h3: H3,
+        a: A, img: Img,
+        blockquote: Blockquote,
+        ul: UnorderedList, li: ListItem,
+        ImageWithCaption, AnnuityCalculator, CoinFlipper,
+    }
+
+    const MDXContent = getMDXComponent(lesson.body.code);
+
     return (
         <div className='flex-1 overflow-hidden'>
             <div className='h-full overflow-y-auto'>
                 <div className='max-w-4xl mx-auto px-3 pb-6'>
                     <div className='flex flex-col-reverse sm:flex-row items-start justify-between gap-1 sm:pt-3'>
                         <div className='flex-1 flex flex-col gap-1'>
-                            <h2 className='text-2xl font-medium'>{lesson.frontmatter.title}</h2>
+                            <h2 className='text-2xl font-medium'>{lesson.title}</h2>
                             <div className='flex flex-row items-center gap-3'>
                                 <div className='flex flex-row items-center gap-2'>
                                     <span className='text-sm'>Importance</span>
-                                    <StarRating rating={lesson.frontmatter.importance} />
+                                    <StarRating rating={Number(lesson.importance)} />
                                 </div>
                                 <div className='flex flex-row items-center gap-2'>
                                     <span className='text-sm'>Difficulty</span>
-                                    <StarRating rating={lesson.frontmatter.difficulty} />
+                                    <StarRating rating={Number(lesson.difficulty)} />
                                 </div>
                             </div>
                         </div>
@@ -127,17 +142,7 @@ export default async function Page({
                     <Separator className='my-6' />
 
                     <div className='text-wrap whitespace-pre-line'>
-                        <Markdown
-                            rehypePlugins={[rehypeRaw]}
-                            components={{
-                                h1: H1, h2: H2, h3: H3,
-                                a: A, img: Img,
-                                blockquote: Blockquote,
-                                ul: UnorderedList, li: ListItem
-                            }}
-                        >
-                            {lesson.content}
-                        </Markdown>
+                        <MDXContent components={mdxComponents} />
                     </div>
 
                     <LessonNavigation slug={slug} />
@@ -149,10 +154,8 @@ export default async function Page({
 
 // generate static routes at build time
 // see https://github.com/vercel/next.js/tree/canary/examples/blog-starter
-export async function generateStaticParams() {
-    const lessons = getAllLessons();
-   
-    return lessons.map((lesson) => ({
-      slug: lesson.slug,
+export async function generateStaticParams() {   
+    return allMDXLessons.map((lesson) => ({
+        slug: lesson._raw.flattenedPath,
     }));
 }
