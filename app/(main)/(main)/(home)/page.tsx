@@ -6,7 +6,6 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 import { getUserById, updateUser } from "@/utils/crud/user";
 import { getAdviceByUserId } from "@/utils/crud/advice";
 import { getTodayMarketSummary } from "@/app/api/ai/market-summary";
-import { getLessonsByGroup } from "@/app/(main)/education/helpers";
 
 import { H3 } from "@/components/ui/typography";
 
@@ -67,7 +66,7 @@ export default async function HomePage({
                     <div className='flex flex-col gap-2'>
                         <span className='font-medium'>Education</span>
             
-                        <LessonsProgress lessonGroups={getLessonsByGroup()} />
+                        <LessonsProgress />
                     </div>
                 </div>
             </div>

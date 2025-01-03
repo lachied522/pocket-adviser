@@ -2,44 +2,29 @@
 import { useMemo } from "react";
 import Link from "next/link";
 
+import { allLessons } from "content-collections";
+
 import { type GlobalState, useGlobalContext } from "@/context/GlobalContext";
 
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-
-import type { LessonGroup } from "@/app/(main)/education/helpers";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface LessonsProgressProps {
-    lessonGroups: LessonGroup[]
-}
-
-export default function LessonsProgress({ lessonGroups }: LessonsProgressProps) {
+export default function LessonsProgress() {
     const { state } = useGlobalContext() as GlobalState;
 
     const [progress, currentLesson] = useMemo(() => {
-        let totalLessons = 0;
         const completed = Object.values(state.lessons ?? {})
         .reduce((acc, value) => acc + (value === "completed"? 1: 0), 0);
 
-        let currentLesson: LessonGroup["lessons"][number] | null = null;
         const currentLessonSlug = Object.entries(state.lessons ?? {}).find(([_, value]) => value === "in-progress")?.[0];
 
-        // get total number of lesson and find the current lesson
-        for (const group of lessonGroups) {
-            for (const lesson of group.lessons) {
-                if (lesson._meta.path === currentLessonSlug) {
-                    currentLesson = lesson;
-                }
+        let currentLesson = allLessons.find((lesson) => lesson._meta.path === currentLessonSlug);
 
-                totalLessons++;
-            }
-        }
+        if (!currentLesson) currentLesson = allLessons.find((lesson) => lesson.lesson === 0);
 
-        if (!currentLesson) currentLesson = lessonGroups[0].lessons[0];
-
-        return [completed / totalLessons, currentLesson]
-    }, [state.lessons, lessonGroups]);
+        return [completed / allLessons.length, currentLesson!]
+    }, [state.lessons]);
 
     return (
         <div className='max-w-2xl w-full flex flex-col items-stretch gap-6 mx-auto'>
