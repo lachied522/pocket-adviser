@@ -54,6 +54,8 @@ Even though the expected outcome is the same, the certainty of the \$50 in Optio
 
 A risk averse investor will always choose Option B. In order to deviate from the safe choice and bear more risk the investor must receive a higher expected return to make up for the uncertainty involved.
 
+<RiskExample />
+
 ## Capital Market Line
 This effect can be seen by plotting expected return and risk of all the asset classes available to investors. The resulting trend is upwards and to the right, indicating that expected return is increasing with risk. The trendline plotted through the asset classes is called the **capital market line (CML)**.
 
@@ -61,9 +63,12 @@ This effect can be seen by plotting expected return and risk of all the asset cl
 
 You can see that stocks lie pretty far up on the line (which is important to know if you decide to invest in them, which I hope you do once you finish this course). So while the average return of the S&P 500 might be 10%, it has fallen as much 36% in some years (2008) and risen by 30+% in others.
 
-![Stocks vs Bonds Performance](/education/stocks-bonds-performance.png)
-
-<div>Cumulative returns of S&P 500 Bond Index vs. S&P 500 from S&P Global</div>
+<ImageWithCaption
+    alt="Stocks vs Bonds Performance"
+    src="/education/stocks-bonds-performance.png"
+    caption="Cumulative returns of S&P 500 Bond Index vs. S&P 500 from S&P Global"
+    href="https://www.spglobal.com/spdji/en/indices/equity/sp-500/#overview"
+/>
 
 When I first saw the capital market line I thought, "I'd like a high return, so all I have to do is invest in the riskiest assets!" By thinking this, I failed to see the ever increasing range of possible returns as you move from right to left along the CML.
 
@@ -73,7 +78,7 @@ For this reason, I think the above plot of the capital market line (which is the
 
 If the price of an asset tomorrow, or one year from now, was known to be signficantly higher than it is today, investors would simply buy into it and bid up the price until there was no longer any return to be earned. In other words, the risk-reward relationship exists precisely because we can never know for certain what will happen in the future.
 
-> Key Concept - Making more money from investing requires you take on more risk and potentially lose more.
+<KeyConcept content="Making more money from investing requires you take on more risk and potentially lose more." />
 
 Risk, or uncertainty in outcome, is the price you pay for high returns. Earning outsized returns requires taking on some level of risk or uncertainty. But that does not mean simply taking on as much risk as possible is the answer. There is never a guarantee that the high return outcome is the one that eventuates. With increasing risk, the probability of experiencing negative outcomes also increases.
 
@@ -104,13 +109,14 @@ The S&P 500 is commonly used as a proxy for the market portfolio. That is becaus
 The S&P 500 is commonly used as a benchmark to compare the performance of other portfolios to. When you hear the phrase "beat the market," it is usually referring to outperforming the S&P 500. The average return of the S&P 500 is about 10%.
 
 ## Capital Asset Pricing Model (CAPM)
-Beta provides a standardised way of measuring risk by comparing it to the market portfolio. This allows us to approximately measure the expected return of an investment based on its relationship to the market portfolio. We can calculate expected return mathematically with the following formula, called the capital asset pricing model formula (don't be alarmed by this formula, it will only be used to inform some of the concepts for the rest of this section).
+Beta provides a standardised way of measuring risk by comparing it to the market portfolio. This allows us to approximately measure the expected return of an investment based on its relationship to the market portfolio. We can calculate expected return mathematically with the below formula, called the Capital Asset Pricing Model formula (don't be alarmed by this formula, it will only be used to inform some of the concepts for the rest of this section).
 
-> E(R) = R<sub>f</sub> + β<sub>i</sub>
+$$E(R) = R_f + β_i E(R_m - R_f)$$
 
 In this formula, the risk-free rate is the expected return of a zero-risk investment. In practice, there is no zero-risk investment, however the [three-month US Treasury bill](https://fred.stlouisfed.org/series/DTB3) is often considered the closest to a zero-risk investment.
 
-The way to interpret this formula is that every investment should earn some minimum return (the risk-free rate), plus an incremental amount corresponding to the additional risk taken in proportion to the market portfolio. So, for example, if a stock has a Beta of 1.5 and the risk-free rate is 5.0%, we can expect the stock to return 5.0 + 1.5 * (10.0 - 5.0) = 12.5%.
+The way to interpret this formula is that every investment should earn some minimum return (the risk-free rate), plus an incremental amount corresponding to the additional risk taken in proportion to the market portfolio. So, for example, if a stock has a Beta of 1.5 and the risk-free rate is 5.0%, we can expect the stock to return
+$5.0 + 1.5 (10.0 - 5.0) = 12.5%.$
 
 This formula is by no means the secret to making money in stocks. It is highly simplistic and is derived from statistical relationships presented by historical data. It assumes that those historical relationships will continue to hold in the future, and has nothing to do with any of the fundamental, technical, or macroeconomic factors that truly determine returns. What it does do is provide an initial scope for what can be expected from a stock. For example, Woolworths (WOW) has a Beta of 0.25, indicating it is much less risky than the market so is unlikely to earn a 20%+ return. This does not mean it isn't possible if some the above-mentioned factors line up favourably.
 

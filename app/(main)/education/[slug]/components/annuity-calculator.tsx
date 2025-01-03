@@ -105,7 +105,7 @@ export default function AnnuityCalculator() {
                 // increment month by one
                 date.setMonth(new Date().getMonth() + t);
 
-                const interest = prevValue * (annualGrowthRate / 100) / 12;
+                const interest = t > 0? prevValue * (annualGrowthRate / 100) / 12: 0;
                 _totalInterest += interest;
 
                 const wealth = t > 0? prevValue + interest + monthlyAddition: startingPrincipal;
@@ -261,8 +261,6 @@ export default function AnnuityCalculator() {
 
                     <ChartContainer config={chartConfig} className="w-full">
                         <BarChart
-                            width={730}
-                            height={250}
                             data={data}
                             margin={{ top: 10, right: 0, left: -10, bottom: 0 }}
                             accessibilityLayer

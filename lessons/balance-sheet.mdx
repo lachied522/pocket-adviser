@@ -14,7 +14,12 @@ The balance sheet contains all of a company’s assets, liabilities, and shareho
 
 Shareholder's equity is simply the amount of money belonging to the company's shareholders. If all of the company's assets were sold and all of its debt paid off, i.e. all of the money flows pertaining to them were realised, shareholder's equity is the amount that would be leftover. For this reason, shareholder's equity is also referred to as book value. Below is Apple's balance statement for June 2024 from their [investor relation's website](https://investor.apple.com/investor-relations/default.aspx).
 
-![Apple's Balance Sheet 2024](/education/aapl-balance-sheet-2024.png)
+<ImageWithCaption
+    alt="Apple's Balance Sheet 2024"
+    src="/education/aapl-balance-sheet-2024.png"
+    caption="Apple's Balance Sheet for June 2024"
+    href="https://investor.apple.com/investor-relations/default.aspx"
+/>
 
 ### Tangibility
 Assets and liabilities are mostly **tangible**, meaning you can physically touch them or their value can be easily measured. You can touch a machine or a building, so they are tangible assets. Even money in the bank could be withdrawn for you to touch it if you really wanted.
@@ -75,7 +80,7 @@ Retained earnings is the amount of profit that has been accumulated and retained
 
 ## Some Accounting
 
-> Key Concept - Assets = Liabilities + Shareholders' Equity
+<KeyConcept type="Formula" content="Assets = Liabilities + Shareholders' Equity" />
 
 Above is the Fundamental Accounting Equation, which states that total assets must be equal to the sum of total liabilities and shareholder's equity. You will find that balance sheets always satisfy this equation. Intuitively, this makes sense because shareholder's equity is defined as the amount left over after all the obligations pertaining to the company's liabilities are resolved.
 
@@ -84,17 +89,22 @@ We are getting into a bit of accounting here, but I believe this equation has im
 The way to view this equation is that the company's assets must be financed by either debt or equity. For example, if a company wants to build a big factory to manufacture its product, it can get money by either taking out a loan (debt) or issuing more shares (equity). When the factory is built it becomes an asset (PP&E). The increase in assets on the left-hand side of the equation is equal to the increase in debt on the right-hand side, and the equation remains balanced. When the company starts selling the product its bank balance (cash) increases. This time, the increase in assets on the left-hand side is matched by an increase in equity (retained earnings) on the right-hand side, indicating the money belongs to shareholders.
 
 ## Leverage
-
-> Key Concept - Debt magnifies shareholders' return on investment in both good and bad times.
+<KeyConcept content="Debt magnifies shareholders' return on investment in both good and bad times." />
 
 If debt incurs interest payments, why use debt financing at all?
 
-Debt financing does not require shareholders to invest more in the company. Assuming the company makes enough from whatever it used the debt for to cover interest payments, shareholders get to keep all the money left over. This has the effect of increasing shareholders' return on investment. For this reason, debt level is also refered to as leverage or gearing.
+Debt financing does not require shareholders to invest more in the company. Assuming the company makes enough to cover interest payments, shareholders get to keep all the money left over. This increases the return on **investment to the shareholders**.
+
+This effect is also referred to as leverage or gearing, alluding to the fact that small changes in input can magnify the outcome.
+
+However, leverage is also risky because the same magnifying effect is applied to the downside. Debt must be paid back, so if you don't make enough money in profits to cover your interest you will have to pay it back out of your own pocket. Below is another scenario involving the same two companies, but this time they have a bad year and don't make enough to cover interest costs. Finding the appropriate balance between debt and equity is extremely important.
 
 ![Leverage Example 1](/education/leverage-example-1.png)
 
 Above is a comparison between a company that uses 100% equity to finance its operations versus a company that uses 10%. You can see how the percentage return (net income / capital invested) is significantly higher for the latter.
 
-However, leverage is also risky because the same magnifying effect is applied to the downside. Below is another scenario involving the same two companies, but this time they have a bad year and don't make enough to cover interest costs. For this reason, the balance between debt and equity financing is a fine line.
-
 ![Leverage Example 2](/education/leverage-example-2.png)
+
+Use the example below to see how leverage affects the return on equity for a company.
+
+<DebtFinancingExample />

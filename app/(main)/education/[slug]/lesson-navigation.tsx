@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { allLessons } from "content-collections";
+
 import { Button } from "@/components/ui/button";
 
-import { getAllLessons } from "../helpers";
 import CompleteAndContinueButton from "./complete-and-continue";
 
 interface LessonNavigationProps {
@@ -11,12 +12,14 @@ interface LessonNavigationProps {
 }
 
 export default function LessonNavigation({ slug }: LessonNavigationProps) {
-    const lessons = getAllLessons();
+    const sortedLessons = allLessons
+        .filter((lesson) => lesson.lesson !== undefined)
+        .sort((a, b) => a.lesson! - b.lesson!);
 
-    const index = lessons.findIndex((lesson) => lesson.slug === slug);
+    const index = sortedLessons.findIndex((lesson) => lesson._meta.path === slug);
 
-    const nextLesson = index < lessons.length - 1? lessons[index + 1].slug: null;
-    const previousLesson = index > 0? lessons[index - 1].slug: null;
+    const nextLesson = index < sortedLessons.length - 1? sortedLessons[index + 1]._meta.path: null;
+    const previousLesson = index > 0? sortedLessons[index - 1]._meta.path: null;
 
     return (
         <div className='w-full sm:w-auto flex flex-row items-center justify-between sm:justify-end gap-3 py-2'>
@@ -35,7 +38,7 @@ export default function LessonNavigation({ slug }: LessonNavigationProps) {
 
             {nextLesson && (
             <CompleteAndContinueButton
-                lesson={lessons[index]?.slug}
+                lesson={sortedLessons[index]?._meta.path}
                 nextLesson={nextLesson}
             />
             )}

@@ -6,17 +6,18 @@ import { COOKIE_NAME_FOR_USER_ID } from "@/constants/cookies";
 import { getUserById, updateUser } from "@/utils/crud/user";
 import { getAdviceByUserId } from "@/utils/crud/advice";
 import { getTodayMarketSummary } from "@/app/api/ai/market-summary";
+import { getLessonsByGroup } from "@/app/(main)/education/helpers";
 
 import { H3 } from "@/components/ui/typography";
 
 import AdviceArea from "./components/advice-area";
-import AdviceTable from "./components/advice-table";
 import MarketUpdate from "./components/market-update";
 import WelcomeDialog from "./components/welcome-dialog";
+import LessonsProgress from "./components/lessons-progress";
 
 const DEFAULT_USER_ID = "DEFAULT_USER";
 
-async function getDailyAdvice(userId: string) {
+async function getAdviceData(userId: string) {
     const advice = await getAdviceByUserId(userId, 20);
 
     if (advice.length > 0) {
@@ -45,7 +46,7 @@ export default async function HomePage({
     if (!user) redirect('/login');
 
     const [adviceData, marketUpdate, _] = await Promise.all([
-        getDailyAdvice(userId),
+        getAdviceData(userId),
         getTodayMarketSummary(),
         updateUser(userId, { dailyAdviceViewed: true }),
     ]);
@@ -61,9 +62,13 @@ export default async function HomePage({
 
                     <MarketUpdate content={marketUpdate} />
 
-                    <AdviceArea advice={adviceData[0]} />
+                    <AdviceArea adviceData={adviceData} />
 
-                    <AdviceTable data={adviceData.slice(1)} />
+                    <div className='flex flex-col gap-2'>
+                        <span className='font-medium'>Education</span>
+            
+                        <LessonsProgress lessonGroups={getLessonsByGroup()} />
+                    </div>
                 </div>
             </div>
         </>

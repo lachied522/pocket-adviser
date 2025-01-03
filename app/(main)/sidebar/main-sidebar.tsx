@@ -199,7 +199,7 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                     <Collapsible
                         key={`lesson-group-${index}`}
                         title={group.title}
-                        defaultOpen={!!group.lessons.find((lesson) => lesson.frontmatter.group === index + 1 && pathname.includes(lesson.slug))}
+                        defaultOpen={!!group.lessons.find((lesson) => lesson.group === index + 1 && pathname.includes(lesson._meta.path))}
                         className="group/collapsible"
                     >
                         <SidebarGroup>
@@ -216,20 +216,20 @@ export default function AppSidebar({ lessonGroups }: AppSidebarProps) {
                                 <SidebarGroupContent className="pt-1">
                                     <SidebarMenu>
                                         {group.lessons
-                                        .filter((lesson) => lesson.frontmatter.group === index + 1)
+                                        .filter((lesson) => lesson.group === index + 1)
                                         .map((lesson) => (
-                                        <SidebarMenuItem key={`lesson-${lesson.slug}`}>
-                                            <Link href={`/education/${lesson.slug}`}>
+                                        <SidebarMenuItem key={`lesson-${lesson._meta.path}`}>
+                                            <Link href={`/education/${lesson._meta.path}`}>
                                                 <SidebarMenuButton
-                                                    isActive={pathname === `/education/${lesson.slug}`}
+                                                    isActive={pathname === `/education/${lesson._meta.path}`}
                                                     className="h-9 max-w-[200px] flex flex-row items-center justify-start gap-1 px-1"
                                                 >
                                                     <div className='size-4 flex items-center justify-center'>
-                                                        {(state.lessons as any)?.[lesson.slug] === "completed" && (
+                                                        {(state.lessons as any)?.[lesson._meta.path] === "completed" && (
                                                         <CheckCheck size={12} className='text-green-400' />
                                                         )}
                                                     </div>
-                                                    <span className="text-xs truncate">{lesson.frontmatter.title}</span>
+                                                    <span className="text-xs truncate">{lesson.title}</span>
                                                 </SidebarMenuButton>
                                             </Link>
                                         </SidebarMenuItem>

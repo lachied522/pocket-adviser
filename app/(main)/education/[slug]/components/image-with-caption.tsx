@@ -1,19 +1,20 @@
-
+import { cn } from "@/components/utils";
 
 interface ImageWithCaptionProps extends React.HTMLAttributes<HTMLImageElement> {
     caption: string
+    href?: string
 }
 
-
-export default function ImageWithCaption(props: ImageWithCaptionProps) {
+export default function ImageWithCaption({ caption, href, ...props }: ImageWithCaptionProps) {
     return (
-        <div className='flex flex-col items-center justify-center'>
+        <a href={href} target="_blank" className='flex flex-col items-center justify-center gap-2'>
             <img
+                className='max-h-[960px]'
                 {...props}
             />
-            <div className='text-center'>
-                {props.caption}
+            <div className={cn('text-center', href && 'text-sky-600 underline')}>
+                {caption}
             </div>
-        </div>
+        </a>
     )
 }

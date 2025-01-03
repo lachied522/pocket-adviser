@@ -5,7 +5,7 @@ interface MarketUpdateProps {
 export default function MarketUpdate({ content }: MarketUpdateProps) {
     return (
         <div className='flex flex-col gap-3'>
-            <span className=''>What&apos;s going on in the market?</span>
+            <span className='font-medium'>What&apos;s going on in the market?</span>
 
             {content && content.length > 0 ? (
             <>

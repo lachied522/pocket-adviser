@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
-import type { Lesson, LessonGroup } from "./helpers";
+import type { LessonGroup } from "./helpers";
 
 interface LessonsProgressProps {
     lessonGroups: LessonGroup[]
@@ -24,13 +24,13 @@ export default function LessonsProgress({ lessonGroups }: LessonsProgressProps) 
         const completed = Object.values(state.lessons ?? {})
         .reduce((acc, value) => acc + (value === "completed"? 1: 0), 0);
 
-        let currentLesson: Lesson | null = null;
+        let currentLesson: LessonGroup["lessons"][number] | null = null;
         const currentLessonSlug = Object.entries(state.lessons ?? {}).find(([_, value]) => value === "in-progress")?.[0];
 
         // get total number of lesson and find the current lesson
         for (const group of lessonGroups) {
             for (const lesson of group.lessons) {
-                if (lesson.slug === currentLessonSlug) {
+                if (lesson._meta.path === currentLessonSlug) {
                     currentLesson = lesson;
                 }
 
@@ -50,22 +50,22 @@ export default function LessonsProgress({ lessonGroups }: LessonsProgressProps) 
                     {lessonGroups.map((group) => (
                     <div key={`lesson-group-${group.number}`} className='flex flex-col gap-3'>
                         <span className='text-xl'>{group.title}</span>
-                        <span className='text-sm'>{group.lessons.reduce((acc, obj) => acc + ((state.lessons as any)?.[obj.slug] === "completed"? 1: 0), 0)}/{group.lessons.length} complete</span>
+                        <span className='text-sm'>{group.lessons.reduce((acc, obj) => acc + ((state.lessons as any)?.[obj._meta.path] === "completed"? 1: 0), 0)}/{group.lessons.length} complete</span>
 
                         <div className='flex flex-col gap-3 py-3'>
                             {group.lessons
                             .map((lesson) => (
-                            <Link key={`lesson-${lesson.slug}`} href={`/education/${lesson.slug}`}>
+                            <Link key={`lesson-${lesson._meta.path}`} href={`/education/${lesson._meta.path}`}>
                                 <Button
                                     variant='ghost'
                                     className='h-10 w-full flex flex-row items-center justify-start gap-3'
                                 >
                                     <div className='size-8 flex items-center justify-center'>
-                                        {(state.lessons as any)?.[lesson.slug] === "completed" && (
+                                        {(state.lessons as any)?.[lesson._meta.path] === "completed" && (
                                         <CheckCheck size={22} className='text-green-400' />
                                         )}
                                     </div>
-                                    <span>{lesson.frontmatter.title}</span>
+                                    <span>{lesson.title}</span>
                                 </Button>
                             </Link>
                             ))}
@@ -81,8 +81,8 @@ export default function LessonsProgress({ lessonGroups }: LessonsProgressProps) 
                         <span>Pick up where you left off:</span>
 
                         <div className='flex flex-row items-center justify-between gap-3'>
-                            <span className='font-medium text-lg'>{currentLesson.frontmatter.title}</span>
-                            <Link href={`/education/${currentLesson.slug}`}>
+                            <span className='font-medium text-lg'>{currentLesson.title}</span>
+                            <Link href={`/education/${currentLesson._meta.path}`}>
                                 <Button>Continue</Button>
                             </Link>
                         </div>

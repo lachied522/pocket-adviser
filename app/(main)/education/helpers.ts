@@ -1,24 +1,4 @@
-
-import matter from "gray-matter";
-import fs from "fs";
-
-import { join } from "path";
-
-type FrontMatter = {
-    title: string
-    lesson: number
-    group: number
-    groupTitle: string
-    difficulty: number
-    importance: number
-    prompts?: string[]
-}
-
-export type Lesson = {
-    frontmatter: FrontMatter
-    slug: string
-    content: string
-}
+import { allLessons, type Lesson } from "content-collections";
 
 export type LessonGroup = {
     title: string
@@ -26,55 +6,29 @@ export type LessonGroup = {
     lessons: Lesson[]
 }
 
-const postsDirectory = join(process.cwd(), "lessons");
-
-export function getLessonSlugs() {
-    return fs.readdirSync(postsDirectory);
-}
-
 export function getLessonBySlug(slug: string) {
-    try {
-        const realSlug = slug.replace(/\.md$/, '');
-        const fullPath = join(postsDirectory, `${realSlug}.md`);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data, content } = matter(fileContents);
-      
-        return {
-            frontmatter: data as FrontMatter,
-            slug: realSlug,
-            content,
-        } satisfies Lesson;
-    } catch (e) {
-        // pass
-    }
-}
-
-export function getAllLessons() {
-    const slugs = getLessonSlugs();
-    const lessons = slugs
-        .map((slug) => getLessonBySlug(slug));
-    // sort by lesson number before returning
-    return lessons.filter((lesson) => lesson !== undefined).sort((a, b) => a.frontmatter.lesson - b.frontmatter.lesson);
+    const realSlug = slug.replace(/\.md$/, '');
+    return allLessons.find((lesson) => lesson._meta.path === realSlug);
 }
 
 export function getLessonsByGroup() {
-    const lessons = getAllLessons();
-
-    // group lessons by name
+    // group lessons by group name
     const groups: { [key: string]: Lesson[] } = {};
-    for (const lesson of lessons) {
-        if (!lesson.frontmatter.groupTitle) continue;
+    for (const lesson of allLessons) {
+        if (!(lesson.group && lesson.groupTitle)) continue;
 
-        if (groups[lesson.frontmatter.groupTitle]) {
-            groups[lesson.frontmatter.groupTitle].push(lesson);
+        if (groups[lesson.groupTitle]) {
+            groups[lesson.groupTitle].push(lesson);
         } else {
-            groups[lesson.frontmatter.groupTitle] = [lesson];
+            groups[lesson.groupTitle] = [lesson];
         }
     }
 
-    return Object.entries(groups).map(([title, lessons]) => ({
+    const lessonGroups = Object.entries(groups).map(([title, lessons]) => ({
         title,
-        lessons,
-        number: lessons[0].frontmatter.group,
+        lessons: lessons.sort((a, b) => a.lesson! - b.lesson!),
+        number: lessons[0].group!,
     })) satisfies LessonGroup[];
+
+    return lessonGroups.sort((a, b) => a.number - b.number);
 }

@@ -1,85 +1,15 @@
 import { notFound } from "next/navigation";
 
-import { getMDXComponent } from "next-contentlayer/hooks";
-import type { MDXComponents } from "mdx/types";
-
 import { Star } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/components/utils";
 
+import { allLessons } from "content-collections";
+import { MDXContent } from "@content-collections/mdx/react";
+
 import LessonNavigation from "./lesson-navigation";
-
-import { allMDXLessons } from "contentlayer/generated";
-
-import ImageWithCaption from "./components/image-with-caption";
-import AnnuityCalculator from "./components/annuity-calculator";
-import CoinFlipper from "./components/coin-flipper";
-
-function H1(props: any) {
-    return (
-        <h1 className="text-2xl font-semibold">
-            {props.children}
-        </h1>
-    )
-}
-
-function H2(props: any) {
-    return (
-        <h2 className="text-xl font-semibold">
-            {props.children}
-        </h2>
-    )
-}
-
-function H3(props: any) {
-    return (
-        <h3 className="font-semibold">
-            {props.children}
-        </h3>
-    )
-}
-
-function A(props: any) {
-    return (
-        <a className="text-sky-600 underline">
-            {props.children}
-        </a>
-    )
-}
-
-function Img(props: any) {
-    return (
-        <img
-            className="mx-auto"
-            {...props}            
-        />
-    )
-}
-
-function Blockquote(props: any) {
-    return (
-        <blockquote className='text-center border border-l-2 border-l-zinc-600 rounded-md p-3'>
-            {props.children}
-        </blockquote>
-    )
-}
-
-function UnorderedList(props: any) {
-    return (
-        <ul className='list-disc pl-6'>
-            {props.children}
-        </ul>
-    )
-}
-
-function ListItem(props: any) {
-    return (
-        <li>
-            {props.children}
-        </li>
-    )
-}
+import customComponents from "./components/custom-components";
 
 function StarRating({ rating }: { rating: number }) {
     return (
@@ -102,21 +32,11 @@ export default async function Page({
   }) {
     const slug = (await params).slug;
 
-    const lesson = allMDXLessons.find((lesson) => lesson._raw.flattenedPath === slug);
+    const lesson = allLessons.find((lesson) => lesson._meta.path === slug);
 
     if (!lesson) {
         return notFound();
     }
-
-    const mdxComponents: MDXComponents = {
-        h1: H1, h2: H2, h3: H3,
-        a: A, img: Img,
-        blockquote: Blockquote,
-        ul: UnorderedList, li: ListItem,
-        ImageWithCaption, AnnuityCalculator, CoinFlipper,
-    }
-
-    const MDXContent = getMDXComponent(lesson.body.code);
 
     return (
         <div className='flex-1 overflow-hidden'>
@@ -141,8 +61,11 @@ export default async function Page({
                     </div>
                     <Separator className='my-6' />
 
-                    <div className='text-wrap whitespace-pre-line'>
-                        <MDXContent components={mdxComponents} />
+                    <div className='text-wrap whitespace-pre-line mb-6'>
+                        <MDXContent
+                            code={lesson.mdx}
+                            components={customComponents}
+                        />
                     </div>
 
                     <LessonNavigation slug={slug} />
@@ -155,7 +78,7 @@ export default async function Page({
 // generate static routes at build time
 // see https://github.com/vercel/next.js/tree/canary/examples/blog-starter
 export async function generateStaticParams() {   
-    return allMDXLessons.map((lesson) => ({
-        slug: lesson._raw.flattenedPath,
+    return allLessons.map((lesson) => ({
+        slug: lesson._meta.path,
     }));
 }

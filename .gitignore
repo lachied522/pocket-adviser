@@ -39,5 +39,5 @@ next-env.d.ts
 .env*.local
 .env
 
-# content layer
-.contentlayer
+# content collections
+.content-collections
